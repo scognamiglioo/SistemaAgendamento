@@ -1,0 +1,92 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html 
+    lang="en"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="jakarta.faces.html"
+    xmlns:f="jakarta.faces.core"
+    xmlns:p="primefaces">
+    <f:view>
+        <h:head>
+            <title>Login Page</title>
+            <h:outputStylesheet name="css/login.css"/>
+            <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+
+        </h:head>
+
+        <h:body>
+            <header >
+
+                <h1 style="margin: 0;">Sistema de Agendamento</h1>
+            </header>
+
+            <p:outputPanel styleClass="login-container">
+                <div class="login-card">
+
+
+
+                    <h:form id="login">
+                        <p:messages id="messages" globalOnly="true"/>
+
+                        <h:panelGrid columns="2" cellpadding="5" 
+                                     style="margin: 0 auto; width: 100%;">
+
+                            <p:outputLabel for="cpf" value="CPF"/>
+                            <p:inputText id="cpf" 
+                                         value="#{loginController.username}"
+                                         required="true"
+                                         style="width: 100%"/>
+
+                            <p:outputLabel for="password" value="Password"/>
+                            <p:password id="password" 
+                                        value="#{loginController.password}"
+                                        style="width: 100%" />
+
+
+                        </h:panelGrid>
+
+                        <p:commandButton id="submit" 
+                                         update="@form" 
+                                         value="Login" 
+                                         action="#{loginController.execute}" 
+                                         ajax="false"
+                                         style="display:block; padding:10px; margin-top:10px;
+                                         border:1px solid #333; border-radius:4px;"/>
+
+                        <div style="text-align: center; margin-top: 15px;">
+                            <a href="./request_reset.xhtml"
+                               style="display:block; padding:10px; 
+                               border:1px solid #333; border-radius:4px;
+                               text-decoration:none; color:black;">
+                                Esqueci minha senha
+                            </a>
+                        </div>
+
+                    </h:form>
+
+                    <div style="text-align: center; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                        <p style="color: #666; margin-bottom: 10px;">Não tem uma conta?</p>
+                        <p:button value="Criar Nova Conta" 
+                                  outcome="/app/newlogin"
+                                  styleClass="secondary-button"/>
+                    </div>
+
+                </div>
+            </p:outputPanel>
+
+            <footer style="
+                    background-color: #000;
+                    color: white;
+                    padding: 20px;
+                    text-align: center;
+                    font-family: 'Poppins', sans-serif;
+                    font-size: 1.1rem;
+                    letter-spacing: 0.5px;">
+
+                <p style="margin: 0;">Web Dev / 2025</p>
+            </footer>
+
+        </h:body>
+    </f:view>
+</html>

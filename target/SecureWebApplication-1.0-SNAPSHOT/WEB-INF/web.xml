@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="https://jakarta.ee/xml/ns/jakartaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="https://jakarta.ee/xml/ns/jakartaee https://jakarta.ee/xml/ns/jakartaee/web-app_6_0.xsd"
+         version="6.0">
+    <context-param>
+        <param-name>jakarta.faces.PROJECT_STAGE</param-name>
+        <param-value>Development</param-value>
+    </context-param>
+    
+    <context-param>
+        <param-name>jakarta.faces.FACELETS_SKIP_COMMENTS</param-name>
+        <param-value>true</param-value>
+    </context-param>
+    
+    <servlet>
+        <servlet-name>Faces Servlet</servlet-name>
+        <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
+        <load-on-startup>1</load-on-startup>
+    </servlet>
+    
+    <servlet-mapping>
+        <servlet-name>Faces Servlet</servlet-name>
+        <url-pattern>*.xhtml</url-pattern>
+    </servlet-mapping>
+    
+    <security-role>
+        <description>System administrator</description>
+        <role-name>admin</role-name>
+    </security-role>
+    
+    <security-role>
+        <description>Common authenticated user</description>
+        <role-name>user</role-name>
+    </security-role>
+    
+    <security-role>
+        <description>Common authenticated user</description>
+        <role-name>funcionario</role-name>
+    </security-role>
+    
+    <!-- PÁGINAS PÚBLICAS -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Public Pages</web-resource-name>
+            <url-pattern>/login.xhtml</url-pattern>
+            <url-pattern>/activate.xhtml</url-pattern>
+            <url-pattern>/app/newlogin.xhtml</url-pattern> 
+        </web-resource-collection>
+        
+    </security-constraint>
+    
+    <security-constraint>
+        <display-name>Admin Role</display-name>
+        <web-resource-collection>
+            <web-resource-name>All App Pages</web-resource-name>
+            <url-pattern>/app/*</url-pattern>
+            <url-pattern>/password/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+    
+    <security-constraint>
+        <display-name>User Role</display-name>
+        <web-resource-collection>
+            <web-resource-name>Profile Page</web-resource-name>
+            <url-pattern>/app/index.xhtml</url-pattern>
+            <url-pattern>/password/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+            <role-name>user</role-name>
+        </auth-constraint>
+    </security-constraint>
+    
+    <!-- Área Funcionários -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Funcionario Area</web-resource-name>
+            <url-pattern>/funcionario/*</url-pattern>
+            <url-pattern>/password/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>funcionario</role-name>
+            
+        </auth-constraint>
+    </security-constraint>
+    
+    <session-config>
+        <session-timeout>
+            30
+        </session-timeout>
+    </session-config>
+    
+    <welcome-file-list>
+        
+        <welcome-file>login.xhtml</welcome-file>
+        
+    </welcome-file-list>
+    
+    <error-page>
+        <error-code>403</error-code>
+        <location>/WEB-INF/templates/forbidden.xhtml</location>
+    </error-page>
+</web-app>

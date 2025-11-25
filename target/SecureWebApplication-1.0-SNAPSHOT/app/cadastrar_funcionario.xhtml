@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title>Cadastrar Funcionário</title>
+        <h:outputStylesheet library="css" name="admin.css"/>
+    </h:head>
+    <h:body>
+        <ui:param name="Role" value="#{io.github.scognamiglioo.entities.Role}" />
+
+        <div class="login-container">
+            <div class="login-card" style="max-width:700px;">
+                <h1 style="text-align:center">Cadastrar Funcionário</h1>
+
+                <h:form id="formCreate">
+                    <h:messages globalOnly="false" showDetail="true" showSummary="true"
+                                style="color:red; font-weight:bold;"/>
+
+                    <h:panelGrid columns="2" cellpadding="5" style="margin: 0 auto; width: 100%;">
+
+                        <h:outputLabel for="nome" value="Nome *"/>
+                        <h:inputText id="nome" value="#{employeeController.employee.nome}" required="true" style="width:100%"/>
+
+                        <h:outputLabel for="cpf" value="CPF *"/>
+                        <h:inputText id="cpf" value="#{employeeController.employee.cpf}" required="true" style="width:100%"/>
+
+                        <h:outputLabel for="email" value="Email *"/>
+                        <h:inputText id="email" value="#{employeeController.employee.email}" required="true" style="width:100%"/>
+
+                        <h:outputLabel for="telefone" value="Telefone"/>
+                        <h:inputText id="telefone" value="#{employeeController.employee.telefone}" style="width:100%"/>
+
+                        <h:outputLabel for="username" value="Username *"/>
+                        <h:inputText id="username" value="#{employeeController.employee.username}" required="true" style="width:100%"/>
+
+                        <h:outputLabel for="password" value="Senha *"/>
+                        <h:inputSecret id="password"
+                                       value="#{employeeController.employee.password}"
+                                       required="true"
+                                       requiredMessage="Senha obrigatória"
+                                       style="width:100%"/>
+
+
+                        <h:outputLabel for="role" value="Perfil *"/>
+                        <h:selectOneMenu id="role" value="#{employeeController.selectedRole}">
+                            <f:selectItems value="#{employeeController.roles}"
+                                           var="r"
+                                           itemLabel="#{r}"
+                                           itemValue="#{r}" />
+
+                        </h:selectOneMenu>
+
+
+
+
+                        <h:outputLabel for="guiche" value="Guichê / Sala (apenas atendente)"/>
+                        <h:selectOneMenu id="guiche" value="#{employeeController.selectedGuicheId}" style="width:100%">
+                            <f:selectItem itemLabel="Nenhum" itemValue="#{null}" />
+
+
+                            <f:selectItems value="#{employeeController.guiches}" var="g" itemLabel="#{g.nome}" itemValue="#{g.id}" />
+                        </h:selectOneMenu>
+
+                        <h:outputLabel for="ativo" value="Ativo"/>
+                        <h:selectBooleanCheckbox id="ativo" value="#{employeeController.employee.ativo}" />
+
+                        <h:outputLabel />
+                        <h:commandButton value="Cadastrar" action="#{employeeController.save}" styleClass="admin-btn" />
+
+                    </h:panelGrid>
+
+                    <h:messages globalOnly="true" style="color:red;margin-top:10px;"/>
+
+
+                </h:form>
+
+
+
+
+            </div>
+        </div>
+    </h:body>
+</html>

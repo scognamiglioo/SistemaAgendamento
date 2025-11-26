@@ -207,7 +207,7 @@ public class DataService
     @Override
     public boolean isUserActive(String username) {
 
-        // 1) Tenta na tabela User
+        // tenta na tabela User
         try {
             Boolean result = em.createQuery(
                     "SELECT u.active FROM User u WHERE u.username = :username",
@@ -223,7 +223,7 @@ public class DataService
         } catch (Exception ignored) {
         }
 
-        // 2) Tenta na tabela Funcionario
+        // tenta na tabela Funcionario
         try {
             Boolean result2 = em.createQuery(
                     "SELECT f.ativo FROM Funcionario f WHERE f.username = :username",
@@ -344,7 +344,7 @@ public class DataService
 
     @Override
     public boolean cpfExists(String cpf) {
-        // supondo que cpf esteja normalizado (somente dígitos)
+        
         TypedQuery<Long> q = em.createQuery(
                 "SELECT COUNT(u) FROM User u WHERE u.cpf = :cpf", Long.class);
         q.setParameter("cpf", cpf);
@@ -383,7 +383,7 @@ public class DataService
         parameters.put("Pbkdf2PasswordHash.SaltSizeBytes", "64");
         passwordHasher.initialize(parameters);
 
-        // RECEBE A SENHA DO FORMULÁRIO
+        
         String hashedPassword = passwordHasher.generate(password.toCharArray());
 
         Guiche guiche = (guicheId != null) ? findGuicheById(guicheId) : null;

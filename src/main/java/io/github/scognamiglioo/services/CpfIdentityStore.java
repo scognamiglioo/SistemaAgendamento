@@ -37,9 +37,9 @@ public class CpfIdentityStore implements IdentityStore {
         String input = login.getCaller();
         String password = login.getPasswordAsString();
 
-        // --------------------------------------------------------
-        // 1) Se o usuário digitou CPF → converte para username
-        // --------------------------------------------------------
+        
+        // se o usuário digitou CPF → converte para username
+        
         if (input.matches("\\d{11}")) {
             String usernameFound = dataService.getUsernameByCpf(input);
 
@@ -50,18 +50,18 @@ public class CpfIdentityStore implements IdentityStore {
             input = usernameFound;
         }
 
-        // --------------------------------------------------------
-        // 2) Procura User ou Funcionario pelo username obtido
-        // --------------------------------------------------------
+        
+        // procura User ou Funcionario pelo username obtido
+        
         AuthRecord record = findByUsername(input);
 
         if (record == null) {
             return CredentialValidationResult.INVALID_RESULT;
         }
 
-        // --------------------------------------------------------
-        // 3) Verifica senha
-        // --------------------------------------------------------
+        
+        // verifica senha
+        
         if (!passwordHash.verify(password.toCharArray(), record.passwordHash)) {
             return CredentialValidationResult.INVALID_RESULT;
         }
@@ -71,9 +71,9 @@ public class CpfIdentityStore implements IdentityStore {
 
     private AuthRecord findByUsername(String username) {
 
-    // ---------------------------
-    // 1) Buscar USER
-    // ---------------------------
+    
+    // buscar user
+    
     try {
         User u = em.createQuery(
                 "SELECT u FROM User u WHERE u.username = :username", User.class)
@@ -81,16 +81,16 @@ public class CpfIdentityStore implements IdentityStore {
                 .getSingleResult();
 
         Set<String> roles = new HashSet<>();
-        roles.add(u.getUserGroup()); // Ex: "usuario"
+        roles.add(u.getUserGroup()); 
 
         return new AuthRecord(u.getUsername(), u.getPassword(), roles);
 
     } catch (NoResultException ignored) {}
 
 
-    // ---------------------------
-    // 2) Buscar FUNCIONARIO
-    // ---------------------------
+    
+    // buscar funcionario
+    
     try {
         Funcionario f = em.createQuery(
                 "SELECT f FROM Funcionario f WHERE f.username = :username", Funcionario.class)
@@ -98,17 +98,18 @@ public class CpfIdentityStore implements IdentityStore {
                 .getSingleResult();
 
         Set<String> roles = new HashSet<>();
-        roles.add(f.getRole().name()); // "admin", "funcionario", etc.
+        roles.add(f.getRole().name()); // "admin", "funcionario"
 
         return new AuthRecord(f.getUsername(), f.getPassword(), roles);
 
     } catch (NoResultException ignored) {}
 
 
-    // Ninguém encontrado
+    
     return null;
 }
 
 
     record AuthRecord(String username, String passwordHash, Set<String> roles) {}
 }
+

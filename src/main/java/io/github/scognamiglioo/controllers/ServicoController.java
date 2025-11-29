@@ -186,6 +186,58 @@ public class ServicoController implements Serializable {
         loadServicos();
     }
 
+    public void loadServicoForEdit() {
+        if (selectedServicoId != null && selectedServicoId > 0) {
+            try {
+                Servico servicoParaEditar = servicoService.findServicoById(selectedServicoId);
+                if (servicoParaEditar != null) {
+                    servico = new Servico();
+                    servico.setNome(servicoParaEditar.getNome());
+                    servico.setValor(servicoParaEditar.getValor());
+                    editMode = true;
+                } else {
+                    FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_ERROR, "Serviço não encontrado!", null));
+                }
+            } catch (Exception ex) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro ao carregar serviço: " + ex.getMessage(), null));
+            }
+        } else {
+            editMode = false;
+            servico = new Servico();
+        }
+    }
+
+    public String saveAndReturn() {
+        String result = save();
+        if (result == null) { // Se save() retornou null, significa sucesso
+            // Verifica se não há mensagens de erro
+            boolean hasErrors = FacesContext.getCurrentInstance()
+                .getMessageList()
+                .stream()
+                .anyMatch(msg -> msg.getSeverity().equals(FacesMessage.SEVERITY_ERROR));
+                
+            if (!hasErrors) {
+                return "/app/servico/gerenciar_servicos.xhtml?faces-redirect=true";
+            }
+        }
+        return null;
+    }
+
+    public String navigateToEdit(Long servicoId) {
+        selectedServicoId = servicoId;
+        return "/app/servico/adicionar_servico.xhtml?faces-redirect=true&id=" + servicoId;
+    }
+
+    public String navigateToAdd() {
+        return "/app/servico/adicionar_servico.xhtml?faces-redirect=true";
+    }
+
+    public String navigateToList() {
+        return "/app/servico/gerenciar_servicos.xhtml?faces-redirect=true";
+    }
+
     // Getters e Setters
     public Servico getServico() {
         return servico;

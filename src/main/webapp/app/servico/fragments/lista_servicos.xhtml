@@ -1,0 +1,118 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+    <div class="servicos-list">
+        <h3>Lista de Serviços (#{servicoController.servicos.size()} encontrados)</h3>
+        
+        <h:panelGroup rendered="#{empty servicoController.servicos}">
+            <div class="no-results">
+                <p>Nenhum serviço encontrado.</p>
+                <h:form>
+                    <h:commandButton value="Cadastrar Primeiro Serviço" 
+                                   action="#{servicoController.navigateToAdd}"
+                                   styleClass="btn btn-primary" />
+                </h:form>
+            </div>
+        </h:panelGroup>
+
+        <h:panelGroup rendered="#{not empty servicoController.servicos}">
+            <div class="table-responsive">
+                <h:dataTable value="#{servicoController.servicos}" 
+                           var="servico" 
+                           styleClass="servicos-table table table-striped"
+                           headerClass="table-header"
+                           rowClasses="table-row-odd,table-row-even">
+                    
+                    <h:column>
+                        <f:facet name="header">ID</f:facet>
+                        #{servico.id}
+                    </h:column>
+                    
+                    <h:column>
+                        <f:facet name="header">Nome</f:facet>
+                        #{servico.nome}
+                    </h:column>
+                    
+                    <h:column>
+                        <f:facet name="header">Valor</f:facet>
+                        <h:outputText value="#{servico.valor}">
+                            <f:convertNumber type="currency" currencySymbol="R$ " />
+                        </h:outputText>
+                    </h:column>
+                    
+                    <h:column>
+                        <f:facet name="header">Ações</f:facet>
+                        <div class="action-buttons">
+                            <!-- Botão Editar -->
+                            <h:commandButton value="Editar" 
+                                           action="#{servicoController.navigateToEdit(servico.id)}"
+                                           styleClass="btn btn-sm btn-warning"
+                                           title="Editar serviço" />
+                            
+                            <!-- Botão Excluir -->
+                            <h:commandButton value="Excluir" 
+                                           action="#{servicoController.delete(servico.id)}"
+                                           styleClass="btn btn-sm btn-danger"
+                                           title="Excluir serviço"
+                                           update="lista-servicos"
+                                           onclick="return confirm('Tem certeza que deseja excluir o serviço #{servico.nome}?');" />
+                            
+                            <!-- Botão Funcionários -->
+                            <h:commandButton value="Funcionários" 
+                                           action="#{servicoController.loadFuncionariosPorServico(servico.id)}"
+                                           styleClass="btn btn-sm btn-info"
+                                           title="Gerenciar funcionários"
+                                           update="funcionarios-panel" />
+                        </div>
+                    </h:column>
+                </h:dataTable>
+            </div>
+        </h:panelGroup>
+
+        <!-- Painel de Funcionários -->
+        <h:panelGroup id="funcionarios-panel" 
+                      rendered="#{not empty servicoController.funcionariosPorServico or servicoController.servicoParaAssociar != null}">
+            <div class="funcionarios-section">
+                <h4>Funcionários do Serviço</h4>
+                
+                <!-- Lista de funcionários associados -->
+                <h:panelGroup rendered="#{not empty servicoController.funcionariosPorServico}">
+                    <ul class="funcionarios-list">
+                        <ui:repeat value="#{servicoController.funcionariosPorServico}" var="func">
+                            <li class="funcionario-item">
+                                <span>#{func.nome} - #{func.cpf}</span>
+                                <h:commandButton value="Remover" 
+                                               action="#{servicoController.desassociarFuncionario(func.id)}"
+                                               styleClass="btn btn-xs btn-outline-danger"
+                                               update="funcionarios-panel"
+                                               onclick="return confirm('Remover #{func.nome} deste serviço?');" />
+                            </li>
+                        </ui:repeat>
+                    </ul>
+                </h:panelGroup>
+
+                <!-- Formulário para associar novo funcionário -->
+                <div class="associar-funcionario">
+                    <h5>Associar Funcionário</h5>
+                    <div class="form-row">
+                        <h:selectOneMenu value="#{servicoController.selectedFuncionarioId}"
+                                       styleClass="form-control">
+                            <f:selectItem itemLabel="Selecione um funcionário..." itemValue="" />
+                            <f:selectItems value="#{servicoController.todosFuncionarios}"
+                                         var="func"
+                                         itemLabel="#{func.nome} - #{func.cpf}"
+                                         itemValue="#{func.id}" />
+                        </h:selectOneMenu>
+                        <h:commandButton value="Associar" 
+                                       action="#{servicoController.associarFuncionario}"
+                                       styleClass="btn btn-success"
+                                       update="funcionarios-panel" />
+                    </div>
+                </div>
+            </div>
+        </h:panelGroup>
+    </div>
+
+</ui:composition>

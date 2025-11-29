@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title>Gerenciar Serviços</title>
+        <h:outputStylesheet library="css" name="admin.css"/>
+        <h:outputStylesheet library="css" name="servicos.css"/>
+    </h:head>
+    
+    <h:body>
+        <div class="servicos-container">
+            <!-- Header -->
+            <div class="servicos-header">
+                <h1>Gerenciamento de Serviços</h1>
+                <div class="servicos-actions">
+                    <h:form>
+                        <h:commandButton value="Novo Serviço" 
+                                       action="#{servicoController.navigateToAdd}"
+                                       styleClass="btn btn-primary" />
+                        <h:commandButton value="Voltar ao Painel" 
+                                       action="/app/admin.xhtml?faces-redirect=true"
+                                       styleClass="btn btn-secondary"
+                                       immediate="true" />
+                    </h:form>
+                </div>
+            </div>
+
+            <h:form>
+                <!-- Filtros de Busca -->
+                <div class="servicos-filters">
+                    <h3>Buscar Serviços</h3>
+                    <div class="filter-row">
+                        <h:inputText value="#{servicoController.searchNome}" 
+                                   placeholder="Buscar por nome..."
+                                   styleClass="form-control search-input" />
+                        <h:commandButton value="Buscar" 
+                                       action="#{servicoController.searchByNome}"
+                                       styleClass="btn btn-info" 
+                                       update="lista-servicos"/>
+                        <h:commandButton value="Limpar" 
+                                       action="#{servicoController.clearFilters}"
+                                       styleClass="btn btn-secondary" 
+                                       update="lista-servicos"/>
+                    </div>
+                </div>
+
+                <!-- Lista de Serviços -->
+                <h:panelGroup id="lista-servicos">
+                    <ui:include src="fragments/lista_servicos.xhtml" />
+                </h:panelGroup>
+
+            </h:form>
+        </div>
+    </h:body>
+</html>

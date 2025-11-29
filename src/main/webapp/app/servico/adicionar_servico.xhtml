@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+
+    <h:head>
+        <title>
+            <h:outputText value="Editar Serviço" rendered="#{servicoController.editMode}" />
+            <h:outputText value="Novo Serviço" rendered="#{!servicoController.editMode}" />
+        </title>
+        <h:outputStylesheet library="css" name="admin.css"/>
+        <h:outputStylesheet library="css" name="servicos.css"/>
+    </h:head>
+    
+    <h:body>
+        <f:metadata>
+            <f:viewParam name="id" value="#{servicoController.selectedServicoId}" />
+            <f:viewAction action="#{servicoController.loadServicoForEdit}" 
+                         rendered="#{not empty param.id}" />
+        </f:metadata>
+
+        <div class="servicos-container">
+            <!-- Header -->
+            <div class="servicos-header">
+                <h1>#{servicoController.formTitle}</h1>
+                <div class="servicos-actions">
+                    <h:form>
+                        <h:commandButton value="Voltar à Lista" 
+                                       action="#{servicoController.navigateToList}"
+                                       styleClass="btn btn-secondary"
+                                       immediate="true" />
+                    </h:form>
+                </div>
+            </div>
+
+            <!-- Formulário -->
+            <h:form>
+                <ui:include src="fragments/form_servico.xhtml" />
+            </h:form>
+        </div>
+    </h:body>
+</html>

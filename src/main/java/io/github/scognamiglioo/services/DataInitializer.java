@@ -187,6 +187,102 @@ public class DataInitializer {
             
             System.out.println(">>> Funcionários iniciais criados.");
         }
+        
+        // Associar funcionários aos serviços (relacionamento many-to-many)
+        if (dataService.getAllFuncionarios().size() > 0 && servicoService.getAllServicos().size() > 0) {
+            
+            try {
+                // Buscar alguns funcionários e serviços para criar associações
+                var funcionarios = dataService.getAllFuncionarios();
+                var servicos = servicoService.getAllServicos();
+                
+                // Encontrar médicos/atendentes (Dr. Roberto, Dra. Patricia, etc.)
+                Funcionario drRoberto = funcionarios.stream()
+                    .filter(f -> f.getNome().contains("Roberto Almeida"))
+                    .findFirst().orElse(null);
+                    
+                Funcionario draPatricia = funcionarios.stream()
+                    .filter(f -> f.getNome().contains("Patricia Fernandes"))
+                    .findFirst().orElse(null);
+                    
+                Funcionario drJoao = funcionarios.stream()
+                    .filter(f -> f.getNome().contains("João Oliveira"))
+                    .findFirst().orElse(null);
+                    
+                Funcionario draFernanda = funcionarios.stream()
+                    .filter(f -> f.getNome().contains("Fernanda Souza"))
+                    .findFirst().orElse(null);
+                    
+                Funcionario enfLucas = funcionarios.stream()
+                    .filter(f -> f.getNome().contains("Lucas Santos"))
+                    .findFirst().orElse(null);
+                
+                // Encontrar serviços específicos
+                var consultaMedica = servicos.stream()
+                    .filter(s -> s.getNome().contains("Consulta Médica Geral"))
+                    .findFirst().orElse(null);
+                    
+                var examesSangue = servicos.stream()
+                    .filter(s -> s.getNome().contains("Exame de Sangue"))
+                    .findFirst().orElse(null);
+                    
+                var raioX = servicos.stream()
+                    .filter(s -> s.getNome().contains("Raio-X"))
+                    .findFirst().orElse(null);
+                    
+                var consultaCardio = servicos.stream()
+                    .filter(s -> s.getNome().contains("Consulta Cardiológica"))
+                    .findFirst().orElse(null);
+                    
+                var consultaDermo = servicos.stream()
+                    .filter(s -> s.getNome().contains("Consulta Dermatológica"))
+                    .findFirst().orElse(null);
+                    
+                var vacinacao = servicos.stream()
+                    .filter(s -> s.getNome().contains("Vacinação"))
+                    .findFirst().orElse(null);
+                    
+                var consultaPediatrica = servicos.stream()
+                    .filter(s -> s.getNome().contains("Consulta Pediátrica"))
+                    .findFirst().orElse(null);
+                
+                // Criar associações lógicas
+                
+                // Dr. Roberto (Clínico Geral) - pode fazer consultas gerais, exames básicos
+                if (drRoberto != null) {
+                    if (consultaMedica != null) servicoService.associarFuncionarioAoServico(drRoberto.getId(), consultaMedica.getId());
+                    if (examesSangue != null) servicoService.associarFuncionarioAoServico(drRoberto.getId(), examesSangue.getId());
+                }
+                
+                // Dra. Patricia (Cardiologista) - especializada em cardiologia
+                if (draPatricia != null) {
+                    if (consultaCardio != null) servicoService.associarFuncionarioAoServico(draPatricia.getId(), consultaCardio.getId());
+                    if (consultaMedica != null) servicoService.associarFuncionarioAoServico(draPatricia.getId(), consultaMedica.getId());
+                }
+                
+                // Dr. João (Radiologista) - exames de imagem
+                if (drJoao != null) {
+                    if (raioX != null) servicoService.associarFuncionarioAoServico(drJoao.getId(), raioX.getId());
+                }
+                
+                // Dra. Fernanda (Dermatologista + Pediatra)
+                if (draFernanda != null) {
+                    if (consultaDermo != null) servicoService.associarFuncionarioAoServico(draFernanda.getId(), consultaDermo.getId());
+                    if (consultaPediatrica != null) servicoService.associarFuncionarioAoServico(draFernanda.getId(), consultaPediatrica.getId());
+                }
+                
+                // Enfermeiro Lucas - vacinação e procedimentos básicos
+                if (enfLucas != null) {
+                    if (vacinacao != null) servicoService.associarFuncionarioAoServico(enfLucas.getId(), vacinacao.getId());
+                    if (examesSangue != null) servicoService.associarFuncionarioAoServico(enfLucas.getId(), examesSangue.getId());
+                }
+                
+                System.out.println(">>> Associações funcionário-serviço criadas.");
+                
+            } catch (Exception e) {
+                System.err.println(">>> Erro ao criar associações funcionário-serviço: " + e.getMessage());
+            }
+        }
     }
 
 }

@@ -1,6 +1,8 @@
 package io.github.scognamiglioo.entities;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -57,6 +59,14 @@ public class Funcionario implements Serializable {
 
     @Column(nullable = false)
     private boolean ativo = true;
+
+    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @JoinTable(
+        name = "funcionario_servico",
+        joinColumns = @JoinColumn(name = "funcionario_id"),
+        inverseJoinColumns = @JoinColumn(name = "servico_id")
+    )
+    private List<Servico> servicos = new ArrayList<>();
 
     public Funcionario() {
     }
@@ -154,6 +164,33 @@ public class Funcionario implements Serializable {
 
     public void setAtivo(boolean ativo) {
         this.ativo = ativo;
+    }
+
+    public List<Servico> getServicos() {
+        return servicos;
+    }
+
+    public void setServicos(List<Servico> servicos) {
+        this.servicos = servicos;
+    }
+
+    // Métodos utilitários para gerenciar relacionamento
+    public void addServico(Servico servico) {
+        if (!servicos.contains(servico)) {
+            servicos.add(servico);
+            if (!servico.getFuncionarios().contains(this)) {
+                servico.getFuncionarios().add(this);
+            }
+        }
+    }
+
+    public void removeServico(Servico servico) {
+        if (servicos.contains(servico)) {
+            servicos.remove(servico);
+            if (servico.getFuncionarios().contains(this)) {
+                servico.getFuncionarios().remove(this);
+            }
+        }
     }
 
     @Override

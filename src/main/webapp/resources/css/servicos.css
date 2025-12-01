@@ -812,5 +812,75 @@ div[id*="funcionarios-content"][style*="display: none"] {
     
     .form-actions {
         flex-direction: column;
+    }    
 
-    }
+
+/* ========== SELEÇÃO DE FUNCIONÁRIOS NO FORMULÁRIO ========== */
+.funcionarios-selection {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #dee2e6;
+    margin-top: 10px;
+}
+
+.funcionarios-list-form {
+    max-height: 300px;
+    overflow-y: auto;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 15px;
+    background: white;
+    margin: 10px 0;
+}
+
+.funcionarios-checkboxes {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.funcionarios-checkboxes table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0 8px;
+}
+
+.funcionarios-checkboxes td {
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    transition: background-color 0.2s ease;
+}
+
+.funcionarios-checkboxes td:hover {
+    background: #e9ecef;
+}
+
+.funcionarios-checkboxes input[type="checkbox"] {
+    margin-right: 10px;
+    transform: scale(1.2);
+}
+
+.funcionarios-checkboxes label {
+    cursor: pointer;
+    font-weight: 500;
+    color: #495057;
+}
+
+.funcionarios-atuais {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #dee2e6;
+}
+
+.funcionarios-atuais h6 {
+    margin: 0 0 10px 0;
+    color: #495057;
+    font-weight: bold;
+}
+
+.funcionarios-atuais .funcionarios-simple-list {
+    max-height: 200px;
+    overflow-y: auto;
+}

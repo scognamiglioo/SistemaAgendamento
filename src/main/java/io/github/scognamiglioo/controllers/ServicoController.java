@@ -51,6 +51,10 @@ public class ServicoController implements Serializable {
     private List<Funcionario> todosFuncionarios;
     private Long selectedFuncionarioId;
     private Map<Long, List<Funcionario>> funcionariosPorServicoMap;
+    
+    // Para seleção múltipla de funcionários na edição/criação
+    private List<Long> selectedFuncionarioIds = new ArrayList<>();
+    private List<Funcionario> funcionariosDoServico = new ArrayList<>();
 
     @PostConstruct
     public void init() {
@@ -74,8 +78,15 @@ public class ServicoController implements Serializable {
         try {
             if (editMode && selectedServicoId != null) {
                 updateExistingServico();
+                // Salva associações de funcionários para serviço existente
+                salvarAssociacoesFuncionarios();
             } else {
-                createNewServico();
+                Servico servicoCriado = createNewServico();
+                // Para novo serviço, salva associações se houver funcionários selecionados
+                if (servicoCriado != null && !selectedFuncionarioIds.isEmpty()) {
+                    selectedServicoId = servicoCriado.getId();
+                    salvarAssociacoesFuncionarios();
+                }
             }
             
             resetForm();
@@ -103,15 +114,18 @@ public class ServicoController implements Serializable {
         }
     }
     
-    private void createNewServico() {
-        servicoService.createServico(servico.getNome(), servico.getValor());
+    private Servico createNewServico() {
+        Servico servicoCriado = servicoService.createServico(servico.getNome(), servico.getValor());
         addSuccessMessage("Serviço criado com sucesso!");
+        return servicoCriado;
     }
     
     private void resetForm() {
         servico = new Servico();
         editMode = false;
         selectedServicoId = null;
+        selectedFuncionarioIds.clear();
+        funcionariosDoServico.clear();
     }
 
     public void edit(Long id) {
@@ -199,14 +213,51 @@ public class ServicoController implements Serializable {
         }
     }
     
-    public void associarFuncionario() {
-        // Este método precisa ser implementado conforme a necessidade
-        // Mantido para compatibilidade com possível funcionalidade futura
+    /**
+     * Salva as associações de funcionários ao serviço (método privado)
+     */
+    private void salvarAssociacoesFuncionarios() {
+        if (selectedServicoId != null && selectedFuncionarioIds != null) {
+            try {
+                // Remove todas as associações atuais
+                List<Funcionario> funcionariosAtuais = servicoService.findFuncionariosByServico(selectedServicoId);
+                for (Funcionario func : funcionariosAtuais) {
+                    servicoService.desassociarFuncionarioDoServico(func.getId(), selectedServicoId);
+                }
+                
+                // Adiciona as novas associações
+                for (Long funcionarioId : selectedFuncionarioIds) {
+                    servicoService.associarFuncionarioAoServico(funcionarioId, selectedServicoId);
+                }
+                
+                loadAllFuncionariosPorServico();
+                
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, "Erro ao salvar associações", ex);
+                addErrorMessage("Erro ao associar funcionários: " + ex.getMessage());
+            }
+        }
     }
-
-    public void desassociarFuncionario(Long funcionarioId) {
-        // Este método precisa ser implementado conforme a necessidade  
-        // Mantido para compatibilidade com possível funcionalidade futura
+    
+    /**
+     * Carrega os funcionários já associados ao serviço para edição
+     */
+    public void loadFuncionariosDoServico() {
+        if (selectedServicoId != null) {
+            try {
+                funcionariosDoServico = servicoService.findFuncionariosByServico(selectedServicoId);
+                selectedFuncionarioIds.clear();
+                
+                // Preenche a lista de IDs selecionados
+                for (Funcionario func : funcionariosDoServico) {
+                    selectedFuncionarioIds.add(func.getId());
+                }
+                
+            } catch (Exception ex) {
+                LOGGER.log(Level.SEVERE, "Erro ao carregar funcionários do serviço", ex);
+                addErrorMessage("Erro ao carregar funcionários associados");
+            }
+        }
     }
 
     // ========== NAVEGAÇÃO ==========
@@ -220,6 +271,9 @@ public class ServicoController implements Serializable {
                     servico.setNome(servicoParaEditar.getNome());
                     servico.setValor(servicoParaEditar.getValor());
                     editMode = true;
+                    
+                    // Carrega funcionários associados para edição
+                    loadFuncionariosDoServico();
                 } else {
                     addErrorMessage("Serviço não encontrado!");
                 }
@@ -230,6 +284,8 @@ public class ServicoController implements Serializable {
         } else {
             editMode = false;
             servico = new Servico();
+            selectedFuncionarioIds.clear();
+            funcionariosDoServico.clear();
         }
     }
 
@@ -357,5 +413,21 @@ public class ServicoController implements Serializable {
         }
         List<Funcionario> funcionarios = funcionariosPorServicoMap.get(servicoId);
         return funcionarios != null ? funcionarios.size() : 0;
+    }
+    
+    public List<Long> getSelectedFuncionarioIds() {
+        return selectedFuncionarioIds;
+    }
+
+    public void setSelectedFuncionarioIds(List<Long> selectedFuncionarioIds) {
+        this.selectedFuncionarioIds = selectedFuncionarioIds;
+    }
+
+    public List<Funcionario> getFuncionariosDoServico() {
+        return funcionariosDoServico;
+    }
+
+    public void setFuncionariosDoServico(List<Funcionario> funcionariosDoServico) {
+        this.funcionariosDoServico = funcionariosDoServico;
     }
 }

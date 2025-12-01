@@ -6,6 +6,7 @@
     <div class="servicos-list">
         <h3>Lista de Serviços (#{servicoController.servicosCount} encontrados)</h3>
         
+        <!-- Estado sem serviços -->
         <h:panelGroup rendered="#{empty servicoController.servicos}">
             <div class="no-results">
                 <p>Nenhum serviço encontrado.</p>
@@ -17,116 +18,111 @@
             </div>
         </h:panelGroup>
         
+        <!-- Lista de serviços com funcionalidade JavaScript otimizada -->
         <h:panelGroup rendered="#{not empty servicoController.servicos}">
             <script type="text/javascript">
+                // Função otimizada para toggle de funcionários
                 function toggleFuncionarios(servicoId) {
-                    console.log('Toggle funcionários para serviço:', servicoId);
-                    
-                    var contentDiv = document.getElementById('funcionarios-content-' + servicoId);
-                    var button = document.getElementById('btn-funcionarios-' + servicoId);
+                    const contentDiv = document.getElementById('funcionarios-content-' + servicoId);
+                    const button = document.getElementById('btn-funcionarios-' + servicoId);
                     
                     if (!contentDiv) {
-                        console.error('Div não encontrada: funcionarios-content-' + servicoId);
+                        console.error('Elemento não encontrado: funcionarios-content-' + servicoId);
                         return;
                     }
                     
-                    if (contentDiv.style.display === 'none' || contentDiv.style.display === '') {
+                    const isHidden = contentDiv.style.display === 'none' || contentDiv.style.display === '';
+                    
+                    if (isHidden) {
                         // Expandir
                         contentDiv.style.display = 'block';
                         contentDiv.style.padding = '15px 20px';
-                        if (button) button.innerHTML = '⮟ Esconder Funcionários';
-                        console.log('✅ Funcionários expandidos');
+                        if (button) button.textContent = '⮟ Esconder Funcionários';
                     } else {
                         // Esconder
                         contentDiv.style.display = 'none';
                         contentDiv.style.padding = '0';
-                        if (button) button.innerHTML = '⮞ Ver Funcionários';
-                        console.log('❌ Funcionários escondidos');
+                        if (button) button.textContent = '⮞ Ver Funcionários';
                     }
                 }
-                
-                // Debug inicial
-                document.addEventListener('DOMContentLoaded', function() {
-                    var divs = document.querySelectorAll('[id^="funcionarios-content-"]');
-                    console.log('Página carregada - ' + divs.length + ' divs de funcionários encontradas');
-                });
             </script>
             
-            <!-- Formulário único englobando todas as ações -->
+            <!-- Formulário único otimizado -->
             <h:form id="form-servicos">
-                
-            <div class="servicos-cards">
-                <ui:repeat value="#{servicoController.servicos}" var="servico" varStatus="status">
-                    <div class="servico-card">
-                        <!-- Cabeçalho do Serviço -->
-                        <div class="servico-header">
-                            <div class="servico-info">
-                                <h4>#{servico.nome}</h4>
-                                <div class="servico-details">
-                                    <span class="servico-id">ID: #{servico.id}</span>
-                                    <span class="servico-valor">
-                                        <h:outputText value="#{servico.valor}">
-                                            <f:convertNumber type="currency" currencySymbol="R$ " />
-                                        </h:outputText>
-                                    </span>
+                <div class="servicos-cards">
+                    <ui:repeat value="#{servicoController.servicos}" var="servico">
+                        <div class="servico-card">
+                            <!-- Cabeçalho do Serviço -->
+                            <div class="servico-header">
+                                <div class="servico-info">
+                                    <h4>#{servico.nome}</h4>
+                                    <div class="servico-details">
+                                        <span class="servico-id">ID: #{servico.id}</span>
+                                        <span class="servico-valor">
+                                            <h:outputText value="#{servico.valor}">
+                                                <f:convertNumber type="currency" currencySymbol="R$ " />
+                                            </h:outputText>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="servico-actions">
+                                    <h:commandButton value="Editar" 
+                                                   action="#{servicoController.navigateToEdit(servico.id)}"
+                                                   styleClass="btn btn-sm btn-warning"
+                                                   title="Editar serviço"
+                                                   immediate="true" />
+                                    
+                                    <h:commandButton value="Excluir" 
+                                                   action="#{servicoController.delete(servico.id)}"
+                                                   styleClass="btn btn-sm btn-danger"
+                                                   title="Excluir serviço"
+                                                   onclick="return confirm('Tem certeza que deseja excluir o serviço #{servico.nome}?');"
+                                                   immediate="true">
+                                        <f:ajax render="@form" />
+                                    </h:commandButton>
                                 </div>
                             </div>
-                            <div class="servico-actions">
-                                <h:commandButton value="Editar" 
-                                               action="#{servicoController.navigateToEdit(servico.id)}"
-                                               styleClass="btn btn-sm btn-warning"
-                                               title="Editar serviço"
-                                               immediate="true" />
+                            
+                            <!-- Toggle para funcionários -->
+                            <div class="funcionarios-toggle">
+                                <button 
+                                    id="btn-funcionarios-#{servico.id}"
+                                    type="button"
+                                    class="btn-funcionarios-arrow"
+                                    onclick="toggleFuncionarios('#{servico.id}');">
+                                    ⮞ Ver Funcionários
+                                </button>
+                            </div>
                                 
-                                <h:commandButton value="Excluir" 
-                                               action="#{servicoController.delete(servico.id)}"
-                                               styleClass="btn btn-sm btn-danger"
-                                               title="Excluir serviço"
-                                               onclick="return confirm('Tem certeza que deseja excluir o serviço #{servico.nome}?');"
-                                               immediate="true">
-                                    <f:ajax render="@form" />
-                                </h:commandButton>
+                            <!-- Conteúdo dos funcionários (sempre renderizado, controle via JavaScript) -->
+                            <div id="funcionarios-content-#{servico.id}" style="display: none;">
+                                
+                                <!-- Lista de funcionários quando existem -->
+                                <h:panelGroup rendered="#{not empty servicoController.funcionariosPorServicoMap[servico.id]}">
+                                    <div style="background: #eeffee; padding: 10px; margin-bottom: 10px; font-size: 12px;">
+                                        ✅ #{servicoController.getFuncionariosCountByServico(servico.id)} funcionário(s) encontrado(s)
+                                    </div>
+                                    <ul class="funcionarios-simple-list">
+                                        <ui:repeat value="#{servicoController.funcionariosPorServicoMap[servico.id]}" var="funcionario">
+                                            <li>
+                                                <strong>#{funcionario.nome}</strong><br/>
+                                                <small>Email: #{funcionario.email} | CPF: #{funcionario.cpf}</small>
+                                            </li>
+                                        </ui:repeat>
+                                    </ul>
+                                </h:panelGroup>
+                                
+                                <!-- Mensagem quando não há funcionários -->
+                                <h:panelGroup rendered="#{empty servicoController.funcionariosPorServicoMap[servico.id]}">
+                                    <div class="no-funcionarios">
+                                        <p>❌ Nenhum funcionário associado a este serviço</p>
+                                    </div>
+                                </h:panelGroup>
+                                
                             </div>
                         </div>
-                        
-                        <!-- Botão para mostrar funcionários (SEM AJAX, apenas JavaScript) -->
-                        <div class="funcionarios-toggle">
-                            <button 
-                                id="btn-funcionarios-#{servico.id}"
-                                type="button"
-                                class="btn-funcionarios-arrow"
-                                onclick="toggleFuncionarios('#{servico.id}');">
-                                ⮞ Ver Funcionários
-                            </button>
-                        </div>
-                            
-                        <!-- Lista de funcionários (sempre renderizada, apenas escondida) -->
-                        <div id="funcionarios-content-#{servico.id}" 
-                             style="display: none; background: #f8f9fa; padding: 0; border-top: 1px solid #dee2e6;">
-                            
-                            <h:panelGroup rendered="#{servicoController.funcionariosPorServicoMap != null and not empty servicoController.funcionariosPorServicoMap[servico.id]}">
-                                <div style="background: #eeffee; padding: 10px; margin-bottom: 10px; font-size: 12px;">
-                                    ✅ #{servicoController.getFuncionariosCountByServico(servico.id)} funcionário(s) encontrado(s)
-                                </div>
-                                <ul class="funcionarios-simple-list">
-                                    <ui:repeat value="#{servicoController.funcionariosPorServicoMap[servico.id]}" var="funcionario" varStatus="loop">
-                                        <li>
-                                            <strong>#{funcionario.nome}</strong><br/>
-                                            <small>Email: #{funcionario.email} | CPF: #{funcionario.cpf}</small>
-                                        </li>
-                                    </ui:repeat>
-                                </ul>
-                            </h:panelGroup>
-                            
-                            <h:panelGroup rendered="#{servicoController.funcionariosPorServicoMap == null or empty servicoController.funcionariosPorServicoMap[servico.id]}">
-                                <div class="no-funcionarios">
-                                    <p>❌ Nenhum funcionário associado a este serviço</p>
-                                </div>
-                            </h:panelGroup>
-                        </div>
-                    </div>
-                </ui:repeat>
-            </div>
+                    </ui:repeat>
+                </div>
             </h:form>
         </h:panelGroup>
     </div>

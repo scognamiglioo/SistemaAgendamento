@@ -1,0 +1,408 @@
+/* ===========================
+   ESTILOS PARA GERENCIAMENTO DE CARGOS
+   =========================== */
+
+/* Mensagens de erro de validação JSF */
+.ui-messages,
+.ui-messages-error,
+.field-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.ui-messages-error-summary,
+.ui-messages-error-detail {
+    color: #721c24;
+    font-weight: 500;
+}
+
+.ui-messages-error-icon {
+    margin-right: 0.5rem;
+}
+
+/* Mensagens flutuantes */
+.floating-toast.comic-bubble {
+    background: white;
+    border: 3px solid #dc3545;
+    border-radius: 15px;
+    padding: 15px 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    font-size: 14px;
+    font-weight: 600;
+    max-width: 300px;
+    min-width: 250px;
+    opacity: 0;
+    transform: translateY(-20px) scale(0.8);
+    transition: all 0.3s ease;
+    position: fixed;
+    z-index: 99999;
+    text-align: center;
+    color: #333;
+}
+
+.floating-toast.comic-bubble.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.floating-toast.toast-success {
+    border-color: #28a745;
+    background: #d4edda;
+}
+
+.floating-toast.toast-error {
+    border-color: #dc3545;
+    background: #f8d7da;
+}
+
+.toast-icon {
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+.toast-text {
+    line-height: 1.4;
+}
+
+.toast-arrow {
+    position: absolute;
+    bottom: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 15px solid #dc3545;
+}
+
+.floating-toast.toast-success .toast-arrow {
+    border-top-color: #28a745;
+}
+
+/* Formulário de cargo */
+.cargo-form {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.cargo-form .form-group {
+    margin-bottom: 1.5rem;
+}
+
+.cargo-form .form-label.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+.cargo-form .form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #e1e5e9;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.cargo-form .form-control:focus {
+    border-color: #0d6efd;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.cargo-form .field-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+}
+
+/* Ações do formulário */
+.cargo-form .form-actions {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e1e5e9;
+}
+
+.cargo-form .form-actions .btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.cargo-form .form-actions .btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+.cargo-form .form-actions .btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.cargo-form .form-actions .btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.cargo-form .form-actions .btn-outline-primary {
+    color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.cargo-form .form-actions .btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+
+/* Tabela de cargos */
+.table-responsive {
+    overflow-x: auto;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 1rem;
+}
+
+.table th,
+.table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #e1e5e9;
+    vertical-align: middle;
+}
+
+.table th {
+    background-color: #f8f9fa;
+    font-weight: 600;
+    color: #495057;
+    border-bottom: 2px solid #e1e5e9;
+}
+
+.table tbody tr:hover {
+    background-color: #f8f9fa;
+}
+
+/* Células específicas */
+.cargo-name strong {
+    color: #212529;
+    font-size: 1.1rem;
+}
+
+.funcionarios-count .badge {
+    background-color: #0d6efd;
+    color: white;
+    padding: 0.375rem 0.75rem;
+    border-radius: 0.25rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.actions {
+    white-space: nowrap;
+}
+
+.actions .btn {
+    margin-right: 0.5rem;
+    padding: 0.375rem 0.75rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+    border-radius: 0.25rem;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+}
+
+.actions .btn-sm {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.8rem;
+}
+
+.actions .btn-outline-primary {
+    color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.actions .btn-outline-primary:hover {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.actions .btn-outline-danger {
+    color: #dc3545;
+    border-color: #dc3545;
+}
+
+.actions .btn-outline-danger:hover {
+    background-color: #dc3545;
+    color: white;
+}
+
+.actions .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.actions .help-text {
+    color: #6c757d;
+    font-size: 0.875rem;
+    margin-left: 0.5rem;
+    cursor: help;
+}
+
+/* Barra de busca */
+.search-section {
+    margin-bottom: 2rem;
+}
+
+.search-bar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    max-width: 600px;
+}
+
+.search-input {
+    flex: 1;
+    padding: 0.75rem;
+    border: 2px solid #e1e5e9;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+}
+
+.search-input:focus {
+    border-color: #0d6efd;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-search {
+    background-color: #0d6efd;
+    color: white;
+    border: 1px solid #0d6efd;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.375rem;
+    cursor: pointer;
+}
+
+.btn-search:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Estado vazio */
+.empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.empty-state p {
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+}
+
+.empty-state .btn {
+    padding: 0.75rem 1.5rem;
+    font-size: 1rem;
+    text-decoration: none;
+    background-color: #0d6efd;
+    color: white;
+    border-radius: 0.375rem;
+}
+
+/* Seção de informações de funcionários */
+.funcionarios-list {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 0.375rem;
+}
+
+.funcionarios-list h4 {
+    margin-bottom: 0.75rem;
+    color: #495057;
+    font-size: 1.1rem;
+}
+
+.funcionarios-list ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.funcionarios-list li {
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+}
+
+.info-text {
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.btn-info {
+    background-color: #0dcaf0;
+    border-color: #0dcaf0;
+    color: #000;
+}
+
+.btn-info:hover {
+    background-color: #31d2f2;
+    border-color: #25cff2;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .search-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .search-input {
+        margin-bottom: 0.5rem;
+    }
+    
+    .cargo-form .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .cargo-form .form-actions .btn {
+        margin-bottom: 0.5rem;
+        text-align: center;
+    }
+    
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+    
+    .table th,
+    .table td {
+        padding: 0.75rem 0.5rem;
+    }
+    
+    .actions .btn {
+        display: block;
+        margin-bottom: 0.25rem;
+        margin-right: 0;
+        text-align: center;
+    }
+}

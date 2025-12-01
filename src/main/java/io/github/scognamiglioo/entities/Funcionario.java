@@ -57,6 +57,11 @@ public class Funcionario implements Serializable {
     @JoinColumn(name = "guiche_id")
     private Guiche guiche; // opcional para atendente
 
+    // Relacionamento ManyToOne com Cargo
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "cargo_id", nullable = true)
+    private Cargo cargo;
+
     @Column(nullable = false)
     private boolean ativo = true;
 
@@ -82,6 +87,21 @@ public class Funcionario implements Serializable {
         this.password = password;
         this.role = role;
         this.guiche = guiche;
+        this.ativo = ativo;
+    }
+
+    // construtor com cargo
+    public Funcionario(String nome, String cpf, String email, String telefone,
+            String username, String password, Role role, Guiche guiche, Cargo cargo, boolean ativo) {
+        this.nome = nome;
+        this.cpf = cpf;
+        this.email = email;
+        this.telefone = telefone;
+        this.username = username;
+        this.password = password;
+        this.role = role;
+        this.guiche = guiche;
+        this.cargo = cargo;
         this.ativo = ativo;
     }
 
@@ -156,6 +176,14 @@ public class Funcionario implements Serializable {
 
     public void setGuiche(Guiche guiche) {
         this.guiche = guiche;
+    }
+
+    public Cargo getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(Cargo cargo) {
+        this.cargo = cargo;
     }
 
     public boolean isAtivo() {

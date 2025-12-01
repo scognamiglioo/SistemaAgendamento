@@ -119,6 +119,20 @@ public class ServicoService implements ServicoServiceLocal {
     }
 
     @Override
+    public List<Servico> findServicosByNomePartial(String nome) {
+        if (nome == null || nome.trim().isEmpty()) {
+            return getAllServicos();
+        }
+        
+        // Adiciona % para busca parcial (contém o texto)
+        String nomePattern = "%" + nome.trim() + "%";
+        
+        return em.createNamedQuery("Servico.findByNomePartial", Servico.class)
+                .setParameter("nome", nomePattern)
+                .getResultList();
+    }
+
+    @Override
     public List<Funcionario> findFuncionariosByServico(Long servicoId) {
         if (servicoId == null) {
             throw new IllegalArgumentException("ID do serviço é obrigatório");

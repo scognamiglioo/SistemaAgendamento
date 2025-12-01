@@ -22,6 +22,8 @@ public interface ServicoServiceLocal {
     
     List<Servico> findServicosByNome(String nome);
     
+    List<Servico> findServicosByNomePartial(String nome);
+    
     List<Funcionario> findFuncionariosByServico(Long servicoId);
     
     void associarFuncionarioAoServico(Long funcionarioId, Long servicoId);

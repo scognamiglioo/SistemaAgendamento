@@ -151,7 +151,8 @@ public class ServicoController implements Serializable {
     public void searchByNome() {
         try {
             if (searchNome != null && !searchNome.trim().isEmpty()) {
-                servicos = servicoService.findServicosByNome(searchNome.trim());
+                // Usa busca parcial para melhor experiência do usuário
+                servicos = servicoService.findServicosByNomePartial(searchNome.trim());
             } else {
                 loadServicos();
             }

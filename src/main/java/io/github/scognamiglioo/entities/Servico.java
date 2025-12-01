@@ -11,6 +11,7 @@ import jakarta.validation.constraints.*;
 @NamedQueries({
     @NamedQuery(name = "Servico.findAll", query = "SELECT s FROM Servico s ORDER BY s.nome"),
     @NamedQuery(name = "Servico.findByNome", query = "SELECT s FROM Servico s WHERE s.nome = :nome"),
+    @NamedQuery(name = "Servico.findByNomePartial", query = "SELECT s FROM Servico s WHERE LOWER(s.nome) LIKE LOWER(:nome) ORDER BY s.nome"),
     @NamedQuery(name = "Servico.countByNome", query = "SELECT COUNT(s) FROM Servico s WHERE s.nome = :nome"),
     @NamedQuery(name = "Servico.findFuncionariosByServico", query = "SELECT f FROM Funcionario f JOIN f.servicos s WHERE s.id = :servicoId ORDER BY f.nome")
 })

@@ -1,5 +1,163 @@
-/* ============================
-   ESTILOS MODULARES PARA SERVIÇOS
+/* Funcionários - Versão Simplificada */
+.funcionarios-toggle {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid #eee;
+}
+
+.btn-funcionarios-arrow {
+    background: transparent;
+    border: none;
+    color: #007bff;
+    font-size: 14px;
+    padding: 8px 0;
+    text-align: left;
+    cursor: pointer;
+    width: 100%;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-funcionarios-arrow:hover {
+    color: #0056b3;
+    background-color: rgba(0, 123, 255, 0.1);
+    border-radius: 4px;
+    padding-left: 8px;
+}
+
+.btn-funcionarios-arrow:focus {
+    outline: none;
+    color: #0056b3;
+}
+
+.funcionarios-expanded {
+    background: #f8f9fa;
+    border-top: 1px solid #dee2e6;
+    padding: 15px 20px;
+}
+
+/* Remover transições que causam conflito */
+div[id*="funcionarios-content"] {
+    background: #f8f9fa !important;
+    border-top: 1px solid #dee2e6 !important;
+}
+
+div[id*="funcionarios-content"][style*="display: block"] {
+    padding: 15px 20px !important;
+}
+
+div[id*="funcionarios-content"][style*="display: none"] {
+    padding: 0 !important;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        padding-top: 0;
+        padding-bottom: 0;
+    }
+    to {
+        opacity: 1;
+        max-height: 300px;
+        padding-top: 15px;
+        padding-bottom: 15px;
+    }
+}
+
+.funcionarios-simple-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.funcionarios-simple-list li {
+    background: white;
+    padding: 10px 15px;
+    margin: 8px 0;
+    border-radius: 6px;
+    font-size: 14px;
+    border-left: 4px solid #007bff;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.funcionarios-simple-list li:hover {
+    background: #e2e6ea;
+    border-left-color: #0056b3;
+    transform: translateX(5px);
+}
+
+.no-funcionarios {
+    color: #6c757d;
+    font-style: italic;
+    font-size: 14px;
+    margin: 10px 0;
+    text-align: center;
+    padding: 20px;
+    background: white;
+    border-radius: 6px;
+    border: 2px dashed #dee2e6;
+}
+
+.funcionarios-content h6 {
+    margin: 0 0 10px 0;
+    color: #495057;
+    font-weight: bold;
+}
+
+.funcionarios-list .funcionario-item {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
+    padding: 10px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.funcionarios-list .funcionario-info {
+    flex-grow: 1;
+}
+
+.funcionarios-list .funcionario-info strong {
+    display: block;
+    margin-bottom: 5px;
+    color: #333;
+}
+
+.funcionarios-list .funcionario-info small {
+    color: #6c757d;
+}
+
+.add-funcionario-section {
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #dee2e6;
+}
+
+.add-funcionario-section .form-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.add-funcionario-section .form-control {
+    flex-grow: 1;
+    min-width: 200px;
+}
+
+.text-muted {
+    color: #6c757d !important;
+    font-style: italic;
+}
+
+/* ============================ 
+   ESTILOS CARD DOS SERVIÇOS
 ============================ */
 
 .servicos-container {
@@ -372,8 +530,262 @@
     box-shadow: 0 0 0 2px rgba(0,123,255,0.25);
 }
 
-/* Responsividade */
+/* Servicos Cards (nova estrutura expandível) */
+.servicos-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.servico-card {
+    background: white;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.2s ease;
+}
+
+.servico-card:hover {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.servico-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    border-bottom: 1px solid #f1f3f4;
+}
+
+.servico-info h4 {
+    margin: 0 0 8px 0;
+    color: #333;
+    font-size: 1.2em;
+}
+
+.servico-details {
+    display: flex;
+    gap: 15px;
+    align-items: center;
+}
+
+.servico-id {
+    color: #6c757d;
+    font-size: 0.9em;
+}
+
+.servico-valor {
+    font-weight: bold;
+    color: #28a745;
+    font-size: 1.1em;
+}
+
+.servico-actions {
+    display: flex;
+    gap: 8px;
+}
+
+/* Botão de toggle funcionários */
+.funcionarios-toggle {
+    padding: 10px 20px;
+    border-bottom: 1px solid #f1f3f4;
+    background: #f8f9fa;
+}
+
+.btn-toggle-funcionarios {
+    background: transparent;
+    border: none;
+    color: #007bff;
+    font-size: 0.95em;
+    cursor: pointer;
+    padding: 8px 0;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s ease;
+}
+
+.btn-toggle-funcionarios:hover {
+    color: #0056b3;
+}
+
+.btn-toggle-funcionarios.expanded {
+    color: #0056b3;
+    font-weight: 500;
+}
+
+.toggle-icon {
+    font-size: 0.8em;
+    transition: transform 0.2s ease;
+}
+
+.funcionarios-count {
+    color: #6c757d;
+    font-size: 0.9em;
+    margin-left: auto;
+}
+
+/* Panel expandível */
+.funcionarios-panel {
+    border-top: 1px solid #f1f3f4;
+}
+
+.funcionarios-content {
+    padding: 20px;
+}
+
+.funcionarios-content h5 {
+    margin: 0 0 15px 0;
+    color: #495057;
+    font-size: 1.1em;
+}
+
+.funcionarios-content h6 {
+    margin: 15px 0 10px 0;
+    color: #28a745;
+    font-size: 1em;
+    font-weight: 600;
+}
+
+.load-funcionarios-btn {
+    margin-bottom: 15px;
+}
+
+.no-funcionarios {
+    color: #6c757d;
+    font-style: italic;
+    text-align: center;
+    padding: 20px;
+    margin: 0;
+    background: #f8f9fa;
+    border-radius: 4px;
+}
+
+/* Lista de funcionários expandível */
+.funcionarios-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 20px 0;
+}
+
+.funcionario-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 15px;
+    background: #f8f9fa;
+    border: 1px solid #e9ecef;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    transition: background-color 0.2s ease;
+}
+
+.funcionario-item:hover {
+    background: #e9ecef;
+}
+
+.funcionario-info {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
+
+.funcionario-info strong {
+    color: #333;
+    font-size: 1em;
+}
+
+.funcionario-cpf, .funcionario-email {
+    color: #6c757d;
+    font-size: 0.85em;
+}
+
+/* Botão + Adicionar */
+.btn-add-funcionario {
+    background: #28a745;
+    border: 1px solid #28a745;
+    color: white;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.btn-add-funcionario:hover {
+    background: #218838;
+    border-color: #1e7e34;
+}
+
+.add-icon {
+    font-size: 1.2em;
+    font-weight: bold;
+}
+
+/* Formulário inline para adicionar */
+.form-inline {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+    flex-wrap: wrap;
+}
+
+.form-inline .form-control {
+    flex: 1;
+    min-width: 200px;
+}
+
+/* Formulário adicionar funcionário */
+.adicionar-funcionario {
+    background: #f1f8e9;
+    border: 1px solid #c3e6cb;
+    border-radius: 4px;
+    padding: 15px;
+    margin-top: 15px;
+}
+
+.add-funcionario-form {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-top: 10px;
+}
+
+.form-control-sm {
+    padding: 6px 10px;
+    font-size: 0.9em;
+    flex: 1;
+}
+
+/* Responsividade para cards */
 @media (max-width: 768px) {
+    .servico-header {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+    }
+    
+    .servico-actions {
+        width: 100%;
+        justify-content: flex-end;
+    }
+    
+    .servico-details {
+        flex-direction: column;
+        gap: 5px;
+        align-items: flex-start;
+    }
+    
+    .add-funcionario-form {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}
     .servicos-header {
         flex-direction: column;
         gap: 15px;
@@ -400,5 +812,5 @@
     
     .form-actions {
         flex-direction: column;
+
     }
-}

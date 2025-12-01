@@ -4,7 +4,7 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core">
 
     <div class="servicos-list">
-        <h3>Lista de Serviços (#{servicoController.servicos.size()} encontrados)</h3>
+        <h3>Lista de Serviços (#{servicoController.servicosCount} encontrados)</h3>
         
         <h:panelGroup rendered="#{empty servicoController.servicos}">
             <div class="no-results">
@@ -16,102 +16,118 @@
                 </h:form>
             </div>
         </h:panelGroup>
-
+        
         <h:panelGroup rendered="#{not empty servicoController.servicos}">
-            <div class="table-responsive">
-                <h:dataTable value="#{servicoController.servicos}" 
-                           var="servico" 
-                           styleClass="servicos-table table table-striped"
-                           headerClass="table-header"
-                           rowClasses="table-row-odd,table-row-even">
+            <script type="text/javascript">
+                function toggleFuncionarios(servicoId) {
+                    console.log('Toggle funcionários para serviço:', servicoId);
                     
-                    <h:column>
-                        <f:facet name="header">ID</f:facet>
-                        #{servico.id}
-                    </h:column>
+                    var contentDiv = document.getElementById('funcionarios-content-' + servicoId);
+                    var button = document.getElementById('btn-funcionarios-' + servicoId);
                     
-                    <h:column>
-                        <f:facet name="header">Nome</f:facet>
-                        #{servico.nome}
-                    </h:column>
+                    if (!contentDiv) {
+                        console.error('Div não encontrada: funcionarios-content-' + servicoId);
+                        return;
+                    }
                     
-                    <h:column>
-                        <f:facet name="header">Valor</f:facet>
-                        <h:outputText value="#{servico.valor}">
-                            <f:convertNumber type="currency" currencySymbol="R$ " />
-                        </h:outputText>
-                    </h:column>
-                    
-                    <h:column>
-                        <f:facet name="header">Ações</f:facet>
-                        <div class="action-buttons">
-                            <!-- Botão Editar -->
-                            <h:commandButton value="Editar" 
-                                           action="#{servicoController.navigateToEdit(servico.id)}"
-                                           styleClass="btn btn-sm btn-warning"
-                                           title="Editar serviço" />
-                            
-                            <!-- Botão Excluir -->
-                            <h:commandButton value="Excluir" 
-                                           action="#{servicoController.delete(servico.id)}"
-                                           styleClass="btn btn-sm btn-danger"
-                                           title="Excluir serviço"
-                                           update="lista-servicos"
-                                           onclick="return confirm('Tem certeza que deseja excluir o serviço #{servico.nome}?');" />
-                            
-                            <!-- Botão Funcionários -->
-                            <h:commandButton value="Funcionários" 
-                                           action="#{servicoController.loadFuncionariosPorServico(servico.id)}"
-                                           styleClass="btn btn-sm btn-info"
-                                           title="Gerenciar funcionários"
-                                           update="funcionarios-panel" />
-                        </div>
-                    </h:column>
-                </h:dataTable>
-            </div>
-        </h:panelGroup>
-
-        <!-- Painel de Funcionários -->
-        <h:panelGroup id="funcionarios-panel" 
-                      rendered="#{not empty servicoController.funcionariosPorServico or servicoController.servicoParaAssociar != null}">
-            <div class="funcionarios-section">
-                <h4>Funcionários do Serviço</h4>
+                    if (contentDiv.style.display === 'none' || contentDiv.style.display === '') {
+                        // Expandir
+                        contentDiv.style.display = 'block';
+                        contentDiv.style.padding = '15px 20px';
+                        if (button) button.innerHTML = '⮟ Esconder Funcionários';
+                        console.log('✅ Funcionários expandidos');
+                    } else {
+                        // Esconder
+                        contentDiv.style.display = 'none';
+                        contentDiv.style.padding = '0';
+                        if (button) button.innerHTML = '⮞ Ver Funcionários';
+                        console.log('❌ Funcionários escondidos');
+                    }
+                }
                 
-                <!-- Lista de funcionários associados -->
-                <h:panelGroup rendered="#{not empty servicoController.funcionariosPorServico}">
-                    <ul class="funcionarios-list">
-                        <ui:repeat value="#{servicoController.funcionariosPorServico}" var="func">
-                            <li class="funcionario-item">
-                                <span>#{func.nome} - #{func.cpf}</span>
-                                <h:commandButton value="Remover" 
-                                               action="#{servicoController.desassociarFuncionario(func.id)}"
-                                               styleClass="btn btn-xs btn-outline-danger"
-                                               update="funcionarios-panel"
-                                               onclick="return confirm('Remover #{func.nome} deste serviço?');" />
-                            </li>
-                        </ui:repeat>
-                    </ul>
-                </h:panelGroup>
-
-                <!-- Formulário para associar novo funcionário -->
-                <div class="associar-funcionario">
-                    <h5>Associar Funcionário</h5>
-                    <div class="form-row">
-                        <h:selectOneMenu value="#{servicoController.selectedFuncionarioId}"
-                                       styleClass="form-control">
-                            <f:selectItem itemLabel="Selecione um funcionário..." itemValue="" />
-                            <f:selectItems value="#{servicoController.todosFuncionarios}"
-                                         var="func"
-                                         itemLabel="#{func.nome} - #{func.cpf}"
-                                         itemValue="#{func.id}" />
-                        </h:selectOneMenu>
-                        <h:commandButton value="Associar" 
-                                       action="#{servicoController.associarFuncionario}"
-                                       styleClass="btn btn-success"
-                                       update="funcionarios-panel" />
+                // Debug inicial
+                document.addEventListener('DOMContentLoaded', function() {
+                    var divs = document.querySelectorAll('[id^="funcionarios-content-"]');
+                    console.log('Página carregada - ' + divs.length + ' divs de funcionários encontradas');
+                });
+            </script>
+            
+            <!-- Formulário único englobando todas as ações -->
+            <h:form id="form-servicos">
+                
+            <div class="servicos-cards">
+                <ui:repeat value="#{servicoController.servicos}" var="servico" varStatus="status">
+                    <div class="servico-card">
+                        <!-- Cabeçalho do Serviço -->
+                        <div class="servico-header">
+                            <div class="servico-info">
+                                <h4>#{servico.nome}</h4>
+                                <div class="servico-details">
+                                    <span class="servico-id">ID: #{servico.id}</span>
+                                    <span class="servico-valor">
+                                        <h:outputText value="#{servico.valor}">
+                                            <f:convertNumber type="currency" currencySymbol="R$ " />
+                                        </h:outputText>
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="servico-actions">
+                                <h:commandButton value="Editar" 
+                                               action="#{servicoController.navigateToEdit(servico.id)}"
+                                               styleClass="btn btn-sm btn-warning"
+                                               title="Editar serviço"
+                                               immediate="true" />
+                                
+                                <h:commandButton value="Excluir" 
+                                               action="#{servicoController.delete(servico.id)}"
+                                               styleClass="btn btn-sm btn-danger"
+                                               title="Excluir serviço"
+                                               onclick="return confirm('Tem certeza que deseja excluir o serviço #{servico.nome}?');"
+                                               immediate="true">
+                                    <f:ajax render="@form" />
+                                </h:commandButton>
+                            </div>
+                        </div>
+                        
+                        <!-- Botão para mostrar funcionários (SEM AJAX, apenas JavaScript) -->
+                        <div class="funcionarios-toggle">
+                            <button 
+                                id="btn-funcionarios-#{servico.id}"
+                                type="button"
+                                class="btn-funcionarios-arrow"
+                                onclick="toggleFuncionarios('#{servico.id}');">
+                                ⮞ Ver Funcionários
+                            </button>
+                        </div>
+                            
+                        <!-- Lista de funcionários (sempre renderizada, apenas escondida) -->
+                        <div id="funcionarios-content-#{servico.id}" 
+                             style="display: none; background: #f8f9fa; padding: 0; border-top: 1px solid #dee2e6;">
+                            
+                            <h:panelGroup rendered="#{servicoController.funcionariosPorServicoMap != null and not empty servicoController.funcionariosPorServicoMap[servico.id]}">
+                                <div style="background: #eeffee; padding: 10px; margin-bottom: 10px; font-size: 12px;">
+                                    ✅ #{servicoController.getFuncionariosCountByServico(servico.id)} funcionário(s) encontrado(s)
+                                </div>
+                                <ul class="funcionarios-simple-list">
+                                    <ui:repeat value="#{servicoController.funcionariosPorServicoMap[servico.id]}" var="funcionario" varStatus="loop">
+                                        <li>
+                                            <strong>#{funcionario.nome}</strong><br/>
+                                            <small>Email: #{funcionario.email} | CPF: #{funcionario.cpf}</small>
+                                        </li>
+                                    </ui:repeat>
+                                </ul>
+                            </h:panelGroup>
+                            
+                            <h:panelGroup rendered="#{servicoController.funcionariosPorServicoMap == null or empty servicoController.funcionariosPorServicoMap[servico.id]}">
+                                <div class="no-funcionarios">
+                                    <p>❌ Nenhum funcionário associado a este serviço</p>
+                                </div>
+                            </h:panelGroup>
+                        </div>
                     </div>
-                </div>
+                </ui:repeat>
             </div>
+            </h:form>
         </h:panelGroup>
     </div>
 

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="http://primefaces.org/ui">
+    <h:head>
+        <title>Lista de Usuários</title>
+        <h:outputStylesheet library="css" name="list-user.css"/>
+    </h:head>
+    <h:body>
+        <a href="./admin.xhtml">Voltar</a>
+
+        <h1>Usuários Comuns</h1>
+
+        <table border="1">
+            <tr>
+                <th>ID</th><th>Nome</th><th>CPF</th><th>Email</th><th>Telefone</th>
+                <th>Username</th><th>Ativo</th><th>Ação</th>
+            </tr>
+
+            <ui:repeat value="#{adminUserBean.users}" var="u">
+                <tr>
+                    <td><h:outputText value="#{u.id}" /></td>
+                    <td><h:outputText value="#{u.nome}" /></td>
+                    <td><h:outputText value="#{u.cpf}" /></td>
+                    <td><h:outputText value="#{u.email}" /></td>
+                    <td><h:outputText value="#{u.telefone}" /></td>
+                    <td><h:outputText value="#{u.username}" /></td>
+                    <td><h:outputText value="#{u.active}" /></td>
+
+                    <td>
+                        <!-- link que passa params via query string (seguros e simples) -->
+                        <h:outputLink value="#{facesContext.externalContext.requestContextPath}/app/edit-user.xhtml?id=#{u.id}&amp;type=user">
+                            Editar
+                        </h:outputLink>
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
+
+        <hr/>
+
+        <h1>Funcionários</h1>
+
+        <table border="1">
+            <tr>
+                <th>ID</th><th>Nome</th><th>CPF</th><th>Email</th><th>Telefone</th>
+                <th>Username</th><th>Role</th><th>Ativo</th><th>Ação</th>
+            </tr>
+
+            <ui:repeat value="#{adminUserBean.funcionarios}" var="f">
+                <tr>
+                    <td><h:outputText value="#{f.id}" /></td>
+                    <td><h:outputText value="#{f.nome}" /></td>
+                    <td><h:outputText value="#{f.cpf}" /></td>
+                    <td><h:outputText value="#{f.email}" /></td>
+                    <td><h:outputText value="#{f.telefone}" /></td>
+                    <td><h:outputText value="#{f.username}" /></td>
+                    <td><h:outputText value="#{f.role}" /></td>
+                    <td><h:outputText value="#{f.ativo}" /></td>
+
+                    <td>
+                        <h:outputLink value="#{facesContext.externalContext.requestContextPath}/app/edit-user.xhtml?id=#{f.id}&amp;type=funcionario">
+                            Editar
+                        </h:outputLink>
+                    </td>
+                </tr>
+            </ui:repeat>
+        </table>
+
+
+
+    </h:body>
+</html>

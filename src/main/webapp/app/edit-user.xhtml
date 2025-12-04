@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core">
+
+<h:head>
+    <title>Editar Usuário</title>
+     <h:outputStylesheet library="css" name="edit.css"/>
+</h:head>
+
+<h:body>
+
+<f:metadata>
+    <f:viewParam name="id" value="#{adminUserBean.editId}" />
+    <f:viewParam name="type" value="#{adminUserBean.editType}" />
+    <!-- Executa antes do render para carregar entidade -->
+    <f:event type="preRenderView" listener="#{adminUserBean.loadEntityForEdit}" />
+</f:metadata>
+
+<h2>Editando #{adminUserBean.editType}</h2>
+
+<h:form>
+    <h:panelGrid columns="2">
+
+        <h:outputLabel value="Nome:" for="nome" />
+        <h:inputText id="nome"
+                     value="#{adminUserBean.selectedUser != null ? adminUserBean.selectedUser.nome : adminUserBean.selectedFuncionario.nome}" />
+
+        <h:outputLabel value="Email:" for="email" />
+        <h:inputText id="email"
+                     value="#{adminUserBean.selectedUser != null ? adminUserBean.selectedUser.email : adminUserBean.selectedFuncionario.email}" />
+
+        <h:outputLabel value="Telefone:" for="telefone" />
+        <h:inputText id="telefone"
+                     value="#{adminUserBean.selectedUser != null ? adminUserBean.selectedUser.telefone : adminUserBean.selectedFuncionario.telefone}" />
+
+        <!-- mostra campo ativo/ativo para funcionario e user -->
+        <h:outputLabel value="Ativo:" for="ativo" />
+        <h:selectBooleanCheckbox id="ativo"
+                                 value="#{adminUserBean.selectedUser != null ? adminUserBean.selectedUser.active : adminUserBean.selectedFuncionario.ativo}" />
+
+    </h:panelGrid>
+
+    <br/>
+    <h:commandButton value="Salvar" action="#{adminUserBean.save}" />
+    <h:commandButton value="Cancelar" action="user-list.xhtml?faces-redirect=true" immediate="true" />
+</h:form>
+
+</h:body>
+</html>

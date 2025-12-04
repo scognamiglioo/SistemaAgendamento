@@ -1,0 +1,133 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html 
+    lang="en"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="jakarta.faces.html"
+    xmlns:f="jakarta.faces.core"
+    xmlns:p="primefaces">
+    <f:view>
+        <h:head>
+            <title>Minha Conta</title>
+            <h:outputStylesheet name="css/login.css"/>
+        </h:head>
+        <h:body>
+
+           
+            <header style="padding: 20px; text-align: center; position: relative;">
+                <h1 style="margin: 0; color: #ffffff;">Sistema de Agendamento</h1>
+                <div style="position: absolute; top: 20px; right: 20px;">
+                    <p:outputLabel value="Usuário: #{userSessionController.currentUser}" 
+                                   style="color: white; margin-right: 10px;"/>
+                    <h:form>
+                        <p:commandButton value="Sair" 
+                                         action="#{userSessionController.logout}"
+                                         style="background: #dc3545; border: none; color: white;"
+                                         ajax="false"/>
+                    </h:form>
+                </div>
+            </header>
+
+            <div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
+
+                <!-- Informações do Usuário -->
+                <p:panel header="Minhas Informações" style="margin-bottom: 20px;">
+                    <h:panelGrid columns="2" cellpadding="10">
+                        <p:outputLabel value="Usuário Logado:"/>
+                        <p:outputLabel value="#{facesContext.externalContext.remoteUser}" style="font-weight: bold;"/>
+
+                    </h:panelGrid>
+                </p:panel>
+
+
+                <p:panel header="Novo Agendamento" style="margin-bottom: 20px;">
+                    <h:form id="formAgendamento">
+                        <p:growl id="messages" showDetail="true" />
+
+                        <h:panelGrid columns="2" cellpadding="10" style="width: 100%;">
+
+                            <h:outputLabel for="username" value="Nome de Usuário:" />
+                            <h:inputText id="username" value="#{agendamentoController.username}" 
+                                         required="true" requiredMessage="Nome de usuário é obrigatório" />
+
+                            
+                                                <p:outputLabel for="servico" value="Serviço *"/>
+                                                <p:selectOneMenu id="servico" 
+                                                                 value="#{agendamentoController.agendamento.servico}"
+                                                                 required="true"
+                                                                 requiredMessage="Selecione um serviço"
+                                                                 style="width: 100%">
+                                                    <f:selectItem itemLabel="Selecione um serviço..." itemValue=""/>
+                                                    <f:selectItems value="#{agendamentoController.servicosDisponiveis}" />
+                                                </p:selectOneMenu>
+                    
+                                                <p:outputLabel for="data" value="Data *"/>
+                                                <p:calendar id="data" 
+                                                            value="#{agendamentoController.agendamento.data}"
+                                                            required="true"
+                                                            requiredMessage="Selecione uma data"
+                                                            mindate="#{agendamentoController.dataMinima}"
+                                                            pattern="dd/MM/yyyy"
+                                                            locale="pt"
+                                                            style="width: 100%"/>
+                    
+                                                <p:outputLabel for="hora" value="Hora *"/>
+                                                <p:selectOneMenu id="hora" 
+                                                                 value="#{agendamentoController.agendamento.hora}"
+                                                                 required="true"
+                                                                 requiredMessage="Selecione um horário"
+                                                                 style="width: 100%"
+                                                                 >
+                                                    <f:selectItem itemLabel="Selecione um horário..." itemValue=""/>
+                                                    <f:selectItems value="#{agendamentoController.horariosDisponiveis}" />
+                                                </p:selectOneMenu>
+                    
+                    
+                    
+                            <!-- BOTÃO AGENDAR -->
+                            <p:commandButton value="Agendar" 
+                                             action="#{agendamentoController.salvarAgendamento}"
+                                             update="messages"
+                                             process="@form"
+                                             style="width: 100%; margin-top: 10px;"/>
+
+                        </h:panelGrid>
+                    </h:form>
+                </p:panel>
+
+                <!-- Meus Agendamentos -->
+                <p:panel header="Meus Agendamentos">
+                    <p:dataTable value="#{agendamentoController.meusAgendamentos}" 
+                                 var="agendamento"
+                                 emptyMessage="Nenhum agendamento encontrado"
+                                 style="width: 100%"
+                                 >
+
+                        <p:column headerText="Data" style="width: 120px;">
+                            <h:outputText value="#{agendamento.data}">
+                                <f:convertDateTime pattern="dd/MM/yyyy"/>
+                            </h:outputText>
+                        </p:column>
+
+                        <p:column headerText="Hora" style="width: 80px;">
+                            <h:outputText value="#{agendamento.hora}"/>
+                        </p:column>
+
+                        <p:column headerText="Serviço" style="width: 200px;">
+                            <h:outputText value="#{agendamento.servico}"/>
+                        </p:column>
+
+                    </p:dataTable>
+                </p:panel>
+
+
+
+
+            </div>
+
+            <footer style="background-color: #000000; color: white; padding: 20px; text-align: center;">
+                <p style="margin: 0;">Web Dev/2025</p>
+            </footer>
+        </h:body>
+    </f:view>
+</html>

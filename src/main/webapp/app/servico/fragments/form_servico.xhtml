@@ -1,0 +1,112 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+                xmlns:h="http://xmlns.jcp.org/jsf/html"
+                xmlns:f="http://xmlns.jcp.org/jsf/core"
+                xmlns:p="primefaces">
+
+    <div class="servico-form">
+        <div class="form-section">
+            <h3>Dados do Serviço</h3>
+
+            <h:messages showDetail="true" showSummary="true" styleClass="error-message"/>
+
+            <div class="form-group">
+                <h:outputLabel for="nome" value="Nome do Serviço:" styleClass="form-label required" />
+                <p:inputText id="nome" 
+                             value="#{servicoController.servico.nome}"
+                             styleClass="form-control"
+                             required="true"
+                             requiredMessage="Nome é obrigatório"
+                             maxlength="100"
+                             placeholder="Ex: Consulta Médica" />
+                <h:message for="nome" styleClass="error-message" />
+            </div>
+
+            <div class="form-group">
+                <h:outputLabel for="valor" value="Valor:" styleClass="form-label required" />
+
+                <p:inputText id="valor"
+                             value="#{servicoController.servico.valor}"
+                             styleClass="form-control"
+                             required="true"
+                             requiredMessage="Valor é obrigatório"
+                             placeholder="Ex: 150.00">
+
+                    <f:convertNumber type="number"
+                                     minFractionDigits="2"
+                                     maxFractionDigits="2" />
+                </p:inputText>
+
+                <small class="form-help">
+                    Formato: 150.00 (use ponto como separador decimal)
+                </small>
+
+                <h:message for="valor" styleClass="error-message" />
+            </div>
+
+
+            <!-- Seleção de Funcionários -->
+            <div class="form-group">
+                <h:outputLabel value="Funcionários Associados:" styleClass="form-label" />
+                <h:panelGroup rendered="#{empty servicoController.todosFuncionarios}">
+                    <div class="no-funcionarios">
+                        <p>Nenhum funcionário cadastrado. 
+                            <a href="/app/cadastrar_funcionario.xhtml">Clique aqui para cadastrar funcionários</a>
+                        </p>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{not empty servicoController.todosFuncionarios}">
+                    <div class="funcionarios-selection">
+                        <small class="form-help">Selecione os funcionários que podem realizar este serviço:</small>
+                        <div class="funcionarios-list-form">
+                            <h:selectManyCheckbox value="#{servicoController.selectedFuncionarioIds}" 
+                                                  layout="pageDirection" 
+                                                  styleClass="funcionarios-checkboxes">
+                                <f:selectItems value="#{servicoController.todosFuncionarios}" 
+                                               var="funcionario" 
+                                               itemValue="#{funcionario.id}" 
+                                               itemLabel="#{funcionario.nome} - #{funcionario.email}" />
+                            </h:selectManyCheckbox>
+                        </div>
+
+                        <h:panelGroup rendered="#{servicoController.editMode and not empty servicoController.funcionariosDoServico}">
+                            <div class="funcionarios-atuais">
+                                <h6>Funcionários atualmente associados:</h6>
+                                <ul class="funcionarios-simple-list">
+                                    <ui:repeat value="#{servicoController.funcionariosDoServico}" var="funcionario">
+                                        <li>
+                                            <strong>#{funcionario.nome}</strong><br/>
+                                            <small>#{funcionario.email}</small>
+                                        </li>
+                                    </ui:repeat>
+                                </ul>
+                            </div>
+                        </h:panelGroup>
+                    </div>
+                </h:panelGroup>
+            </div>
+
+            <div class="form-actions">
+                <h:commandButton value="#{servicoController.saveButtonText}" 
+                                 action="#{servicoController.saveAndReturn}"
+                                 styleClass="btn btn-primary">
+                    <f:ajax execute="@form" render="@form" />
+                </h:commandButton>
+
+                <h:commandButton value="Cancelar" 
+                                 action="#{servicoController.navigateToList}"
+                                 styleClass="btn btn-secondary"
+                                 immediate="true" />
+
+                <h:commandButton value="Salvar e Continuar" 
+                                 action="#{servicoController.save}"
+                                 styleClass="btn btn-outline-primary"
+                                 rendered="#{!servicoController.editMode}">
+                    <f:ajax execute="@form" render="@form" />
+                </h:commandButton>
+            </div>
+        </div>
+    </div>
+
+</ui:composition>

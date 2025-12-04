@@ -1,0 +1,146 @@
+/* ============================
+   RESET / BASE
+============================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #ffffff;
+    color: #000000;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 0;
+}
+
+/* ============================
+   CONTAINER PRINCIPAL
+============================ */
+.page-container {
+    width: 95%;
+    max-width: 1100px;
+    background: #ffffff;
+    border: 2px solid #000000;
+    padding: 30px;
+    border-radius: 12px;
+}
+
+.page-container h1 {
+    font-size: 26px;
+    text-align: center;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 18px;
+}
+
+/* ============================
+   TABELAS (user-list)
+============================ */
+.table-wrapper {
+    margin-bottom: 40px;
+}
+
+.styled-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.styled-table th,
+.styled-table td {
+    border: 2px solid #000000;
+    padding: 12px;
+    text-align: left;
+}
+
+.styled-table th {
+    background: #000000;
+    color: #ffffff;
+    text-transform: uppercase;
+    font-size: 14px;
+}
+
+.styled-table tr:nth-child(even) {
+    background: #f4f4f4;
+}
+
+.styled-table tr:hover {
+    background: #e8e8e8;
+}
+
+/* links de ação */
+.action-link {
+    padding: 6px 10px;
+    background: #000000;
+    color: #ffffff;
+    border-radius: 6px;
+    font-size: 14px;
+    text-decoration: none;
+    border: 2px solid #000000;
+    transition: 0.25s ease-in-out;
+}
+
+.action-link:hover {
+    background: #ffffff;
+    color: #000000;
+}
+
+/* ============================
+   FORMULÁRIO (edit-user)
+============================ */
+.form-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    font-weight: bold;
+    display: block;
+    margin-bottom: 6px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #000000;
+    border-radius: 8px;
+    font-size: 15px;
+    background: #ffffff;
+}
+
+/* ============================
+   BOTÕES (usar padrão do admin)
+============================ */
+.save-button,
+.cancel-button {
+    width: 100%;
+    padding: 18px;
+    margin-top: 25px;
+
+    background: #000000;
+    color: #ffffff;
+
+    border: 2px solid #000000;
+    border-radius: 8px;
+
+    font-size: 16px;
+    cursor: pointer;
+    transition: 0.25s ease-in-out;
+}
+
+.save-button:hover,
+.cancel-button:hover {
+    background: #ffffff;
+    color: #000000;
+}

@@ -317,29 +317,26 @@ public class FuncionarioServicoService implements FuncionarioServicoServiceLocal
 
     @Override
     public void deleteAssociacao(Long funcionarioId, Long servicoId, Long localizacaoId) {
-        try {
-            LOGGER.log(Level.INFO, "Deletando associação: funcionario={0}, servico={1}, localizacao={2}", 
-                      new Object[]{funcionarioId, servicoId, localizacaoId});
-            
-            FuncionarioServicoId id = new FuncionarioServicoId(funcionarioId, servicoId, localizacaoId);
-            FuncionarioServico associacao = em.find(FuncionarioServico.class, id);
-            
-            if (associacao != null) {
-                // Garantir que a entidade está gerenciada
-                if (!em.contains(associacao)) {
-                    associacao = em.merge(associacao);
-                }
-                em.remove(associacao);
-                em.flush(); // Força a execução imediata
-                LOGGER.log(Level.INFO, "Associação removida com sucesso: {0}", associacao);
-            } else {
-                LOGGER.log(Level.WARNING, "Associação não encontrada para exclusão");
-                throw new IllegalArgumentException("Associação não encontrada");
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Erro ao deletar associação", e);
-            throw new RuntimeException("Erro ao deletar associação: " + e.getMessage(), e);
+        if (funcionarioId == null || servicoId == null || localizacaoId == null) {
+            throw new IllegalArgumentException("IDs não podem ser nulos");
         }
+
+        FuncionarioServicoId id = new FuncionarioServicoId(funcionarioId, servicoId, localizacaoId);
+        FuncionarioServico associacao = em.find(FuncionarioServico.class, id);
+        
+        if (associacao == null) {
+            throw new IllegalArgumentException("Associação não encontrada");
+        }
+        
+        if (!em.contains(associacao)) {
+            associacao = em.merge(associacao);
+        }
+        
+        em.remove(associacao);
+        em.flush();
+        
+        LOGGER.log(Level.INFO, "Associação removida: func={0}, serv={1}, loc={2}", 
+                  new Object[]{funcionarioId, servicoId, localizacaoId});
     }
 
     @Override

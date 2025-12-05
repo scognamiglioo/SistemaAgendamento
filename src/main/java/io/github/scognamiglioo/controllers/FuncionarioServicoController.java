@@ -43,7 +43,6 @@ public class FuncionarioServicoController implements Serializable {
 
     // Estado do formulário
     private FuncionarioServico associacao = new FuncionarioServico();
-    private Long selectedAssociacaoId;
     private Long funcionarioId;
     private Long servicoId;
     private Long localizacaoId;
@@ -59,7 +58,6 @@ public class FuncionarioServicoController implements Serializable {
     private Long filterFuncionarioId;
     private Long filterServicoId;
     private Long filterLocalizacaoId;
-    private Boolean filterAtivo;
     
     // Seleções para nova associação
     private Long selectedFuncionarioId;
@@ -95,17 +93,11 @@ public class FuncionarioServicoController implements Serializable {
 
     public void loadFuncionarios() {
         try {
-            // Usar query com JOIN FETCH para carregar funcionários com cargo
             funcionarios = funcionarioServicoService.getAllFuncionariosWithCargo();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erro ao carregar funcionários", e);
-            // Fallback para método sem JOIN FETCH
-            try {
-                funcionarios = dataService.getAllFuncionarios();
-            } catch (Exception e2) {
-                LOGGER.log(Level.SEVERE, "Erro no fallback ao carregar funcionários", e2);
-                funcionarios = List.of();
-            }
+            funcionarios = List.of();
+            addErrorMessage("Erro ao carregar funcionários");
         }
     }
 
@@ -148,7 +140,7 @@ public class FuncionarioServicoController implements Serializable {
                 return null;
             }
             
-            if (editMode && selectedAssociacaoId != null) {
+            if (editMode && funcionarioId != null && servicoId != null && localizacaoId != null) {
                 updateExistingAssociacao();
             } else {
                 createNewAssociacao();
@@ -214,7 +206,6 @@ public class FuncionarioServicoController implements Serializable {
         servicoId = null;
         localizacaoId = null;
         editMode = false;
-        selectedAssociacaoId = null;
     }
 
     public void edit(Long funcionarioIdParam, Long servicoIdParam, Long localizacaoIdParam) {
@@ -236,16 +227,7 @@ public class FuncionarioServicoController implements Serializable {
     }
 
     public void delete(Long funcionarioIdParam, Long servicoIdParam, Long localizacaoIdParam) {
-        try {
-            funcionarioServicoService.deleteAssociacao(funcionarioIdParam, servicoIdParam, localizacaoIdParam);
-            loadAssociacoes();
-            lastMessage = "Associação excluída com sucesso!";
-            messageType = "success";
-        } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Erro ao excluir associação", ex);
-            lastMessage = "Erro ao excluir associação: " + ex.getMessage();
-            messageType = "error";
-        }
+        deleteAssociacao(funcionarioIdParam, servicoIdParam, localizacaoIdParam);
     }
 
     public void cancel() {
@@ -291,24 +273,22 @@ public class FuncionarioServicoController implements Serializable {
     
     public void deleteAssociacao(Long funcionarioIdParam, Long servicoIdParam, Long localizacaoIdParam) {
         try {
-            LOGGER.log(Level.INFO, "Tentando excluir associação: funcionario={0}, servico={1}, localizacao={2}", 
-                      new Object[]{funcionarioIdParam, servicoIdParam, localizacaoIdParam});
-            
             funcionarioServicoService.deleteAssociacao(funcionarioIdParam, servicoIdParam, localizacaoIdParam);
             loadAssociacoes();
-            loadFuncionarios(); // Recarregar funcionários para atualizar a visualização agrupada
             
             lastMessage = "Associação excluída com sucesso!";
             messageType = "success";
-            addSuccessMessage("Associação excluída com sucesso!");
+            addSuccessMessage(lastMessage);
             
-            LOGGER.log(Level.INFO, "Associação excluída com sucesso");
-            
+        } catch (IllegalArgumentException ex) {
+            lastMessage = ex.getMessage();
+            messageType = "error";
+            addErrorMessage(lastMessage);
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Erro ao excluir associação", ex);
-            lastMessage = "Erro ao excluir associação: " + ex.getMessage();
+            lastMessage = "Erro ao excluir associação";
             messageType = "error";
-            addErrorMessage("Erro ao excluir associação: " + ex.getMessage());
+            addErrorMessage(lastMessage);
         }
     }
 
@@ -332,13 +312,12 @@ public class FuncionarioServicoController implements Serializable {
         filterFuncionarioId = null;
         filterServicoId = null;
         filterLocalizacaoId = null;
-        filterAtivo = null;
         loadAssociacoes();
     }
     
     private boolean hasActiveFilters() {
         return filterFuncionarioId != null || filterServicoId != null || 
-               filterLocalizacaoId != null || filterAtivo != null;
+               filterLocalizacaoId != null;
     }
 
     // ========== MÉTODOS AUXILIARES ==========
@@ -391,27 +370,6 @@ public class FuncionarioServicoController implements Serializable {
             editMode = false;
             resetForm();
         }
-    }
-
-    public String saveAndReturn() {
-        String result = save();
-        if (result == null && !hasErrors()) {
-            return navigateToList();
-        }
-        return null;
-    }
-
-    public String navigateToEdit(Long associacaoId) {
-        selectedAssociacaoId = associacaoId;
-        return "/app/associacao/adicionar_associacao.xhtml?faces-redirect=true&id=" + associacaoId;
-    }
-
-    public String navigateToAdd() {
-        return "/app/associacao/adicionar_associacao.xhtml?faces-redirect=true";
-    }
-
-    public String navigateToList() {
-        return "/app/associacao/gerenciar_associacoes.xhtml?faces-redirect=true";
     }
     
     // ========== UTILIDADES ==========
@@ -480,14 +438,6 @@ public class FuncionarioServicoController implements Serializable {
         this.locais = locais;
     }
 
-    public Long getSelectedAssociacaoId() {
-        return selectedAssociacaoId;
-    }
-
-    public void setSelectedAssociacaoId(Long selectedAssociacaoId) {
-        this.selectedAssociacaoId = selectedAssociacaoId;
-    }
-
     public Long getFuncionarioId() {
         return funcionarioId;
     }
@@ -550,14 +500,6 @@ public class FuncionarioServicoController implements Serializable {
 
     public void setFilterLocalizacaoId(Long filterLocalizacaoId) {
         this.filterLocalizacaoId = filterLocalizacaoId;
-    }
-
-    public Boolean getFilterAtivo() {
-        return filterAtivo;
-    }
-
-    public void setFilterAtivo(Boolean filterAtivo) {
-        this.filterAtivo = filterAtivo;
     }
     
     public int getAssociacoesCount() {

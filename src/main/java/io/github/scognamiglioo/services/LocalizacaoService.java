@@ -177,7 +177,10 @@ public class LocalizacaoService implements LocalizacaoServiceLocal {
             Localizacao local = em.find(Localizacao.class, id);
             if (local != null) {
                 em.remove(local);
-                LOGGER.log(Level.INFO, "Local excluído: {0}", local);
+                em.flush();
+                LOGGER.log(Level.INFO, "Local excluído: ID={0}", id);
+            } else {
+                throw new IllegalArgumentException("Local não encontrado com ID: " + id);
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erro ao excluir local com ID: " + id, e);

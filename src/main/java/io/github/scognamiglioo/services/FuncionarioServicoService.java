@@ -318,14 +318,27 @@ public class FuncionarioServicoService implements FuncionarioServicoServiceLocal
     @Override
     public void deleteAssociacao(Long funcionarioId, Long servicoId, Long localizacaoId) {
         try {
-            FuncionarioServico associacao = findAssociacaoById(funcionarioId, servicoId, localizacaoId);
+            LOGGER.log(Level.INFO, "Deletando associação: funcionario={0}, servico={1}, localizacao={2}", 
+                      new Object[]{funcionarioId, servicoId, localizacaoId});
+            
+            FuncionarioServicoId id = new FuncionarioServicoId(funcionarioId, servicoId, localizacaoId);
+            FuncionarioServico associacao = em.find(FuncionarioServico.class, id);
+            
             if (associacao != null) {
+                // Garantir que a entidade está gerenciada
+                if (!em.contains(associacao)) {
+                    associacao = em.merge(associacao);
+                }
                 em.remove(associacao);
-                LOGGER.log(Level.INFO, "Associação removida: {0}", associacao);
+                em.flush(); // Força a execução imediata
+                LOGGER.log(Level.INFO, "Associação removida com sucesso: {0}", associacao);
+            } else {
+                LOGGER.log(Level.WARNING, "Associação não encontrada para exclusão");
+                throw new IllegalArgumentException("Associação não encontrada");
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erro ao deletar associação", e);
-            throw new RuntimeException("Erro ao deletar associação", e);
+            throw new RuntimeException("Erro ao deletar associação: " + e.getMessage(), e);
         }
     }
 
@@ -402,6 +415,23 @@ public class FuncionarioServicoService implements FuncionarioServicoServiceLocal
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erro ao buscar associações com filtros", e);
             throw new RuntimeException("Erro ao buscar associações", e);
+        }
+    }
+    
+    // ========== BUSCA DE FUNCIONÁRIOS COM RELACIONAMENTOS ==========
+    @Override
+    public List<Funcionario> getAllFuncionariosWithCargo() {
+        try {
+            TypedQuery<Funcionario> query = em.createQuery(
+                "SELECT DISTINCT f FROM Funcionario f " +
+                "JOIN FETCH f.user " +
+                "LEFT JOIN FETCH f.cargo " +
+                "ORDER BY f.user.nome", 
+                Funcionario.class);
+            return query.getResultList();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao buscar funcionários com cargo", e);
+            throw new RuntimeException("Erro ao buscar funcionários", e);
         }
     }
 }

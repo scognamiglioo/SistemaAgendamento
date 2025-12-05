@@ -63,4 +63,7 @@ public interface FuncionarioServicoServiceLocal {
     
     // ========== BUSCA COM FILTROS ==========
     List<FuncionarioServico> findAssociacoesWithFilters(Long funcionarioId, Long servicoId, Long localizacaoId);
+    
+    // ========== BUSCA DE FUNCIONÁRIOS COM RELACIONAMENTOS ==========
+    List<Funcionario> getAllFuncionariosWithCargo();
 }

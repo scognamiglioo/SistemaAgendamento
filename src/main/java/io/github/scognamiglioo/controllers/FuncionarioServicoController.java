@@ -61,6 +61,11 @@ public class FuncionarioServicoController implements Serializable {
     private Long filterLocalizacaoId;
     private Boolean filterAtivo;
     
+    // Seleções para nova associação
+    private Long selectedFuncionarioId;
+    private Long selectedServicoId;
+    private Long selectedLocalizacaoId;
+    
     // Mensagem para exibição flutuante
     private String lastMessage = "";
     private String messageType = "";
@@ -90,9 +95,17 @@ public class FuncionarioServicoController implements Serializable {
 
     public void loadFuncionarios() {
         try {
-            funcionarios = dataService.getAllFuncionarios();
+            // Usar query com JOIN FETCH para carregar funcionários com cargo
+            funcionarios = funcionarioServicoService.getAllFuncionariosWithCargo();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erro ao carregar funcionários", e);
+            // Fallback para método sem JOIN FETCH
+            try {
+                funcionarios = dataService.getAllFuncionarios();
+            } catch (Exception e2) {
+                LOGGER.log(Level.SEVERE, "Erro no fallback ao carregar funcionários", e2);
+                funcionarios = List.of();
+            }
         }
     }
 
@@ -237,6 +250,66 @@ public class FuncionarioServicoController implements Serializable {
 
     public void cancel() {
         resetForm();
+    }
+    
+    public void createAssociacao() {
+        try {
+            // Validação
+            if (selectedFuncionarioId == null || selectedServicoId == null || selectedLocalizacaoId == null) {
+                lastMessage = "Selecione funcionário, serviço e localização";
+                messageType = "error";
+                return;
+            }
+            
+            // Verificar se já existe
+            if (funcionarioServicoService.existsAssociacao(selectedFuncionarioId, selectedServicoId, selectedLocalizacaoId)) {
+                lastMessage = "Esta associação já existe";
+                messageType = "error";
+                return;
+            }
+            
+            // Criar associação
+            funcionarioServicoService.createAssociacao(selectedFuncionarioId, selectedServicoId, selectedLocalizacaoId);
+            
+            // Limpar seleções
+            selectedFuncionarioId = null;
+            selectedServicoId = null;
+            selectedLocalizacaoId = null;
+            
+            // Recarregar lista
+            loadAssociacoes();
+            
+            lastMessage = "Associação criada com sucesso!";
+            messageType = "success";
+            
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Erro ao criar associação", ex);
+            lastMessage = "Erro ao criar associação: " + ex.getMessage();
+            messageType = "error";
+        }
+    }
+    
+    public void deleteAssociacao(Long funcionarioIdParam, Long servicoIdParam, Long localizacaoIdParam) {
+        try {
+            LOGGER.log(Level.INFO, "Tentando excluir associação: funcionario={0}, servico={1}, localizacao={2}", 
+                      new Object[]{funcionarioIdParam, servicoIdParam, localizacaoIdParam});
+            
+            funcionarioServicoService.deleteAssociacao(funcionarioIdParam, servicoIdParam, localizacaoIdParam);
+            loadAssociacoes();
+            loadFuncionarios(); // Recarregar funcionários para atualizar a visualização agrupada
+            
+            lastMessage = "Associação excluída com sucesso!";
+            messageType = "success";
+            addSuccessMessage("Associação excluída com sucesso!");
+            
+            LOGGER.log(Level.INFO, "Associação excluída com sucesso");
+            
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Erro ao excluir associação", ex);
+            lastMessage = "Erro ao excluir associação: " + ex.getMessage();
+            messageType = "error";
+            addErrorMessage("Erro ao excluir associação: " + ex.getMessage());
+        }
     }
 
     // ========== FILTROS E BUSCA ==========
@@ -491,6 +564,35 @@ public class FuncionarioServicoController implements Serializable {
         return associacoes != null ? associacoes.size() : 0;
     }
     
+    public int getTotalAssociacoes() {
+        return getAssociacoesCount();
+    }
+    
+    // Getters e setters para seleções de nova associação
+    public Long getSelectedFuncionarioId() {
+        return selectedFuncionarioId;
+    }
+    
+    public void setSelectedFuncionarioId(Long selectedFuncionarioId) {
+        this.selectedFuncionarioId = selectedFuncionarioId;
+    }
+    
+    public Long getSelectedServicoId() {
+        return selectedServicoId;
+    }
+    
+    public void setSelectedServicoId(Long selectedServicoId) {
+        this.selectedServicoId = selectedServicoId;
+    }
+    
+    public Long getSelectedLocalizacaoId() {
+        return selectedLocalizacaoId;
+    }
+    
+    public void setSelectedLocalizacaoId(Long selectedLocalizacaoId) {
+        this.selectedLocalizacaoId = selectedLocalizacaoId;
+    }
+    
     public String getLastMessage() {
         return lastMessage;
     }
@@ -505,5 +607,19 @@ public class FuncionarioServicoController implements Serializable {
     
     public void setMessageType(String messageType) {
         this.messageType = messageType;
+    }
+    
+    // ========== MÉTODOS AUXILIARES PARA AGRUPAMENTO ========== 
+    
+    /**
+     * Verifica se um funcionário tem associações
+     */
+    public boolean funcionarioTemAssociacoes(Long funcionarioId) {
+        if (associacoes == null || funcionarioId == null) {
+            return false;
+        }
+        
+        return associacoes.stream()
+                .anyMatch(assoc -> assoc.getFuncionario().getId().equals(funcionarioId));
     }
 }

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+
+    <h:head>
+        <title>Gerenciar Localizações</title>
+        <h:outputStylesheet library="css" name="admin.css"/>
+        <h:outputStylesheet library="css" name="localizacoes.css"/>
+        
+        <!-- Scripts para validação -->
+        <h:outputScript name="js/floating-messages.js" />
+        <h:outputScript name="js/form-success-monitor.js" />
+    </h:head>
+
+    <h:body>
+        <div class="localizacoes-container">
+            <!-- Header -->
+            <div class="localizacoes-header">
+                <h1>Gerenciamento de Localizações</h1>
+                <div class="localizacoes-actions">
+                    <h:form>
+                        <h:commandButton value="Nova Localização" 
+                                         action="#{localizacaoController.navigateToAdd}"
+                                         styleClass="btn btn-primary" />
+                        <h:commandButton value="Voltar ao Painel" 
+                                         action="/app/admin.xhtml?faces-redirect=true"
+                                         styleClass="btn btn-secondary"
+                                         immediate="true" />
+                    </h:form>
+                </div>
+            </div>
+
+            <h:form>
+                <!-- Campos hidden para capturar mensagens -->
+                <h:inputHidden id="hiddenLastMessage" value="#{localizacaoController.lastMessage}" />
+                <h:inputHidden id="hiddenMessageType" value="#{localizacaoController.messageType}" />
+                
+                <!-- Filtros de Busca -->
+                <div class="localizacoes-filters">
+                    <h3>Buscar Localizações</h3>
+                    <div class="filter-row">
+                        <p:inputText value="#{localizacaoController.searchNome}" 
+                                     placeholder="Buscar por nome..."
+                                     styleClass="form-control search-input" />
+                        <h:commandButton value="Buscar"
+                                         action="#{localizacaoController.searchByNome}"
+                                         styleClass="btn btn-info">
+                            <f:ajax execute="@form" render="lista-localizacoes" />
+                        </h:commandButton>
+
+                        <h:commandButton value="Limpar"
+                                         action="#{localizacaoController.clearFilters}"
+                                         styleClass="btn btn-secondary">
+                            <f:ajax execute="@form" render="lista-localizacoes" />
+                        </h:commandButton>
+                    </div>
+                </div>
+
+                <!-- Lista de Localizações -->
+                <h:panelGroup id="lista-localizacoes">
+                    <ui:include src="fragments/lista_localizacoes.xhtml" />
+                </h:panelGroup>
+
+            </h:form>
+        </div>
+
+        <!-- Container para mensagens flutuantes -->
+        <div id="floating-message-container"></div>
+    </h:body>
+</html>

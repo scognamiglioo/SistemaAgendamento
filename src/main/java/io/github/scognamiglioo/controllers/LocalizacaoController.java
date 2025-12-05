@@ -239,15 +239,15 @@ public class LocalizacaoController implements Serializable {
 
     public String navigateToEdit(Long localId) {
         selectedLocalId = localId;
-        return "/app/local/adicionar_localizacao.xhtml?faces-redirect=true&id=" + localId;
+        return "/app/localizacao/adicionar_localizacao.xhtml?faces-redirect=true&id=" + localId;
     }
 
     public String navigateToAdd() {
-        return "/app/local/adicionar_localizacao.xhtml?faces-redirect=true";
+        return "/app/localizacao/adicionar_localizacao.xhtml?faces-redirect=true";
     }
 
     public String navigateToList() {
-        return "/app/local/gerenciar_locais.xhtml?faces-redirect=true";
+        return "/app/localizacao/gerenciar_localizacoes.xhtml?faces-redirect=true";
     }
     
     // ========== UTILIDADES ==========

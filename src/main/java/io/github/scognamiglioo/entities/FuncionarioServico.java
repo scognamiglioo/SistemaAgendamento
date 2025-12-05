@@ -14,15 +14,44 @@ import jakarta.persistence.*;
 @IdClass(FuncionarioServicoId.class)
 @NamedQueries({
     @NamedQuery(name = "FuncionarioServico.findAll", 
-                query = "SELECT fs FROM FuncionarioServico fs ORDER BY fs.funcionario.user.nome, fs.servico.nome, fs.localizacao.nome"),
+                query = "SELECT fs FROM FuncionarioServico fs " +
+                       "JOIN FETCH fs.funcionario " +
+                       "JOIN FETCH fs.funcionario.user " +
+                       "LEFT JOIN FETCH fs.funcionario.cargo " +
+                       "JOIN FETCH fs.servico " +
+                       "JOIN FETCH fs.localizacao"),
     @NamedQuery(name = "FuncionarioServico.findByFuncionario", 
-                query = "SELECT fs FROM FuncionarioServico fs WHERE fs.funcionario.id = :funcionarioId ORDER BY fs.servico.nome, fs.localizacao.nome"),
+                query = "SELECT fs FROM FuncionarioServico fs " +
+                       "JOIN FETCH fs.funcionario " +
+                       "JOIN FETCH fs.funcionario.user " +
+                       "LEFT JOIN FETCH fs.funcionario.cargo " +
+                       "JOIN FETCH fs.servico " +
+                       "JOIN FETCH fs.localizacao " +
+                       "WHERE fs.funcionario.id = :funcionarioId"),
     @NamedQuery(name = "FuncionarioServico.findByServico", 
-                query = "SELECT fs FROM FuncionarioServico fs WHERE fs.servico.id = :servicoId ORDER BY fs.funcionario.user.nome, fs.localizacao.nome"),
+                query = "SELECT fs FROM FuncionarioServico fs " +
+                       "JOIN FETCH fs.funcionario " +
+                       "JOIN FETCH fs.funcionario.user " +
+                       "LEFT JOIN FETCH fs.funcionario.cargo " +
+                       "JOIN FETCH fs.servico " +
+                       "JOIN FETCH fs.localizacao " +
+                       "WHERE fs.servico.id = :servicoId"),
     @NamedQuery(name = "FuncionarioServico.findByLocalizacao", 
-                query = "SELECT fs FROM FuncionarioServico fs WHERE fs.localizacao.id = :localizacaoId ORDER BY fs.funcionario.user.nome, fs.servico.nome"),
+                query = "SELECT fs FROM FuncionarioServico fs " +
+                       "JOIN FETCH fs.funcionario " +
+                       "JOIN FETCH fs.funcionario.user " +
+                       "LEFT JOIN FETCH fs.funcionario.cargo " +
+                       "JOIN FETCH fs.servico " +
+                       "JOIN FETCH fs.localizacao " +
+                       "WHERE fs.localizacao.id = :localizacaoId"),
     @NamedQuery(name = "FuncionarioServico.findByFuncionarioAndServico", 
-                query = "SELECT fs FROM FuncionarioServico fs WHERE fs.funcionario.id = :funcionarioId AND fs.servico.id = :servicoId"),
+                query = "SELECT fs FROM FuncionarioServico fs " +
+                       "JOIN FETCH fs.funcionario " +
+                       "JOIN FETCH fs.funcionario.user " +
+                       "LEFT JOIN FETCH fs.funcionario.cargo " +
+                       "JOIN FETCH fs.servico " +
+                       "JOIN FETCH fs.localizacao " +
+                       "WHERE fs.funcionario.id = :funcionarioId AND fs.servico.id = :servicoId"),
     @NamedQuery(name = "FuncionarioServico.countByFuncionario", 
                 query = "SELECT COUNT(fs) FROM FuncionarioServico fs WHERE fs.funcionario.id = :funcionarioId"),
     @NamedQuery(name = "FuncionarioServico.countByServico", 

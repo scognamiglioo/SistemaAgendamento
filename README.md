@@ -1,6 +1,6 @@
 # Sistema de Agendamento em Jakarta EE 
 
-# Importante!
+
 
 ## Segurança - Hash em Senhas
 WildFly precisa de Elytron and Java Authentication Service Provider Interface (SPI) para ativação do Containers (JASPI).
@@ -15,6 +15,7 @@ Se o projeto não funcionar, acesse o arquivo ``jboss-cli`` pelo cmd e digite:
     > Reload the settings
 
 ## MailGun
+
 https://login.mailgun.com
 
 ### 1. Obter credenciais SMTP no Mailgun
@@ -62,7 +63,8 @@ Copie os dados:
    - **Remote Host:** `smtp.mailgun.org`
    - **Remote Port:** `587`
 
-
+### Arquivo .env
+Coloque o seu .env com o mail dado pelo MailGun, como o arquivo .envexample sugere, na pasta ´resources' do projeto. 
 
 ## Banco de dados e Persistência
 

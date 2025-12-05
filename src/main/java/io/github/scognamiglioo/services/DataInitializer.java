@@ -9,6 +9,9 @@ import jakarta.ejb.EJB;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Initialized;
 import jakarta.enterprise.event.Observes;
+import java.util.ArrayList;
+import java.util.List;
+
 
 @ApplicationScoped
 public class DataInitializer {
@@ -64,24 +67,16 @@ public class DataInitializer {
 
             User guisso = dataService.createInitialUser(
                     "Luis Guisso", // nome
-                    "00000000191", // cpf
+                    "00000000188", // cpf
                     "guisso@example.com",// email
                     "11999990001", // telefone
                     "guisso", // username
                     "asdf", // password
-                    "admin" // group
+                    "user" // group
                     
             );
 
-            User azacchi = dataService.createInitialUser(
-                    "Andrea Zacchi",
-                    "00000000192",
-                    "azacchi@example.com",
-                    "11999990002",
-                    "azacchi",
-                    "asdf",
-                    "funcionario"
-            );
+           
 
             System.out.println(">>> Usuários iniciais criados.");
         }
@@ -125,16 +120,17 @@ public class DataInitializer {
             // Funcionários administrativos (sem cargo específico - definido pelo Role)
             Funcionario maria = dataService.createFuncionario(
                 "Maria Silva Santos",
-                "12345678901",
+                "00000000191",
                 "maria.santos@clinica.com",
                 "11987654321",
                 "maria.santos",
-                "senha123",
+                "asdf",
                 Role.admin,
                 null, // Admin não precisa de guichê
-                true
+                null, // Admin não precisa de cargo específico
+                true,
+                new ArrayList<>() // Lista vazia de serviços
             );
-            // Administradores não recebem cargo específico, pois o cargo é administrativo (definido pelo Role)
             
             // Recepcionistas (sem cargo específico - definido pelo Role)
             Funcionario ana = dataService.createFuncionario(
@@ -146,9 +142,10 @@ public class DataInitializer {
                 "senha123",
                 Role.recepcionista,
                 guiche1.getId(),
-                true
+                null, // Recepcionista não precisa de cargo específico
+                true,
+                new ArrayList<>() // Lista vazia de serviços
             );
-            // Recepcionistas não recebem cargo específico, pois o cargo é administrativo
             
             Funcionario carlos = dataService.createFuncionario(
                 "Carlos Eduardo Lima",
@@ -159,9 +156,10 @@ public class DataInitializer {
                 "senha123",
                 Role.recepcionista,
                 guiche2.getId(),
-                true
+                null, // Recepcionista não precisa de cargo específico
+                true,
+                new ArrayList<>() // Lista vazia de serviços
             );
-            // Recepcionistas não recebem cargo específico, pois o cargo é administrativo
             
             // Atendentes/Médicos
             Funcionario drRoberto = dataService.createFuncionario(
@@ -173,12 +171,10 @@ public class DataInitializer {
                 "senha123",
                 Role.atendente,
                 sala101.getId(),
-                true
+                cargoMedicoGeral != null ? cargoMedicoGeral.getId() : null,
+                true,
+                new ArrayList<>() // Lista vazia de serviços
             );
-            if (drRoberto != null && cargoMedicoGeral != null) {
-                drRoberto.setCargo(cargoMedicoGeral);
-                dataService.updateFuncionario(drRoberto);
-            }
             
             Funcionario draPatricia = dataService.createFuncionario(
                 "Dra. Patricia Fernandes",
@@ -189,12 +185,10 @@ public class DataInitializer {
                 "senha123",
                 Role.atendente,
                 sala102.getId(),
-                true
+                cargoCardiologista != null ? cargoCardiologista.getId() : null,
+                true,
+                new ArrayList<>() // Lista vazia de serviços
             );
-            if (draPatricia != null && cargoCardiologista != null) {
-                draPatricia.setCargo(cargoCardiologista);
-                dataService.updateFuncionario(draPatricia);
-            }
             
             Funcionario drJoao = dataService.createFuncionario(
                 "Dr. João Oliveira",
@@ -205,12 +199,10 @@ public class DataInitializer {
                 "senha123", 
                 Role.atendente,
                 sala101.getId(),
-                true
+                cargoRadiologista != null ? cargoRadiologista.getId() : null,
+                true,
+                new ArrayList<>() // Lista vazia de serviços
             );
-            if (drJoao != null && cargoRadiologista != null) {
-                drJoao.setCargo(cargoRadiologista);
-                dataService.updateFuncionario(drJoao);
-            }
             
             Funcionario draFernanda = dataService.createFuncionario(
                 "Dra. Fernanda Souza",
@@ -221,12 +213,10 @@ public class DataInitializer {
                 "senha123",
                 Role.atendente,
                 sala102.getId(),
-                true
+                cargoDermatologista != null ? cargoDermatologista.getId() : null,
+                true,
+                new ArrayList<>() // Lista vazia de serviços
             );
-            if (draFernanda != null && cargoDermatologista != null) {
-                draFernanda.setCargo(cargoDermatologista);
-                dataService.updateFuncionario(draFernanda);
-            }
             
             Funcionario enfLucas = dataService.createFuncionario(
                 "Enfermeiro Lucas Santos",
@@ -237,12 +227,10 @@ public class DataInitializer {
                 "senha123",
                 Role.atendente,
                 guiche1.getId(),
-                true
+                cargoEnfermeiro != null ? cargoEnfermeiro.getId() : null,
+                true,
+                new ArrayList<>() // Lista vazia de serviços
             );
-            if (enfLucas != null && cargoEnfermeiro != null) {
-                enfLucas.setCargo(cargoEnfermeiro);
-                dataService.updateFuncionario(enfLucas);
-            }
             
             System.out.println(">>> Funcionários iniciais criados com cargos associados.");
         }

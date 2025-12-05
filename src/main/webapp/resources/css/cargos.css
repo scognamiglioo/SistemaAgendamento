@@ -281,6 +281,7 @@
 }
 
 .search-input {
+    background-color: #ffffff;
     flex: 1;
     padding: 0.75rem;
     border: 2px solid #e1e5e9;

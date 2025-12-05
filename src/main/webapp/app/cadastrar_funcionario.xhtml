@@ -1,87 +1,122 @@
-<!DOCTYPE html>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:f="http://xmlns.jcp.org/jsf/core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+      xmlns:p="http://primefaces.org/ui">
 
-    <h:head>
-        <title>Cadastrar Funcionário</title>
-        <h:outputStylesheet library="css" name="admin.css"/>
-    </h:head>
-    <h:body>
-        <ui:param name="Role" value="#{io.github.scognamiglioo.entities.Role}" />
+<h:head>
+    <title>Gerenciar Funcionário</title>
+    <h:outputStylesheet library="css" name="cadastro_func.css" />
+</h:head>
 
-        <div class="login-container">
-            <div class="login-card" style="max-width:700px;">
-                <h1 style="text-align:center">Cadastrar Funcionário</h1>
+<h:body>
+    <h:form id="formFuncionario">
+        
 
-                <h:form id="formCreate">
-                    <h:messages globalOnly="false" showDetail="true" showSummary="true"
-                                style="color:red; font-weight:bold;"/>
+        <h:panelGroup layout="block" styleClass="container">
+            <h1>Cadastrar Novo Funcionário</h1>
 
-                    <h:panelGrid columns="2" cellpadding="5" style="margin: 0 auto; width: 100%;">
+            <!-- Dados Pessoais -->
+            <fieldset>
+                <legend>Dados Pessoais</legend>
 
-                        <h:outputLabel for="nome" value="Nome *"/>
-                        <h:inputText id="nome" value="#{employeeController.employee.nome}" required="true" style="width:100%"/>
+                <h:panelGroup layout="block" styleClass="form-group">
+                    <h:outputLabel for="nome" value="Nome:" styleClass="required" />
+                    <h:inputText id="nome" value="#{employeeController.employee.nome}" required="true" 
+                                 requiredMessage="Nome é obrigatório" />
+                </h:panelGroup>
 
-                        <h:outputLabel for="cpf" value="CPF *"/>
-                        <h:inputText id="cpf" value="#{employeeController.employee.cpf}" required="true" style="width:100%"/>
+                <h:panelGroup layout="block" styleClass="form-group">
+                    <h:outputLabel for="cpf" value="CPF:" styleClass="required" />
+                    <h:inputText id="cpf" value="#{employeeController.employee.cpf}" required="true"
+                                 requiredMessage="CPF é obrigatório" />
+                </h:panelGroup>
 
-                        <h:outputLabel for="email" value="Email *"/>
-                        <h:inputText id="email" value="#{employeeController.employee.email}" required="true" style="width:100%"/>
+                <h:panelGroup layout="block" styleClass="form-group">
+                    <h:outputLabel for="email" value="Email:" styleClass="required" />
+                    <h:inputText id="email" value="#{employeeController.employee.email}" required="true"
+                                 requiredMessage="Email é obrigatório" type="email" />
+                </h:panelGroup>
 
-                        <h:outputLabel for="telefone" value="Telefone"/>
-                        <h:inputText id="telefone" value="#{employeeController.employee.telefone}" style="width:100%"/>
+                <h:panelGroup layout="block" styleClass="form-group">
+                    <h:outputLabel for="telefone" value="Telefone:" />
+                    <h:inputText id="telefone" value="#{employeeController.employee.telefone}" />
+                </h:panelGroup>
+            </fieldset>
 
-                        <h:outputLabel for="username" value="Username *"/>
-                        <h:inputText id="username" value="#{employeeController.employee.username}" required="true" style="width:100%"/>
+            <!-- Dados de Acesso -->
+            <fieldset>
+                <legend>Dados de Acesso</legend>
 
-                        <h:outputLabel for="password" value="Senha *"/>
-                        <h:inputSecret id="password"
-                                       value="#{employeeController.employee.password}"
-                                       required="true"
-                                       requiredMessage="Senha obrigatória"
-                                       style="width:100%"/>
+                <h:panelGroup layout="block" styleClass="form-group">
+                    <h:outputLabel for="username" value="Username:" styleClass="required" />
+                    <h:inputText id="username" value="#{employeeController.employee.username}" required="true"
+                                 requiredMessage="Username é obrigatório" />
+                </h:panelGroup>
 
+                <h:panelGroup layout="block" styleClass="form-group">
+                    <h:outputLabel for="password" value="Senha:" styleClass="required" />
+                    <h:inputSecret id="password" value="#{employeeController.employee.password}" required="true"
+                                   requiredMessage="Senha é obrigatória" />
+                </h:panelGroup>
 
-                        <h:outputLabel for="role" value="Perfil *"/>
-                        <h:selectOneMenu id="role" value="#{employeeController.selectedRole}">
-                            <f:selectItems value="#{employeeController.roles}"
-                                           var="r"
-                                           itemLabel="#{r}"
-                                           itemValue="#{r}" />
+                <h:panelGroup layout="block" styleClass="form-group">
+                    <h:outputLabel for="role" value="Perfil:" styleClass="required" />
+                    <h:selectOneMenu id="role" value="#{employeeController.selectedRole}" required="true"
+                                    requiredMessage="Perfil é obrigatório">
+                        <f:selectItems value="#{employeeController.roles}" var="role" 
+                                       itemLabel="#{role}" itemValue="#{role}" />
+                    </h:selectOneMenu>
+                </h:panelGroup>
+            </fieldset>
 
-                        </h:selectOneMenu>
+            <!-- Dados Profissionais -->
+            <fieldset>
+                <legend>Dados Profissionais</legend>
 
+                <h:panelGroup layout="block" styleClass="form-group">
+                    <h:outputLabel for="cargo" value="Cargo:" styleClass="required" />
+                    <h:selectOneMenu id="cargo" value="#{employeeController.selectedCargoId}" required="true"
+                                    requiredMessage="Cargo é obrigatório">
+                        <f:selectItem itemLabel="-- Selecione um Cargo --" itemValue="" />
+                        <f:selectItems value="#{employeeController.cargos}" var="cargo"
+                                       itemLabel="#{cargo.nome}" itemValue="#{cargo.id}" />
+                    </h:selectOneMenu>
+                </h:panelGroup>
 
+                
 
+                <h:panelGroup layout="block" styleClass="form-group-checkbox">
+                    <h:selectBooleanCheckbox id="ativo" value="#{employeeController.employee.ativo}" />
+                    <h:outputLabel for="ativo" value="Ativo" />
+                </h:panelGroup>
+            </fieldset>
 
-                        <h:outputLabel for="guiche" value="Guichê / Sala (apenas atendente)"/>
-                        <h:selectOneMenu id="guiche" value="#{employeeController.selectedGuicheId}" style="width:100%">
-                            <f:selectItem itemLabel="Nenhum" itemValue="#{null}" />
+            <!-- Serviços -->
+            <fieldset>
+                <legend>Serviços</legend>
 
+                <h:panelGroup layout="block" styleClass="form-group">
+                    <h:outputLabel for="servicos" value="Serviços Atribuídos:" />
+                    <h:selectManyCheckbox id="servicos" value="#{employeeController.selectedServicosIds}"
+                                          layout="pageDirection">
+                        <f:selectItems value="#{employeeController.servicos}" var="servico"
+                                       itemLabel="#{servico.nome}" itemValue="#{servico.id}" />
+                    </h:selectManyCheckbox>
+                    <span class="info-text">Opcional: marque os serviços que o funcionário pode prestar</span>
+                </h:panelGroup>
+            </fieldset>
 
-                            <f:selectItems value="#{employeeController.guiches}" var="g" itemLabel="#{g.nome}" itemValue="#{g.id}" />
-                        </h:selectOneMenu>
+            <!-- Botões -->
+            <h:panelGroup layout="block" styleClass="button-group">
+                <h:commandButton action="#{employeeController.save()}" value="Salvar" 
+                                styleClass="btn btn-primary" />
+                <h:button value="Cancelar" outcome="/app/admin.xhtml" styleClass="btn btn-secondary" />
+            </h:panelGroup>
+        </h:panelGroup>
+    </h:form>
+</h:body>
 
-                        <h:outputLabel for="ativo" value="Ativo"/>
-                        <h:selectBooleanCheckbox id="ativo" value="#{employeeController.employee.ativo}" />
-
-                        <h:outputLabel />
-                        <h:commandButton value="Cadastrar" action="#{employeeController.save}" styleClass="admin-btn" />
-
-                    </h:panelGrid>
-
-                    <h:messages globalOnly="true" style="color:red;margin-top:10px;"/>
-
-
-                </h:form>
-
-
-
-
-            </div>
-        </div>
-    </h:body>
 </html>

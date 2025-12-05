@@ -40,8 +40,11 @@ public interface DataServiceLocal {
 
     public boolean validateResetToken(String token);
 
-    Funcionario createFuncionario(String nome, String cpf, String email, String telefone,
-            String username, String plainPassword, Role role, Long guicheId, boolean ativo);
+    public Funcionario createFuncionario(String nome, String cpf, String email, String telefone,
+            String username, String password, Role role,
+            Long guicheId, Long cargoId, boolean ativo,
+            List<Long> servicosIds);
+
 
     List<Guiche> listGuiches();
 

@@ -7,6 +7,8 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.NoResultException;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -200,19 +202,20 @@ public class CargoService implements CargoServiceLocal {
 
     @Override
     public List<Funcionario> findFuncionariosByCargo(Long cargoId) {
-        if (cargoId == null) {
-            return List.of();
+        if (cargoId == null || cargoId <= 0) {
+            return new ArrayList<>();
         }
-
         try {
-            TypedQuery<Funcionario> query = em.createQuery(
-                "SELECT f FROM Funcionario f WHERE f.cargo.id = :cargoId ORDER BY f.nome", 
-                Funcionario.class);
-            query.setParameter("cargoId", cargoId);
-            return query.getResultList();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Erro ao buscar funcionários do cargo ID: " + cargoId, e);
-            throw new RuntimeException("Erro ao buscar funcionários do cargo", e);
+            // JPQL com cast para garantir tipo correto
+            return em.createQuery(
+                "SELECT f FROM Funcionario f WHERE CAST(f.cargo.id AS java.lang.Long) = :cargoId", 
+                Funcionario.class
+            )
+            .setParameter("cargoId", cargoId)
+            .getResultList();
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Erro ao buscar funcionários do cargo " + cargoId + ": " + ex.getMessage(), ex);
+            return new ArrayList<>();
         }
     }
 }

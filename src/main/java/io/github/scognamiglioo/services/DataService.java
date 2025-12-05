@@ -1,5 +1,6 @@
 package io.github.scognamiglioo.services;
 
+import io.github.scognamiglioo.entities.Cargo;
 import io.github.scognamiglioo.entities.Funcionario;
 import io.github.scognamiglioo.entities.Guiche;
 import io.github.scognamiglioo.entities.Role;
@@ -23,6 +24,9 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
+import io.github.scognamiglioo.entities.Servico;
+
+import java.util.List;
 
 @Stateless
 @LocalBean
@@ -344,7 +348,7 @@ public class DataService
 
     @Override
     public boolean cpfExists(String cpf) {
-        
+
         TypedQuery<Long> q = em.createQuery(
                 "SELECT COUNT(u) FROM User u WHERE u.cpf = :cpf", Long.class);
         q.setParameter("cpf", cpf);
@@ -365,59 +369,85 @@ public class DataService
 
     @Override
     public Funcionario createFuncionario(String nome, String cpf, String email, String telefone,
-            String username, String password, Role role, Long guicheId, boolean ativo) {
+            String username, String password, Role role,
+            Long guicheId, Long cargoId, boolean ativo,
+            List<Long> servicosIds) {
 
         if (cpf == null || cpf.isBlank()) {
             throw new IllegalArgumentException("CPF obrigatório");
         }
-        if (employeeCpfExists(cpf)) {
+        // agora checamos no User (composição: dados únicos estão em User)
+        if (cpfExists(cpf)) {
             throw new IllegalArgumentException("CPF já cadastrado");
         }
-        if (employeeUsernameExists(username)) {
+        if (findUserByUsername(username) != null) {
             throw new IllegalArgumentException("Username já cadastrado");
         }
 
+        // hash da senha
         Map<String, String> parameters = new HashMap<>();
         parameters.put("Pbkdf2PasswordHash.Iterations", "3071");
         parameters.put("Pbkdf2PasswordHash.Algorithm", "PBKDF2WithHmacSHA512");
         parameters.put("Pbkdf2PasswordHash.SaltSizeBytes", "64");
         passwordHasher.initialize(parameters);
-
-        
         String hashedPassword = passwordHasher.generate(password.toCharArray());
 
+        // criar User associado (ativo por padrão para funcionários)
+        String userGroup = (role != null) ? role.name() : "employee";
+        User user = new User(nome, cpf, email, telefone, username, hashedPassword, userGroup);
+        user.setActive(true);
+        em.persist(user);
+
         Guiche guiche = (guicheId != null) ? findGuicheById(guicheId) : null;
+        Cargo cargo = (cargoId != null) ? em.find(Cargo.class, cargoId) : null;
+
+        List<Servico> servicos = new ArrayList<>();
+        if (servicosIds != null && !servicosIds.isEmpty()) {
+            servicos = em.createQuery("SELECT s FROM Servico s WHERE s.id IN :ids", Servico.class)
+                    .setParameter("ids", servicosIds)
+                    .getResultList();
+        }
 
         Funcionario funcionario = new Funcionario(
-                nome,
-                cpf,
-                email,
-                telefone,
-                username,
-                hashedPassword,
-                role,
-                guiche,
-                ativo
+                user, role, guiche, cargo, ativo
         );
 
+        funcionario.setServicos(servicos);
+
         em.persist(funcionario);
+
+        // garantir associação bidirecional
+        for (Servico s : servicos) {
+            if (!s.getFuncionarios().contains(funcionario)) {
+                s.getFuncionarios().add(funcionario);
+            }
+        }
+
         return funcionario;
     }
 
     @Override
     public boolean employeeCpfExists(String cpf) {
-        Long count = em.createQuery("SELECT COUNT(e) FROM Funcionario e WHERE e.cpf = :cpf", Long.class)
-                .setParameter("cpf", cpf).getSingleResult();
+        // agora verifica em User (CPF único)
+        TypedQuery<Long> q = em.createQuery(
+                "SELECT COUNT(u) FROM User u WHERE u.cpf = :cpf", Long.class);
+        q.setParameter("cpf", cpf);
+        Long count = q.getSingleResult();
         return count != null && count > 0;
     }
 
     @Override
     public boolean employeeUsernameExists(String username) {
-        Long count = em.createQuery("SELECT COUNT(e) FROM Funcionario e WHERE e.username = :username", Long.class)
-                .setParameter("username", username).getSingleResult();
+        TypedQuery<Long> q = em.createQuery(
+                "SELECT COUNT(u) FROM User u WHERE u.username = :username", Long.class);
+        q.setParameter("username", username);
+        Long count = q.getSingleResult();
         return count != null && count > 0;
     }
 
+    
+
+    
     @Override
     public List<Funcionario> listEmployees() {
         return em.createNamedQuery("Funcionario.all", Funcionario.class).getResultList();

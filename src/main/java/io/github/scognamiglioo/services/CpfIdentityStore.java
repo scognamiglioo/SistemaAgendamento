@@ -89,22 +89,7 @@ public class CpfIdentityStore implements IdentityStore {
 
 
     
-    // buscar funcionario
     
-    try {
-        Funcionario f = em.createQuery(
-                "SELECT f FROM Funcionario f WHERE f.username = :username", Funcionario.class)
-                .setParameter("username", username)
-                .getSingleResult();
-
-        Set<String> roles = new HashSet<>();
-        roles.add(f.getRole().name()); // "admin", "funcionario"
-
-        return new AuthRecord(f.getUsername(), f.getPassword(), roles);
-
-    } catch (NoResultException ignored) {}
-
-
     
     return null;
 }

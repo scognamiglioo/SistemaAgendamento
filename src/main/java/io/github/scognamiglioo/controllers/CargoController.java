@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.logging.Logger;
 import java.util.logging.Level;
-
+import java.util.ArrayList;
 /**
  * Controller para gerenciamento de cargos.
  * Responsabilidades:
@@ -44,15 +44,22 @@ public class CargoController implements Serializable {
     
     // Funcionários relacionados
     private List<Funcionario> funcionariosDoCargoSelecionado;
-    private Map<Long, List<Funcionario>> funcionariosPorCargoMap = new HashMap<>();
-    
+    private Map<Long, List<Funcionario>> funcionariosPorCargoMap;
+
     // Mensagem para exibição flutuante
     private String lastMessage = "";
     private String messageType = "";
 
     @PostConstruct
     public void init() {
-        loadCargos();
+        try {
+            funcionariosPorCargoMap = new HashMap<>();
+            loadCargos(); // Carrega cargos e popula o mapa
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Erro ao inicializar CargoController", ex);
+            cargos = new ArrayList<>();
+            funcionariosPorCargoMap = new HashMap<>();
+        }
     }
 
     // ========== CRUD CARGOS ==========
@@ -60,24 +67,23 @@ public class CargoController implements Serializable {
     public void loadCargos() {
         try {
             cargos = cargoService.getAllCargos();
-            loadAllFuncionarios();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Erro ao carregar cargos", e);
-            addErrorMessage("Erro ao carregar lista de cargos");
-        }
-    }
-    
-    private void loadAllFuncionarios() {
-        try {
             funcionariosPorCargoMap.clear();
+            
+            // Popula o mapa com funcionários de cada cargo
             if (cargos != null) {
                 for (Cargo cargo : cargos) {
-                    List<Funcionario> funcionarios = cargoService.findFuncionariosByCargo(cargo.getId());
-                    funcionariosPorCargoMap.put(cargo.getId(), funcionarios);
+                    try {
+                        List<Funcionario> funcionarios = cargoService.findFuncionariosByCargo(cargo.getId());
+                        funcionariosPorCargoMap.put(cargo.getId(), funcionarios != null ? funcionarios : new ArrayList<>());
+                    } catch (Exception ex) {
+                        LOGGER.log(Level.WARNING, "Erro ao carregar funcionários do cargo " + cargo.getId(), ex);
+                        funcionariosPorCargoMap.put(cargo.getId(), new ArrayList<>());
+                    }
                 }
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Erro ao carregar funcionários por cargo", e);
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Erro ao carregar cargos", ex);
+            cargos = new ArrayList<>();
         }
     }
 
@@ -217,7 +223,7 @@ public class CargoController implements Serializable {
                 loadCargos();
                 return;
             }
-            loadAllFuncionarios();
+            // Não é mais necessário chamar loadAllFuncionarios aqui
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Erro na busca", ex);
             addErrorMessage("Erro na busca: " + ex.getMessage());
@@ -307,13 +313,13 @@ public class CargoController implements Serializable {
             .anyMatch(msg -> msg.getSeverity().equals(FacesMessage.SEVERITY_ERROR));
     }
     
-    public long getFuncionariosCount(Long cargoId) {
-        try {
-            return cargoService.countFuncionariosByCargo(cargoId);
-        } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Erro ao contar funcionários do cargo " + cargoId, e);
-            return 0;
-        }
+    public Map<Long, List<Funcionario>> getFuncionariosPorCargoMap() {
+        return funcionariosPorCargoMap;
+    }
+    
+    public int getFuncionariosCount(Long cargoId) {
+        List<Funcionario> funcionarios = funcionariosPorCargoMap.get(cargoId);
+        return funcionarios != null ? funcionarios.size() : 0;
     }
 
     // ========== GETTERS E SETTERS ==========
@@ -376,14 +382,6 @@ public class CargoController implements Serializable {
     
     public int getCargosCount() {
         return cargos != null ? cargos.size() : 0;
-    }
-    
-    public Map<Long, List<Funcionario>> getFuncionariosPorCargoMap() {
-        return funcionariosPorCargoMap;
-    }
-    
-    public void setFuncionariosPorCargoMap(Map<Long, List<Funcionario>> funcionariosPorCargoMap) {
-        this.funcionariosPorCargoMap = funcionariosPorCargoMap;
     }
     
     public String getLastMessage() {

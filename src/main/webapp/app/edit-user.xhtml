@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<h:head>
+   
+    <h1>Editar Usuário</h1>
+    <h:outputStylesheet library="css" name="edit.css"/>
+</h:head>
+<h:body>
+
+<f:metadata>
+    <f:viewParam name="id" value="#{adminUserBean.editId}" />
+    <f:viewParam name="type" value="#{adminUserBean.editType}" />
+    <f:event type="preRenderView" listener="#{adminUserBean.loadEntityForEdit}" />
+</f:metadata>
+
+<h:form>
+    <h:panelGroup>
+        <h:messages globalOnly="false" layout="table" />
+    </h:panelGroup>
+
+    <h:panelGrid columns="2" columnClasses="label,value" styleClass="form-grid">
+
+        <h:outputLabel for="nome" value="Nome:" />
+        <h:inputText id="nome" value="#{adminUserBean.editNome}" required="true" requiredMessage="Nome é obrigatório" />
+
+        <h:outputLabel for="email" value="Email:" />
+        <h:inputText id="email" value="#{adminUserBean.editEmail}" required="true" requiredMessage="Email é obrigatório" />
+
+        <h:outputLabel for="telefone" value="Telefone:" />
+        <h:inputText id="telefone" value="#{adminUserBean.editTelefone}" />
+
+        <h:outputLabel for="username" value="Username:" />
+        <h:inputText id="username" value="#{adminUserBean.editUsername}" required="true" />
+
+        <h:outputLabel for="ativo" value="Ativo:" />
+        <h:selectBooleanCheckbox id="ativo" value="#{adminUserBean.editAtivo}" />
+
+    </h:panelGrid>
+
+    <br/>
+
+    <h:commandButton value="Salvar" action="#{adminUserBean.save}" styleClass="btn btn-primary"/>
+    <h:commandButton value="Cancelar" action="/app/user-list.xhtml?faces-redirect=true" immediate="true" />
+
+</h:form>
+
+</h:body>
+</html>

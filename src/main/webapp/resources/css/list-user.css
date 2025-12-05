@@ -1,0 +1,101 @@
+/* ===== ESTILO GERAL ===== */
+body {
+    background-color: #fff; 
+    color: #000;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 30px;
+    text-align: center;
+}
+
+h1 {
+    font-size: 26px;
+    margin-top: 40px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+}
+
+/* ===== TABELA ===== */
+table {
+    width: 90%;
+    margin: 0 auto 40px auto;
+    border-collapse: collapse;
+    background-color: #fff;
+    border: 1px solid #444;
+}
+
+th, td {
+    padding: 12px;
+    border: 1px solid #333;
+}
+
+th {
+    background-color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+
+
+tr:hover {
+    background-color: #e0e0e0;
+    transition: 0.2s;
+}
+
+/* ===== BOTÃO/ LINK EDITAR ===== */
+a {
+    color: #000;
+    text-decoration: none;
+    padding: 6px 12px;
+    border: 1px solid #000;
+    border-radius: 5px;
+    font-size: 14px;
+    transition: 0.3s;
+}
+
+a:hover {
+    background-color: #fff;
+    color: #000;
+}
+
+/* ===== LINHA DE DIVISÃO ===== */
+hr {
+    border: 0;
+    height: 1px;
+    background: #444;
+    margin: 40px auto;
+    width: 80%;
+}
+
+.admin-button,
+.ui-button,
+.ui-widget,
+.ui-state-default {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #000000 !important;
+    padding: 10px 20px !important;
+    border-radius: 6px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+}
+
+/* HOVER */
+.admin-button:hover,
+.ui-button:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+
+.ui-button.ui-state-hover,
+.ui-state-hover,
+.ui-state-focus {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    box-shadow: none !important;
+}

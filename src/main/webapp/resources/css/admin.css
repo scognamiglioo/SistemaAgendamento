@@ -1,0 +1,107 @@
+/* ============================
+   RESET / BASE
+============================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: #ffffff;
+    color: #000000;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 40px 0;
+}
+
+/* ============================
+   CARD PRINCIPAL
+============================ */
+.admin-container {
+    width: 450px;
+    background: #ffffff;
+    border: 2px solid #000000;
+    padding: 30px;
+    border-radius: 12px;
+}
+
+.admin-container h1 {
+    font-size: 26px;
+    text-align: center;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #000000;
+    padding-bottom: 18px;
+}
+
+/* ============================
+   BOTÕES
+============================ */
+.admin-button {
+    width: 100%;
+    padding: 18px;
+    margin-top: 32px;
+    margin-bottom: 12px;
+
+
+    background: #fff;
+    color: #ffffff;
+
+    border: 2px solid #000000;
+    border-radius: 8px;
+
+    font-size: 16px;
+    cursor: pointer;
+
+    transition: 0.25s ease-in-out;
+}
+
+.admin-button:hover {
+    background: #ffffff;
+    color: #000000;
+}
+
+
+.admin-button,
+.ui-button,
+.ui-widget,
+.ui-state-default {
+    background-color: #000000 !important;
+    color: #ffffff !important;
+    border: 2px solid #000000 !important;
+    padding: 10px 20px !important;
+    border-radius: 6px !important;
+    font-weight: bold !important;
+    cursor: pointer !important;
+    box-shadow: none !important;
+}
+
+/* HOVER */
+.admin-button:hover,
+.ui-button:hover {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+}
+
+
+.ui-button.ui-state-hover,
+.ui-state-hover,
+.ui-state-focus {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    border: 2px solid #000000 !important;
+    box-shadow: none !important;
+}
+
+/* ============================
+   RODAPÉ
+============================ */
+.admin-footer {
+    margin-top: 20px;
+    font-size: 14px;
+    text-align: center;
+    opacity: 0.8;
+}

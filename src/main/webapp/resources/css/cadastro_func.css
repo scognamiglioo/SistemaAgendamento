@@ -1,0 +1,393 @@
+* {
+    margin: 2;
+    padding: 2;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Mensagens de erro de validação JSF */
+.ui-messages,
+.ui-messages-error,
+.field-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border-radius: 0.375rem;
+    font-size: 0.875rem;
+    display: block;
+    margin-top: 0.25rem;
+}
+
+.ui-messages-error-summary,
+.ui-messages-error-detail {
+    color: #721c24;
+    font-weight: 500;
+}
+
+.ui-messages-error-icon {
+    margin-right: 0.5rem;
+}
+
+/* Container principal */
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem;
+}
+
+.container h1 {
+    color: #212529;
+    font-size: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 3px solid #080808;
+    padding-bottom: 1rem;
+}
+
+/* Fieldsets (seções do formulário) */
+fieldset {
+    border: 1px solid #e1e5e9;
+    border-radius: 0.375rem;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    background-color: #f8f9fa;
+}
+
+fieldset legend {
+    padding: 0 0.5rem;
+    color: #495057;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+/* Grupos de formulário */
+.form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label,
+h:outputLabel {
+    color: #495057;
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-group label.required::after,
+h:outputLabel.required::after {
+    content: " *";
+    color: #dc3545;
+}
+
+/* Inputs de texto, email, password, tel */
+h:inputText,
+h:inputSecret,
+h:selectOneMenu,
+h:selectManyCheckbox,
+.form-control {
+    padding: 0.75rem;
+    border: 2px solid #e1e5e9;
+    border-radius: 0.375rem;
+    font-size: 1rem;
+    background-color: white;
+    transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+h:inputText:focus,
+h:inputSecret:focus,
+h:selectOneMenu:focus,
+.form-control:focus {
+    border-color: #0d6efd;
+    outline: 0;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Select menus */
+h:selectOneMenu,
+h:selectManyCheckbox {
+    cursor: pointer;
+}
+
+h:selectOneMenu option {
+    padding: 0.5rem;
+}
+
+/* Checkboxes */
+h:selectBooleanCheckbox,
+h:selectManyCheckbox {
+    cursor: pointer;
+    accent-color: #0d6efd;
+}
+
+/* Label para checkbox */
+.form-group h:selectBooleanCheckbox {
+    width: auto;
+    margin-right: 0.5rem;
+}
+
+.form-group-checkbox {
+    display: flex;
+    align-items: center;
+    margin-bottom: 1.5rem;
+}
+
+.form-group-checkbox h:selectBooleanCheckbox {
+    margin-right: 0.75rem;
+}
+
+.form-group-checkbox label {
+    margin-bottom: 0;
+}
+
+/* Checkboxes múltiplos (layout vertical) */
+.form-group h:selectManyCheckbox[layout="pageDirection"] {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.form-group h:selectManyCheckbox input[type="checkbox"] {
+    margin-right: 0.5rem;
+    accent-color: #0d6efd;
+}
+
+/* Erros de validação */
+.field-error {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+    display: block;
+    background-color: transparent;
+    border: none;
+    padding: 0.25rem 0;
+}
+
+h:inputText.invalid,
+h:inputSecret.invalid,
+h:selectOneMenu.invalid {
+    border-color: #dc3545;
+    background-color: #fff5f5;
+}
+
+/* Seção de botões */
+.button-group {
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-start;
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid #e1e5e9;
+}
+
+.button-group h:commandButton,
+.button-group h:button,
+.btn {
+    padding: 0.75rem 1.5rem;
+    font-weight: 500;
+    text-decoration: none;
+    border-radius: 0.375rem;
+    border: 1px solid transparent;
+    cursor: pointer;
+    transition: all 0.15s ease-in-out;
+    font-size: 1rem;
+    font-family: inherit;
+}
+
+.btn-primary,
+h:commandButton.btn-primary {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+.btn-primary:hover,
+h:commandButton.btn-primary:hover {
+    background-color: #0b5ed7;
+    border-color: #0a58ca;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+.btn-secondary,
+h:button.btn-secondary {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
+}
+
+.btn-secondary:hover,
+h:button.btn-secondary:hover {
+    background-color: #5c636a;
+    border-color: #565e64;
+}
+
+/* Mensagens flutuantes */
+.floating-toast.comic-bubble {
+    background: white;
+    border: 3px solid #dc3545;
+    border-radius: 15px;
+    padding: 15px 20px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.3);
+    font-size: 14px;
+    font-weight: 600;
+    max-width: 300px;
+    min-width: 250px;
+    opacity: 0;
+    transform: translateY(-20px) scale(0.8);
+    transition: all 0.3s ease;
+    position: fixed;
+    z-index: 99999;
+    text-align: center;
+    color: #333;
+    top: 20px;
+    right: 20px;
+}
+
+.floating-toast.comic-bubble.show {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+}
+
+.floating-toast.toast-success {
+    border-color: #28a745;
+    background: #d4edda;
+}
+
+.floating-toast.toast-error {
+    border-color: #dc3545;
+    background: #f8d7da;
+}
+
+.toast-icon {
+    font-size: 18px;
+    margin-right: 8px;
+}
+
+.toast-text {
+    line-height: 1.4;
+}
+
+.toast-arrow {
+    position: absolute;
+    bottom: -15px;
+    right: 20px;
+    width: 0;
+    height: 0;
+    border-left: 15px solid transparent;
+    border-right: 15px solid transparent;
+    border-top: 15px solid #dc3545;
+}
+
+.floating-toast.toast-success .toast-arrow {
+    border-top-color: #28a745;
+}
+
+/* Dicas de informação */
+.info-text {
+    color: #6c757d;
+    font-size: 0.9rem;
+    margin-top: 0.5rem;
+    font-style: italic;
+}
+
+/* Seção com aviso */
+.alert {
+    padding: 0.75rem 1rem;
+    margin-bottom: 1rem;
+    border: 1px solid;
+    border-radius: 0.375rem;
+}
+
+.alert-info {
+    color: #004085;
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+}
+
+.alert-warning {
+    color: #856404;
+    background-color: #fff3cd;
+    border-color: #ffeaa7;
+}
+
+.alert-danger {
+    color: #721c24;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+
+    .container h1 {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    fieldset {
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    fieldset legend {
+        font-size: 1rem;
+    }
+
+    .button-group {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .button-group h:commandButton,
+    .button-group h:button,
+    .btn {
+        width: 100%;
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-group {
+        margin-bottom: 1rem;
+    }
+
+    h:inputText,
+    h:inputSecret,
+    h:selectOneMenu,
+    h:selectManyCheckbox,
+    .form-control {
+        font-size: 16px; /* Evita zoom em dispositivos móveis */
+    }
+
+    .floating-toast.comic-bubble {
+        max-width: 90vw;
+        min-width: auto;
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        margin: 0 auto;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0.75rem;
+    }
+
+    .container h1 {
+        font-size: 1.25rem;
+    }
+
+    fieldset {
+        padding: 0.75rem;
+    }
+
+    .button-group {
+        gap: 0.5rem;
+    }
+}

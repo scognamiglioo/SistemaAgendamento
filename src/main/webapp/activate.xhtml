@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="primefaces"
+      xmlns:f="jakarta.faces.core">
+<h:head>
+    <title>Ativação de Conta</title>
+    <h:outputStylesheet name="css/admin.css"/>
+     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+</h:head>
+
+<h:body>
+    
+    <f:metadata>
+        <f:viewParam name="token" value="#{activationController.token}" />
+        <f:viewAction action="#{activationController.checkToken}" />
+    </f:metadata>
+    
+    <div class="activation-container">
+    <div class="activation-card">
+
+        <h1>Ativação de Conta</h1>
+
+        <h:form>
+
+            <!-- Exibe mensagens -->
+            <h:messages globalOnly="true" styleClass="ui-messages" />
+
+            <!-- Se ativação ainda não foi feita -->
+            <h:panelGroup rendered="#{activationController.activationAllowed}">
+                <p>Clique no botão abaixo para ativar sua conta.</p>
+
+                <h:commandButton value="Ativar Conta"
+                                 action="#{activationController.activate}" />
+            </h:panelGroup>
+
+            
+            <h:panelGroup rendered="#{not activationController.activationAllowed}">
+                <p style="color: green; font-weight: bold;">Conta ativada com sucesso! Agora você já pode fazer login.</p>
+
+                <p:commandButton 
+                        value="Ir para o login" 
+                        action="/login?faces-redirect=true"
+                        immediate="true"/>
+            </h:panelGroup>
+
+        </h:form>
+
+    </div>
+</div>
+
+
+</h:body>
+</html>

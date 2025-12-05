@@ -13,6 +13,18 @@
         <!-- Scripts para validação -->
         <h:outputScript name="js/floating-messages.js" />
         <h:outputScript name="js/form-success-monitor.js" />
+        
+        <script>
+            //<![CDATA[
+            function monitorarMensagens(data) {
+                if (data.status === 'success' && window.FormSuccessMonitor) {
+                    setTimeout(function() {
+                        window.FormSuccessMonitor.monitor();
+                    }, 100);
+                }
+            }
+            //]]>
+        </script>
     </h:head>
 
     <h:body>
@@ -33,7 +45,7 @@
                 </div>
             </div>
 
-            <h:form>
+            <h:form id="localizacoesForm">
                 <!-- Campos hidden para capturar mensagens -->
                 <h:inputHidden id="hiddenLastMessage" value="#{localizacaoController.lastMessage}" />
                 <h:inputHidden id="hiddenMessageType" value="#{localizacaoController.messageType}" />
@@ -48,13 +60,13 @@
                         <h:commandButton value="Buscar"
                                          action="#{localizacaoController.searchByNome}"
                                          styleClass="btn btn-info">
-                            <f:ajax execute="@form" render="lista-localizacoes" />
+                            <f:ajax execute="@form" render=":localizacoesForm:lista-localizacoes :localizacoesForm:hiddenLastMessage :localizacoesForm:hiddenMessageType" />
                         </h:commandButton>
 
                         <h:commandButton value="Limpar"
                                          action="#{localizacaoController.clearFilters}"
                                          styleClass="btn btn-secondary">
-                            <f:ajax execute="@form" render="lista-localizacoes" />
+                            <f:ajax execute="@form" render=":localizacoesForm:lista-localizacoes :localizacoesForm:hiddenLastMessage :localizacoesForm:hiddenMessageType" />
                         </h:commandButton>
                     </div>
                 </div>
@@ -65,9 +77,9 @@
                 </h:panelGroup>
 
             </h:form>
+            
+            <!-- Container dedicado para mensagens flutuantes -->
+            <div id="floating-message" class="floating-message" style="display: none;"></div>
         </div>
-
-        <!-- Container para mensagens flutuantes -->
-        <div id="floating-message-container"></div>
     </h:body>
 </html>

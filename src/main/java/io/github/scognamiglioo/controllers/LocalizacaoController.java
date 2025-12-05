@@ -153,29 +153,30 @@ public class LocalizacaoController implements Serializable {
     }
 
     public void delete(Long id) {
+        // Limpa mensagens antigas antes de processar
+        lastMessage = "";
+        messageType = "";
+        
         try {
             // Verificar primeiro se há associações com este local
             long associacoesCount = localizacaoService.countFuncionarioServicoByLocalizacao(id);
             if (associacoesCount > 0) {
-                Localizacao localParaExcluir = localizacaoService.findLocalizacaoById(id);
-                String nomeLocal = localParaExcluir != null ? localParaExcluir.getNome() : "este local";
-                
-                lastMessage = "Não é possível excluir \"" + nomeLocal + "\" pois há " + associacoesCount + 
-                             " associação(ões) funcionário-serviço vinculada(s) a este localizacao. Remova as associações primeiro.";
+                lastMessage = "Não é possível excluir esta localização pois existem " + associacoesCount + 
+                             " associação(ões) funcionário-serviço vinculada(s). Remova as associações primeiro.";
                 messageType = "error";
                 return;
             }
             
             localizacaoService.deleteLocalizacao(id);
             loadLocalizacaoizacoes();
-            lastMessage = "Local excluído com sucesso!";
+            lastMessage = "Localização excluída com sucesso!";
             messageType = "success";
         } catch (IllegalStateException ex) {
             lastMessage = ex.getMessage();
             messageType = "error";
         } catch (Exception ex) {
-            LOGGER.log(Level.SEVERE, "Erro ao excluir local", ex);
-            lastMessage = "Erro ao excluir local: " + ex.getMessage();
+            LOGGER.log(Level.SEVERE, "Erro ao excluir localização", ex);
+            lastMessage = "Erro ao excluir localização: " + ex.getMessage();
             messageType = "error";
         }
     }

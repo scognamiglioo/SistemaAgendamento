@@ -9,6 +9,12 @@
         <title>Gerenciar Serviços</title>
         <h:outputStylesheet library="css" name="admin.css"/>
         <h:outputStylesheet library="css" name="servicos.css"/>
+        
+        <!-- Scripts para validação de serviços -->
+        <h:outputScript name="js/floating-messages.js" />
+        <h:outputScript name="js/form-success-monitor.js" />
+        <h:outputScript name="js/servico/servico-validation.js" />
+        <h:outputScript name="js/servico/servico-main.js" />
     </h:head>
 
     <h:body>
@@ -30,6 +36,10 @@
             </div>
 
             <h:form>
+                <!-- Campos hidden para capturar mensagens -->
+                <h:inputHidden id="hiddenLastMessage" value="#{servicoController.lastMessage}" />
+                <h:inputHidden id="hiddenMessageType" value="#{servicoController.messageType}" />
+                
                 <!-- Filtros de Busca -->
                 <div class="servicos-filters">
                     <h3>Buscar Serviços</h3>

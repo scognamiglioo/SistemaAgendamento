@@ -55,6 +55,10 @@ public class ServicoController implements Serializable {
     // Para seleção múltipla de funcionários na edição/criação
     private List<Long> selectedFuncionarioIds = new ArrayList<>();
     private List<Funcionario> funcionariosDoServico = new ArrayList<>();
+    
+    // Mensagem para exibição flutuante
+    private String lastMessage = "";
+    private String messageType = "";
 
     @PostConstruct
     public void init() {
@@ -146,12 +150,33 @@ public class ServicoController implements Serializable {
 
     public void delete(Long id) {
         try {
+            // Verificar primeiro se há funcionários associados
+            int funcionariosCount = getFuncionariosCountByServico(id);
+            if (funcionariosCount > 0) {
+                // Buscar nome do serviço para mensagem mais clara
+                Servico servicoParaExcluir = servicoService.findServicoById(id);
+                String nomeServico = servicoParaExcluir != null ? servicoParaExcluir.getNome() : "este serviço";
+                
+                lastMessage = "Não é possível excluir \"" + nomeServico + "\" pois há " + funcionariosCount + 
+                             " funcionário" + (funcionariosCount > 1 ? "s" : "") + " associado" + 
+                             (funcionariosCount > 1 ? "s" : "") + " a este serviço. Remova os funcionários primeiro.";
+                messageType = "error";
+                return;
+            }
+            
             servicoService.deleteServico(id);
             loadServicos();
             loadAllFuncionariosPorServico();
+            lastMessage = "Serviço excluído com sucesso!";
+            messageType = "success";
             addSuccessMessage("Serviço excluído com sucesso!");
+        } catch (IllegalStateException ex) {
+            lastMessage = ex.getMessage();
+            messageType = "error";
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Erro ao excluir serviço", ex);
+            lastMessage = "Erro ao excluir serviço: " + ex.getMessage();
+            messageType = "error";
             addErrorMessage("Erro ao excluir serviço: " + ex.getMessage());
         }
     }
@@ -429,5 +454,21 @@ public class ServicoController implements Serializable {
 
     public void setFuncionariosDoServico(List<Funcionario> funcionariosDoServico) {
         this.funcionariosDoServico = funcionariosDoServico;
+    }
+    
+    public String getLastMessage() {
+        return lastMessage;
+    }
+    
+    public void setLastMessage(String lastMessage) {
+        this.lastMessage = lastMessage;
+    }
+    
+    public String getMessageType() {
+        return messageType;
+    }
+    
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 }

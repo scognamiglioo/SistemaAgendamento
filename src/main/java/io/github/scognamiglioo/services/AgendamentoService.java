@@ -219,8 +219,18 @@ public class AgendamentoService implements AgendamentoServiceLocal {
             throw new IllegalArgumentException("Funcionário não encontrado");
         }
 
-        // Verifica disponibilidade
-        if (!isHorarioDisponivel(agendamento.getData(), agendamento.getHora(), funcionarioId)) {
+        // Verifica disponibilidade EXCLUINDO o próprio agendamento
+        Long count = em.createQuery(
+            "SELECT COUNT(a) FROM Agendamento a WHERE a.data = :data AND a.hora = :hora " +
+            "AND a.funcionario.id = :funcionarioId AND a.id <> :agendamentoId AND a.status <> 'CANCELADO'",
+            Long.class)
+            .setParameter("data", agendamento.getData())
+            .setParameter("hora", agendamento.getHora())
+            .setParameter("funcionarioId", funcionarioId)
+            .setParameter("agendamentoId", agendamentoId)
+            .getSingleResult();
+
+        if (count > 0) {
             throw new IllegalArgumentException("Funcionário não disponível neste horário");
         }
 

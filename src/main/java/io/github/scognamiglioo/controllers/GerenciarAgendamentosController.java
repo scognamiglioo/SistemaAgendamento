@@ -123,12 +123,34 @@ public class GerenciarAgendamentosController implements Serializable {
      * Prepara o agendamento para edição
      */
     public void editarAgendamento(Agendamento agendamento) {
-        this.agendamentoSelecionado = agendamento;
-        this.funcionarioSelecionadoId = agendamento.getFuncionario() != null ?
-                agendamento.getFuncionario().getId() : null;
-        this.guicheSelecionadoId = agendamento.getGuiche() != null ?
-                agendamento.getGuiche().getId() : null;
-        this.statusSelecionado = agendamento.getStatus().name();
+        try {
+            if (agendamento == null) {
+                addErrorMessage("Agendamento inválido");
+                return;
+            }
+
+            // Recarrega o agendamento do banco para garantir que todas as relações estejam inicializadas
+            this.agendamentoSelecionado = agendamentoService.findAgendamentoById(agendamento.getId());
+
+            if (this.agendamentoSelecionado == null) {
+                addErrorMessage("Agendamento não encontrado");
+                return;
+            }
+
+            // Inicializa os valores dos campos editáveis
+            this.funcionarioSelecionadoId = this.agendamentoSelecionado.getFuncionario() != null ?
+                    this.agendamentoSelecionado.getFuncionario().getId() : null;
+            this.guicheSelecionadoId = this.agendamentoSelecionado.getGuiche() != null ?
+                    this.agendamentoSelecionado.getGuiche().getId() : null;
+            this.statusSelecionado = this.agendamentoSelecionado.getStatus().name();
+
+            LOGGER.log(Level.INFO, "Agendamento #{0} preparado para edição", agendamento.getId());
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao preparar agendamento para edição", e);
+            addErrorMessage("Erro ao carregar dados do agendamento");
+            this.agendamentoSelecionado = null;
+        }
     }
 
     /**
@@ -141,38 +163,84 @@ public class GerenciarAgendamentosController implements Serializable {
                 return;
             }
 
-            // Atribui funcionário se selecionado
+            Long agendamentoId = agendamentoSelecionado.getId();
+            LOGGER.log(Level.INFO, "Salvando alterações do agendamento #{0}", agendamentoId);
+
+            // Atribui funcionário APENAS se mudou
             if (funcionarioSelecionadoId != null) {
-                agendamentoService.atribuirFuncionario(
-                        agendamentoSelecionado.getId(),
-                        funcionarioSelecionadoId
-                );
+                Long funcionarioAtualId = agendamentoSelecionado.getFuncionario() != null ?
+                    agendamentoSelecionado.getFuncionario().getId() : null;
+
+                if (!funcionarioSelecionadoId.equals(funcionarioAtualId)) {
+                    LOGGER.log(Level.INFO, "Atribuindo funcionário ID: {0} (anterior: {1})",
+                        new Object[]{funcionarioSelecionadoId, funcionarioAtualId});
+                    agendamentoService.atribuirFuncionario(agendamentoId, funcionarioSelecionadoId);
+                } else {
+                    LOGGER.log(Level.INFO, "Funcionário não mudou (ID: {0}), pulando atribuição", funcionarioSelecionadoId);
+                }
             }
 
-            // Atribui guichê se selecionado
+            // Atribui guichê APENAS se mudou
             if (guicheSelecionadoId != null) {
-                agendamentoService.atribuirGuiche(
-                        agendamentoSelecionado.getId(),
-                        guicheSelecionadoId
-                );
+                Long guicheAtualId = agendamentoSelecionado.getGuiche() != null ?
+                    agendamentoSelecionado.getGuiche().getId() : null;
+
+                if (!guicheSelecionadoId.equals(guicheAtualId)) {
+                    LOGGER.log(Level.INFO, "Atribuindo guichê ID: {0} (anterior: {1})",
+                        new Object[]{guicheSelecionadoId, guicheAtualId});
+                    agendamentoService.atribuirGuiche(agendamentoId, guicheSelecionadoId);
+                } else {
+                    LOGGER.log(Level.INFO, "Guichê não mudou (ID: {0}), pulando atribuição", guicheSelecionadoId);
+                }
             }
 
-            // Altera status
-            if (statusSelecionado != null) {
-                StatusAgendamento novoStatus = StatusAgendamento.valueOf(statusSelecionado);
-                agendamentoService.alterarStatus(agendamentoSelecionado.getId(), novoStatus);
+            // Altera status APENAS se mudou
+            if (statusSelecionado != null && !statusSelecionado.trim().isEmpty()) {
+                String statusAtual = agendamentoSelecionado.getStatus().name();
+
+                if (!statusSelecionado.equals(statusAtual)) {
+                    StatusAgendamento novoStatus = StatusAgendamento.valueOf(statusSelecionado);
+                    LOGGER.log(Level.INFO, "Alterando status de {0} para {1}",
+                        new Object[]{statusAtual, novoStatus});
+                    agendamentoService.alterarStatus(agendamentoId, novoStatus);
+                } else {
+                    LOGGER.log(Level.INFO, "Status não mudou ({0}), pulando alteração", statusAtual);
+                }
             }
 
-            // Atualiza observações
-            agendamentoService.updateAgendamento(agendamentoSelecionado);
+            // Atualiza observações (sempre, pois podem ter mudado)
+            Agendamento agendamentoAtualizado = agendamentoService.findAgendamentoById(agendamentoId);
+            if (agendamentoAtualizado != null) {
+                String obsAntiga = agendamentoAtualizado.getObservacoes();
+                String obsNova = agendamentoSelecionado.getObservacoes();
+
+                // Normaliza nulls para comparação
+                obsAntiga = (obsAntiga == null || obsAntiga.trim().isEmpty()) ? null : obsAntiga.trim();
+                obsNova = (obsNova == null || obsNova.trim().isEmpty()) ? null : obsNova.trim();
+
+                if ((obsNova != null && !obsNova.equals(obsAntiga)) || (obsNova == null && obsAntiga != null)) {
+                    agendamentoAtualizado.setObservacoes(obsNova);
+                    agendamentoService.updateAgendamento(agendamentoAtualizado);
+                    LOGGER.log(Level.INFO, "Observações atualizadas");
+                } else {
+                    LOGGER.log(Level.INFO, "Observações não mudaram");
+                }
+            }
 
             addSuccessMessage("Agendamento atualizado com sucesso!");
+
+            // Recarrega a lista
             carregarAgendamentos();
 
-            FacesContext.getCurrentInstance().getAttributes().put("success", true);
+            // Limpa a seleção
+            agendamentoSelecionado = null;
+            funcionarioSelecionadoId = null;
+            guicheSelecionadoId = null;
+            statusSelecionado = null;
 
         } catch (IllegalArgumentException ex) {
-            addErrorMessage(ex.getMessage());
+            LOGGER.log(Level.WARNING, "Erro de validação ao salvar agendamento", ex);
+            addErrorMessage("Erro: " + ex.getMessage());
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Erro ao salvar agendamento", ex);
             addErrorMessage("Erro ao salvar agendamento: " + ex.getMessage());
@@ -207,7 +275,48 @@ public class GerenciarAgendamentosController implements Serializable {
 
     private void addInfoMessage(String message) {
         FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Info", message));
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Informação", message));
+    }
+
+    // Métodos para estatísticas
+
+    /**
+     * Total de agendamentos
+     */
+    public int getTotalAgendamentos() {
+        return agendamentos != null ? agendamentos.size() : 0;
+    }
+
+    /**
+     * Agendamentos de hoje
+     */
+    public long getAgendamentosHoje() {
+        if (agendamentos == null) return 0;
+        LocalDate hoje = LocalDate.now();
+        return agendamentos.stream()
+                .filter(a -> a.getData() != null && a.getData().equals(hoje))
+                .count();
+    }
+
+    /**
+     * Agendamentos pendentes (Agendado + Confirmado)
+     */
+    public long getAgendamentosPendentes() {
+        if (agendamentos == null) return 0;
+        return agendamentos.stream()
+                .filter(a -> a.getStatus() == StatusAgendamento.AGENDADO ||
+                           a.getStatus() == StatusAgendamento.CONFIRMADO)
+                .count();
+    }
+
+    /**
+     * Agendamentos concluídos
+     */
+    public long getAgendamentosConcluidos() {
+        if (agendamentos == null) return 0;
+        return agendamentos.stream()
+                .filter(a -> a.getStatus() == StatusAgendamento.CONCLUIDO)
+                .count();
     }
 
     // Getters e Setters

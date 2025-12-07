@@ -311,15 +311,27 @@ public class AgendamentoController implements Serializable {
      */
     public void aplicarFiltros() {
         try {
+            // Garante que os agendamentos estão carregados
+            if (meusAgendamentos == null || meusAgendamentos.isEmpty()) {
+                loadMeusAgendamentos();
+            }
+
+            LOGGER.log(Level.INFO, "Aplicando filtros. Total de agendamentos: {0}",
+                meusAgendamentos != null ? meusAgendamentos.size() : 0);
+            LOGGER.log(Level.INFO, "Filtros - Código: {0}, Data: {1}, Status: {2}",
+                new Object[]{filtroCodigo, filtroData, filtroStatus});
+
             agendamentosFiltrados = new ArrayList<>(meusAgendamentos);
 
             // Filtro por código
             if (filtroCodigo != null && !filtroCodigo.trim().isEmpty()) {
                 try {
                     Long codigo = Long.parseLong(filtroCodigo.trim());
+                    LOGGER.log(Level.INFO, "Filtrando por código: {0}", codigo);
                     agendamentosFiltrados = agendamentosFiltrados.stream()
                             .filter(a -> a.getId().equals(codigo))
                             .toList();
+                    LOGGER.log(Level.INFO, "Após filtro por código: {0} resultados", agendamentosFiltrados.size());
                 } catch (NumberFormatException e) {
                     addWarnMessage("Código inválido. Digite apenas números.");
                     return;
@@ -329,17 +341,21 @@ public class AgendamentoController implements Serializable {
             // Filtro por data
             if (filtroData != null) {
                 LocalDate dataFiltro = new java.sql.Date(filtroData.getTime()).toLocalDate();
+                LOGGER.log(Level.INFO, "Filtrando por data: {0}", dataFiltro);
                 agendamentosFiltrados = agendamentosFiltrados.stream()
                         .filter(a -> a.getData() != null && a.getData().equals(dataFiltro))
                         .toList();
+                LOGGER.log(Level.INFO, "Após filtro por data: {0} resultados", agendamentosFiltrados.size());
             }
 
             // Filtro por status
             if (filtroStatus != null && !filtroStatus.isEmpty()) {
                 StatusAgendamento statusFiltro = StatusAgendamento.valueOf(filtroStatus);
+                LOGGER.log(Level.INFO, "Filtrando por status: {0}", statusFiltro);
                 agendamentosFiltrados = agendamentosFiltrados.stream()
                         .filter(a -> a.getStatus() == statusFiltro)
                         .toList();
+                LOGGER.log(Level.INFO, "Após filtro por status: {0} resultados", agendamentosFiltrados.size());
             }
 
             if (agendamentosFiltrados.isEmpty()) {
@@ -350,8 +366,8 @@ public class AgendamentoController implements Serializable {
 
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erro ao aplicar filtros", e);
-            addErrorMessage("Erro ao filtrar agendamentos");
-            agendamentosFiltrados = new ArrayList<>(meusAgendamentos);
+            addErrorMessage("Erro ao filtrar agendamentos: " + e.getMessage());
+            agendamentosFiltrados = meusAgendamentos != null ? new ArrayList<>(meusAgendamentos) : new ArrayList<>();
         }
     }
 
@@ -370,6 +386,11 @@ public class AgendamentoController implements Serializable {
      * Retorna a lista filtrada ou a lista completa se não houver filtros
      */
     public List<Agendamento> getAgendamentosFiltrados() {
+        // Garante que os agendamentos estão carregados
+        if (meusAgendamentos == null || meusAgendamentos.isEmpty()) {
+            loadMeusAgendamentos();
+        }
+
         if (agendamentosFiltrados != null) {
             return agendamentosFiltrados;
         }

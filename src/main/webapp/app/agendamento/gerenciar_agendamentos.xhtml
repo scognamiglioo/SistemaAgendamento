@@ -350,6 +350,20 @@
                 <div class="filters-section">
                     <div class="filters-grid">
                         <div class="filter-field">
+                            <label><i class="pi pi-hashtag"></i> ID do Agendamento</label>
+                            <p:inputText value="#{gerenciarAgendamentosController.filtroId}"
+                                        placeholder="Ex: 1"
+                                        style="width: 100%;"/>
+                        </div>
+
+                        <div class="filter-field">
+                            <label><i class="pi pi-user"></i> Nome do Paciente</label>
+                            <p:inputText value="#{gerenciarAgendamentosController.filtroUsuario}"
+                                        placeholder="Digite o nome do paciente..."
+                                        style="width: 100%;"/>
+                        </div>
+
+                        <div class="filter-field">
                             <label><i class="pi pi-calendar"></i> Data Início</label>
                             <p:calendar value="#{gerenciarAgendamentosController.filtroDataInicio}"
                                         pattern="dd/MM/yyyy"

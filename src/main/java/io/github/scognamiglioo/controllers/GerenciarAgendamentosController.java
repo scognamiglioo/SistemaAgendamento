@@ -16,6 +16,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 /**
  * Controller para gerenciar todos os agendamentos (área administrativa)
@@ -41,6 +42,8 @@ public class GerenciarAgendamentosController implements Serializable {
     private Date filtroDataInicio;
     private Date filtroDataFim;
     private String filtroStatus;
+    private String filtroId;
+    private String filtroUsuario;
 
     // Seleção/Edição
     private Agendamento agendamentoSelecionado;
@@ -97,24 +100,73 @@ public class GerenciarAgendamentosController implements Serializable {
      */
     public void aplicarFiltros() {
         try {
+            // Carrega todos os agendamentos primeiro
+            agendamentos = agendamentoService.getAllAgendamentos();
+
+            List<Agendamento> resultado = new ArrayList<>(agendamentos);
+
+            // Filtro por ID
+            if (filtroId != null && !filtroId.trim().isEmpty()) {
+                try {
+                    Long id = Long.parseLong(filtroId.trim());
+                    resultado = resultado.stream()
+                            .filter(a -> a.getId().equals(id))
+                            .collect(Collectors.toList());
+                } catch (NumberFormatException e) {
+                    addErrorMessage("ID inválido. Digite apenas números.");
+                    return;
+                }
+            }
+
+            // Filtro por usuário (nome do paciente)
+            if (filtroUsuario != null && !filtroUsuario.trim().isEmpty()) {
+                String usuarioLower = filtroUsuario.trim().toLowerCase();
+                resultado = resultado.stream()
+                        .filter(a -> a.getUser() != null &&
+                                     a.getUser().getNome() != null &&
+                                     a.getUser().getNome().toLowerCase().contains(usuarioLower))
+                        .collect(Collectors.toList());
+            }
+
+            // Filtro por data
             if (filtroDataInicio != null && filtroDataFim != null) {
                 LocalDate inicio = new java.sql.Date(filtroDataInicio.getTime()).toLocalDate();
                 LocalDate fim = new java.sql.Date(filtroDataFim.getTime()).toLocalDate();
-                agendamentos = agendamentoService.findAgendamentosByDataBetween(inicio, fim);
-            } else {
-                agendamentos = agendamentoService.getAllAgendamentos();
+                resultado = resultado.stream()
+                        .filter(a -> a.getData() != null &&
+                                     !a.getData().isBefore(inicio) &&
+                                     !a.getData().isAfter(fim))
+                        .collect(Collectors.toList());
+            } else if (filtroDataInicio != null) {
+                LocalDate inicio = new java.sql.Date(filtroDataInicio.getTime()).toLocalDate();
+                resultado = resultado.stream()
+                        .filter(a -> a.getData() != null && !a.getData().isBefore(inicio))
+                        .collect(Collectors.toList());
+            } else if (filtroDataFim != null) {
+                LocalDate fim = new java.sql.Date(filtroDataFim.getTime()).toLocalDate();
+                resultado = resultado.stream()
+                        .filter(a -> a.getData() != null && !a.getData().isAfter(fim))
+                        .collect(Collectors.toList());
             }
 
-            // Filtra por status se selecionado
+            // Filtro por status
             if (filtroStatus != null && !filtroStatus.isEmpty()) {
                 StatusAgendamento status = StatusAgendamento.valueOf(filtroStatus);
-                agendamentos = agendamentoService.findAgendamentosByStatus(status);
+                resultado = resultado.stream()
+                        .filter(a -> a.getStatus() == status)
+                        .collect(Collectors.toList());
             }
 
-            addInfoMessage("Filtros aplicados com sucesso");
+            agendamentos = resultado;
+
+            if (agendamentos.isEmpty()) {
+                addInfoMessage("Nenhum agendamento encontrado com os filtros aplicados");
+            } else {
+                addInfoMessage("Filtros aplicados: " + agendamentos.size() + " agendamento(s) encontrado(s)");
+            }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erro ao aplicar filtros", e);
-            addErrorMessage("Erro ao aplicar filtros");
+            addErrorMessage("Erro ao aplicar filtros: " + e.getMessage());
             carregarAgendamentos();
         }
     }
@@ -400,5 +452,20 @@ public class GerenciarAgendamentosController implements Serializable {
     public void setStatusSelecionado(String statusSelecionado) {
         this.statusSelecionado = statusSelecionado;
     }
-}
 
+    public String getFiltroId() {
+        return filtroId;
+    }
+
+    public void setFiltroId(String filtroId) {
+        this.filtroId = filtroId;
+    }
+
+    public String getFiltroUsuario() {
+        return filtroUsuario;
+    }
+
+    public void setFiltroUsuario(String filtroUsuario) {
+        this.filtroUsuario = filtroUsuario;
+    }
+}

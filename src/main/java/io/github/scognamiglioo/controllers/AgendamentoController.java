@@ -63,6 +63,12 @@ public class AgendamentoController implements Serializable {
     // Agendamento selecionado para visualização de detalhes
     private Agendamento agendamentoSelecionado;
 
+    // Filtros de pesquisa
+    private String filtroCodigo;
+    private Date filtroData;
+    private String filtroStatus;
+    private List<Agendamento> agendamentosFiltrados;
+
     @PostConstruct
     public void init() {
         loadServicosDisponiveis();
@@ -301,6 +307,76 @@ public class AgendamentoController implements Serializable {
     }
 
     /**
+     * Aplica os filtros de pesquisa
+     */
+    public void aplicarFiltros() {
+        try {
+            agendamentosFiltrados = new ArrayList<>(meusAgendamentos);
+
+            // Filtro por código
+            if (filtroCodigo != null && !filtroCodigo.trim().isEmpty()) {
+                try {
+                    Long codigo = Long.parseLong(filtroCodigo.trim());
+                    agendamentosFiltrados = agendamentosFiltrados.stream()
+                            .filter(a -> a.getId().equals(codigo))
+                            .toList();
+                } catch (NumberFormatException e) {
+                    addWarnMessage("Código inválido. Digite apenas números.");
+                    return;
+                }
+            }
+
+            // Filtro por data
+            if (filtroData != null) {
+                LocalDate dataFiltro = new java.sql.Date(filtroData.getTime()).toLocalDate();
+                agendamentosFiltrados = agendamentosFiltrados.stream()
+                        .filter(a -> a.getData() != null && a.getData().equals(dataFiltro))
+                        .toList();
+            }
+
+            // Filtro por status
+            if (filtroStatus != null && !filtroStatus.isEmpty()) {
+                StatusAgendamento statusFiltro = StatusAgendamento.valueOf(filtroStatus);
+                agendamentosFiltrados = agendamentosFiltrados.stream()
+                        .filter(a -> a.getStatus() == statusFiltro)
+                        .toList();
+            }
+
+            if (agendamentosFiltrados.isEmpty()) {
+                addWarnMessage("Nenhum agendamento encontrado com os filtros aplicados.");
+            } else {
+                addSuccessMessage(agendamentosFiltrados.size() + " agendamento(s) encontrado(s).");
+            }
+
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao aplicar filtros", e);
+            addErrorMessage("Erro ao filtrar agendamentos");
+            agendamentosFiltrados = new ArrayList<>(meusAgendamentos);
+        }
+    }
+
+    /**
+     * Limpa os filtros de pesquisa
+     */
+    public void limparFiltros() {
+        filtroCodigo = null;
+        filtroData = null;
+        filtroStatus = "";
+        agendamentosFiltrados = null;
+        addSuccessMessage("Filtros limpos com sucesso!");
+    }
+
+    /**
+     * Retorna a lista filtrada ou a lista completa se não houver filtros
+     */
+    public List<Agendamento> getAgendamentosFiltrados() {
+        if (agendamentosFiltrados != null) {
+            return agendamentosFiltrados;
+        }
+        return meusAgendamentos != null ? meusAgendamentos : new ArrayList<>();
+    }
+
+    /**
      * Reseta o formulário
      */
     private void resetForm() {
@@ -418,5 +494,33 @@ public class AgendamentoController implements Serializable {
 
     public void setAgendamentoSelecionado(Agendamento agendamentoSelecionado) {
         this.agendamentoSelecionado = agendamentoSelecionado;
+    }
+
+    public String getFiltroCodigo() {
+        return filtroCodigo;
+    }
+
+    public void setFiltroCodigo(String filtroCodigo) {
+        this.filtroCodigo = filtroCodigo;
+    }
+
+    public Date getFiltroData() {
+        return filtroData;
+    }
+
+    public void setFiltroData(Date filtroData) {
+        this.filtroData = filtroData;
+    }
+
+    public String getFiltroStatus() {
+        return filtroStatus;
+    }
+
+    public void setFiltroStatus(String filtroStatus) {
+        this.filtroStatus = filtroStatus;
+    }
+
+    public void setAgendamentosFiltrados(List<Agendamento> agendamentosFiltrados) {
+        this.agendamentosFiltrados = agendamentosFiltrados;
     }
 }

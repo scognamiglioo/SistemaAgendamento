@@ -1,373 +1,408 @@
 <?xml version='1.0' encoding='UTF-8' ?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html 
-    lang="en"
+<html
+    lang="pt-BR"
     xmlns="http://www.w3.org/1999/xhtml"
     xmlns:h="http://xmlns.jcp.org/jsf/html"
     xmlns:f="http://xmlns.jcp.org/jsf/core"
-    xmlns:p="http://primefaces.org/ui"
-    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
-    <f:view>
-        <h:head>
-            <title>Minha Conta</title>
-            <h:outputStylesheet name="css/login.css"/>
-        </h:head>
-        <h:body>
+    xmlns:p="http://primefaces.org/ui">
 
-           
-            <header style="padding: 20px; text-align: center; position: relative;">
-                <h1 style="margin: 0; color: #ffffff;">Sistema de Agendamento</h1>
+    <h:head>
+        <title>Novo Agendamento - Sistema de Agendamento</title>
+        <meta charset="UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding-bottom: 40px;
+            }
+
+            /* Header moderno */
+            .app-header {
+                background: rgba(255, 255, 255, 0.95);
+                box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+                padding: 20px 40px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                backdrop-filter: blur(10px);
+            }
+
+            .app-header h1 {
+                color: #667eea;
+                font-size: 1.8em;
+                font-weight: 700;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .header-actions {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .user-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background: #f8f9fa;
+                padding: 8px 16px;
+                border-radius: 20px;
+                color: #495057;
+                font-weight: 500;
+            }
+
+            /* Container principal */
+            .main-container {
+                max-width: 900px;
+                margin: 30px auto;
+                padding: 0 20px;
+            }
+
+            /* Card do formulário */
+            .form-card {
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                padding: 40px;
+                animation: fadeIn 0.5s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .page-title {
+                text-align: center;
+                margin-bottom: 40px;
+                padding-bottom: 20px;
+                border-bottom: 2px solid #e9ecef;
+            }
+
+            .page-title h2 {
+                color: #2d3748;
+                font-size: 2.5em;
+                font-weight: 700;
+                margin-bottom: 10px;
+            }
+
+            .page-title p {
+                color: #6c757d;
+                font-size: 1.1em;
+            }
+
+            /* Campos do formulário */
+            .form-field {
+                margin-bottom: 25px;
+            }
+
+            .form-field label {
+                display: block;
+                color: #2d3748;
+                font-weight: 600;
+                font-size: 1em;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .form-field label i {
+                color: #667eea;
+            }
+
+            .form-field .required {
+                color: #dc3545;
+                font-weight: bold;
+            }
+
+            .form-step {
+                display: inline-block;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                color: white;
+                padding: 4px 12px;
+                border-radius: 20px;
+                font-size: 0.85em;
+                font-weight: 600;
+                margin-right: 8px;
+            }
+
+            /* Grid para data e hora */
+            .date-time-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 20px;
+            }
+
+            /* Botões */
+            .ui-button {
+                border-radius: 8px !important;
+                font-weight: 600 !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .ui-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+            }
+
+            .submit-button {
+                margin-top: 30px;
+            }
+
+            /* Card de ajuda */
+            .help-card {
+                background: #f8f9fa;
+                border-left: 4px solid #667eea;
+                padding: 20px;
+                border-radius: 10px;
+                margin-top: 30px;
+            }
+
+            .help-card h3 {
+                color: #2d3748;
+                font-size: 1.1em;
+                margin-bottom: 10px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
+            }
+
+            .help-card ul {
+                color: #6c757d;
+                line-height: 1.8;
+                padding-left: 25px;
+            }
+
+            /* Responsivo */
+            @media (max-width: 768px) {
+                .app-header {
+                    flex-direction: column;
+                    gap: 15px;
+                    padding: 15px 20px;
+                }
+
+                .form-card {
+                    padding: 25px;
+                }
+
+                .date-time-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .page-title h2 {
+                    font-size: 1.8em;
+                }
+            }
+        </style>
+    </h:head>
+
+    <h:body>
+        <!-- Header -->
+        <div class="app-header">
+            <h1>
+                <i class="pi pi-calendar"></i>
+                Sistema de Agendamento
+            </h1>
+            <div class="header-actions">
+                <p:button value="Meus Agendamentos"
+                          icon="pi pi-list"
+                          styleClass="ui-button-outlined"
+                          href="meus-agendamentos.xhtml"/>
+
+                <div class="user-info">
+                    <i class="pi pi-user"></i>
+                    <span>#{facesContext.externalContext.remoteUser}</span>
+                </div>
+
                 <h:form>
-                    <div style="position: absolute; top: 20px; right: 20px;">
-                        <p:outputLabel value="Usuário: #{userSessionController.currentUser}"
-                                       style="color: white; margin-right: 10px;"/>
-                        <p:commandButton value="Sair"
-                                         action="#{userSessionController.logout}"
-                                         style="background: #dc3545; border: none; color: white;"
-                                         ajax="false"/>
+                    <p:commandButton value="Sair"
+                                     action="#{userSessionController.logout}"
+                                     icon="pi pi-sign-out"
+                                     styleClass="ui-button-danger ui-button-sm"
+                                     ajax="false"/>
+                </h:form>
+            </div>
+        </div>
+
+        <!-- Container Principal -->
+        <div class="main-container">
+            <div class="form-card">
+
+                <!-- Título da Página -->
+                <div class="page-title">
+                    <h2>
+                        <i class="pi pi-calendar-plus" style="color: #667eea;"></i>
+                        Novo Agendamento
+                    </h2>
+                    <p>Preencha os campos abaixo para agendar seu atendimento</p>
+                </div>
+
+                <h:form id="formAgendamento">
+                    <p:messages id="messages" showDetail="true" closable="true"/>
+
+                    <!-- PASSO 1: Serviço -->
+                    <div class="form-field">
+                        <label>
+                            <span class="form-step">1</span>
+                            <i class="pi pi-briefcase"></i>
+                            Selecione o Serviço
+                            <span class="required">*</span>
+                        </label>
+                        <p:selectOneMenu id="servico"
+                                         value="#{agendamentoController.servicoSelecionadoId}"
+                                         required="true"
+                                         requiredMessage="Selecione um serviço"
+                                         style="width: 100%;">
+                            <f:selectItem itemLabel="Escolha o serviço desejado..." itemValue="#{null}"/>
+                            <f:selectItems value="#{agendamentoController.servicosDisponiveis}"
+                                           var="s"
+                                           itemLabel="#{s.nome} - R$ #{s.valor}"
+                                           itemValue="#{s.id}"/>
+                            <p:ajax event="change"
+                                    listener="#{agendamentoController.onServicoChange}"
+                                    update="panelFuncionario messages"/>
+                        </p:selectOneMenu>
+                    </div>
+
+                    <!-- PASSO 2: Profissional -->
+                    <p:outputPanel id="panelFuncionario" styleClass="form-field">
+                        <label>
+                            <span class="form-step">2</span>
+                            <i class="pi pi-user"></i>
+                            Selecione o Profissional
+                            <span class="required">*</span>
+                        </label>
+                        <p:selectOneMenu id="funcionario"
+                                         value="#{agendamentoController.funcionarioSelecionadoId}"
+                                         required="true"
+                                         requiredMessage="Selecione um profissional"
+                                         style="width: 100%;">
+                            <f:selectItem itemLabel="#{agendamentoController.servicoSelecionadoId == null ? 'Primeiro selecione um serviço...' : 'Escolha o profissional que irá atendê-lo...'}"
+                                          itemValue="#{null}"/>
+                            <f:selectItems value="#{agendamentoController.funcionariosDisponiveis}"
+                                           var="f"
+                                           itemLabel="#{f.nome} - #{f.cargo != null ? f.cargo.nome : 'Profissional'}"
+                                           itemValue="#{f.id}"/>
+                            <p:ajax event="change"
+                                    listener="#{agendamentoController.onFuncionarioChange}"
+                                    update="panelData panelHora messages"/>
+                        </p:selectOneMenu>
+                    </p:outputPanel>
+
+                    <!-- PASSO 3 e 4: Data e Hora -->
+                    <div class="date-time-grid">
+                        <p:outputPanel id="panelData" styleClass="form-field">
+                            <label>
+                                <span class="form-step">3</span>
+                                <i class="pi pi-calendar"></i>
+                                Data do Atendimento
+                                <span class="required">*</span>
+                            </label>
+                            <p:calendar id="data"
+                                        value="#{agendamentoController.dataSelecionada}"
+                                        required="true"
+                                        requiredMessage="Selecione uma data"
+                                        pattern="dd/MM/yyyy"
+                                        mindate="#{agendamentoController.dataMinima}"
+                                        locale="pt"
+                                        showButtonPanel="true"
+                                        placeholder="Selecione a data"
+                                        style="width: 100%;">
+                                <p:ajax event="dateSelect"
+                                        listener="#{agendamentoController.onDataChange}"
+                                        update="panelHora messages"/>
+                            </p:calendar>
+                        </p:outputPanel>
+
+                        <p:outputPanel id="panelHora" styleClass="form-field">
+                            <label>
+                                <span class="form-step">4</span>
+                                <i class="pi pi-clock"></i>
+                                Horário do Atendimento
+                                <span class="required">*</span>
+                            </label>
+                            <p:selectOneMenu id="hora"
+                                             value="#{agendamentoController.horarioSelecionado}"
+                                             required="true"
+                                             requiredMessage="Selecione um horário"
+                                             style="width: 100%;">
+                                <f:selectItem itemLabel="#{agendamentoController.dataSelecionada == null ? 'Primeiro selecione a data...' : 'Escolha o horário disponível...'}"
+                                              itemValue="#{null}"/>
+                                <f:selectItems value="#{agendamentoController.horariosDisponiveis}"/>
+                            </p:selectOneMenu>
+                        </p:outputPanel>
+                    </div>
+
+                    <!-- Observações -->
+                    <div class="form-field">
+                        <label>
+                            <i class="pi pi-comment"></i>
+                            Observações
+                            <span style="color: #6c757d; font-weight: normal; font-size: 0.9em;">(Opcional)</span>
+                        </label>
+                        <p:inputTextarea id="observacoes"
+                                         value="#{agendamentoController.observacoes}"
+                                         rows="4"
+                                         placeholder="Adicione informações relevantes para o seu atendimento..."
+                                         style="width: 100%;"/>
+                    </div>
+
+                    <!-- Botão de Confirmar -->
+                    <div class="submit-button">
+                        <p:commandButton value="Confirmar Agendamento"
+                                         action="#{agendamentoController.salvarAgendamento}"
+                                         update="@form"
+                                         process="@form"
+                                         icon="pi pi-check"
+                                         styleClass="ui-button-success"
+                                         style="width: 100%; padding: 15px; font-size: 1.2em;"/>
                     </div>
                 </h:form>
-            </header>
 
-            <div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
-
-                <!-- Informações do Usuário -->
-                <p:panel header="Minhas Informações" style="margin-bottom: 20px;">
-                    <h:panelGrid columns="2" cellpadding="10">
-                        <p:outputLabel value="Usuário Logado:"/>
-                        <p:outputLabel value="#{facesContext.externalContext.remoteUser}" style="font-weight: bold;"/>
-
-                    </h:panelGrid>
-                </p:panel>
-
-
-                <p:panel header="Novo Agendamento" style="margin-bottom: 20px;">
-                    <h:form id="formAgendamento">
-                        <p:messages id="messages" showDetail="true" closable="true" />
-
-                        <div style="padding: 10px;">
-                            <!-- PASSO 1: Selecionar Serviço -->
-                            <div style="margin-bottom: 15px;">
-                                <p:outputLabel for="servico" value="1. Serviço *" style="display: block; margin-bottom: 5px; font-weight: bold;"/>
-                                <p:selectOneMenu id="servico"
-                                                 value="#{agendamentoController.servicoSelecionadoId}"
-                                                 required="true"
-                                                 requiredMessage="Selecione um serviço"
-                                                 style="width: 100%">
-                                    <f:selectItem itemLabel="Selecione um serviço..." itemValue="#{null}"/>
-                                    <f:selectItems value="#{agendamentoController.servicosDisponiveis}"
-                                                   var="s"
-                                                   itemLabel="#{s.nome} - R$ #{s.valor}"
-                                                   itemValue="#{s.id}"/>
-                                    <p:ajax event="change"
-                                            listener="#{agendamentoController.onServicoChange}"
-                                            update="panelFuncionario  messages"/>
-                                </p:selectOneMenu>
-                            </div>
-
-                            <!-- PASSO 2: Selecionar Funcionário -->
-                            <p:outputPanel id="panelFuncionario" style="display: block; margin-bottom: 15px;">
-                                <p:outputLabel for="funcionario" value="2. Funcionário/Prestador *" style="display: block; margin-bottom: 5px; font-weight: bold;"/>
-                                <p:selectOneMenu id="funcionario"
-                                                 value="#{agendamentoController.funcionarioSelecionadoId}"
-                                                 required="true"
-                                                 requiredMessage="Selecione um funcionário"
-                                                 style="width: 100%">
-                                    <f:selectItem itemLabel="#{agendamentoController.servicoSelecionadoId == null ? 'Primeiro selecione um serviço...' : 'Selecione um funcionário...'}"
-                                                  itemValue="#{null}"/>
-                                    <f:selectItems value="#{agendamentoController.funcionariosDisponiveis}"
-                                                   var="f"
-                                                   itemLabel="#{f.nome} - #{f.cargo != null ? f.cargo.nome : 'Funcionário'}"
-                                                   itemValue="#{f.id}"/>
-                                    <p:ajax event="change"
-                                            listener="#{agendamentoController.onFuncionarioChange}"
-                                            update="panelData panelHora messages funcDebug"/>
-                                </p:selectOneMenu>
-                            </p:outputPanel>
-
-
-
-
-                            <!-- PASSO 3: Selecionar Data -->
-                            <p:outputPanel id="panelData" style="display: block; margin-bottom: 15px;">
-                                <p:outputLabel for="data" value="3. Data *" style="display: block; margin-bottom: 5px; font-weight: bold;"/>
-                                <p:calendar id="data"
-                                            value="#{agendamentoController.dataSelecionada}"
-                                            required="true"
-                                            requiredMessage="Selecione uma data"
-                                            mindate="#{agendamentoController.dataMinima}"
-                                            pattern="dd/MM/yyyy"
-                                            locale="pt"
-                                            showButtonPanel="true"
-                                            style="width: 100%">
-                                    <p:ajax event="dateSelect"
-                                            listener="#{agendamentoController.onDataChange}"
-                                            update="panelHora messages funcDebug"/>
-                                </p:calendar>
-                            </p:outputPanel>
-
-                            <!-- PASSO 4: Selecionar Horário -->
-                            <p:outputPanel id="panelHora" style="display: block; margin-bottom: 15px;">
-                                <p:outputLabel for="hora" value="4. Horário Disponível *" style="display: block; margin-bottom: 5px; font-weight: bold;"/>
-                                <p:selectOneMenu id="hora"
-                                                 value="#{agendamentoController.horarioSelecionado}"
-                                                 required="true"
-                                                 requiredMessage="Selecione um horário"
-                                                 style="width: 100%">
-                                    <f:selectItem itemLabel="#{agendamentoController.dataSelecionada == null ? 'Primeiro selecione uma data...' : 'Selecione um horário disponível...'}"
-                                                  itemValue="#{null}"/>
-                                    <f:selectItems value="#{agendamentoController.horariosDisponiveis}" />
-                                </p:selectOneMenu>
-                            </p:outputPanel>
-
-                            <!-- Observações (Opcional) -->
-                            <div style="margin-bottom: 15px;">
-                                <p:outputLabel for="observacoes" value="Observações" style="display: block; margin-bottom: 5px; font-weight: bold;"/>
-                                <p:inputTextarea id="observacoes"
-                                                 value="#{agendamentoController.observacoes}"
-                                                 rows="3"
-                                                 placeholder="Informações adicionais sobre o agendamento..."
-                                                 style="width: 100%"/>
-                            </div>
-
-                            <!-- BOTÃO AGENDAR -->
-                            <p:commandButton value="Confirmar Agendamento"
-                                             action="#{agendamentoController.salvarAgendamento}"
-                                             update="@form :formMeusAgendamentos:tabelaAgendamentos"
-                                             process="@form"
-                                             icon="pi pi-calendar-plus"
-                                             styleClass="ui-button-success"
-                                             style="width: 100%; padding: 10px; font-size: 1.1em;"/>
-                        </div>
-                    </h:form>
-                </p:panel>
-
-                <!-- Meus Agendamentos -->
-                <p:panel header="Meus Agendamentos" style="margin-bottom: 20px;">
-                    <h:form id="formMeusAgendamentos">
-                        <p:dataTable id="tabelaAgendamentos"
-                                     value="#{agendamentoController.meusAgendamentos}"
-                                     var="agendamento"
-                                     emptyMessage="Nenhum agendamento encontrado"
-                                     paginator="true"
-                                     rows="10"
-                                     paginatorTemplate="{CurrentPageReport} {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                                     rowsPerPageTemplate="5,10,15"
-                                     styleClass="p-datatable-striped"
-                                     style="width: 100%">
-
-                            <p:column headerText="Data/Hora" style="width: 140px;" sortBy="#{agendamento.data}">
-                                <div style="display: flex; flex-direction: column; gap: 3px;">
-                                    <h:outputText value="#{agendamento.dataFormatada}" style="font-weight: bold; font-size: 0.95em;"/>
-                                    <h:outputText value="#{agendamento.horaFormatada}" style="color: #666; font-size: 0.9em;"/>
-                                </div>
-                            </p:column>
-
-                            <p:column headerText="Serviço" sortBy="#{agendamento.nomeServico}">
-                                <h:outputText value="#{agendamento.nomeServico}" style="font-weight: 500;"/>
-                            </p:column>
-
-                            <p:column headerText="Funcionário" style="width: 180px;">
-                                <div style="display: flex; align-items: center; gap: 8px;">
-                                    <i class="pi pi-user" style="color: #2196F3;"></i>
-                                    <h:outputText value="#{agendamento.nomeFuncionario}"/>
-                                </div>
-                            </p:column>
-
-                            <p:column headerText="Guichê" style="width: 120px;">
-                                <div style="display: flex; align-items: center; gap: 6px;">
-                                    <i class="pi pi-building" style="color: #FF9800; font-size: 0.9em;"></i>
-                                    <h:outputText value="#{agendamento.nomeGuiche}"/>
-                                </div>
-                            </p:column>
-
-                            <p:column headerText="Status" style="width: 140px;" sortBy="#{agendamento.status}">
-                                <h:panelGroup rendered="#{agendamento.status.name() == 'AGENDADO'}">
-                                    <span class="badge badge-primary" style="background: #2196F3; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: 500;">
-                                        <i class="pi pi-calendar-plus" style="font-size: 0.8em;"></i> Agendado
-                                    </span>
-                                </h:panelGroup>
-                                <h:panelGroup rendered="#{agendamento.status.name() == 'CONFIRMADO'}">
-                                    <span class="badge badge-success" style="background: #4CAF50; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: 500;">
-                                        <i class="pi pi-check" style="font-size: 0.8em;"></i> Confirmado
-                                    </span>
-                                </h:panelGroup>
-                                <h:panelGroup rendered="#{agendamento.status.name() == 'EM_ATENDIMENTO'}">
-                                    <span class="badge badge-info" style="background: #00BCD4; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: 500;">
-                                        <i class="pi pi-clock" style="font-size: 0.8em;"></i> Em Atendimento
-                                    </span>
-                                </h:panelGroup>
-                                <h:panelGroup rendered="#{agendamento.status.name() == 'CONCLUIDO'}">
-                                    <span class="badge badge-success" style="background: #8BC34A; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: 500;">
-                                        <i class="pi pi-check-circle" style="font-size: 0.8em;"></i> Concluído
-                                    </span>
-                                </h:panelGroup>
-                                <h:panelGroup rendered="#{agendamento.status.name() == 'CANCELADO'}">
-                                    <span class="badge badge-danger" style="background: #F44336; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: 500;">
-                                        <i class="pi pi-times-circle" style="font-size: 0.8em;"></i> Cancelado
-                                    </span>
-                                </h:panelGroup>
-                                <h:panelGroup rendered="#{agendamento.status.name() == 'AUSENTE'}">
-                                    <span class="badge badge-warning" style="background: #FF9800; color: white; padding: 4px 12px; border-radius: 12px; font-size: 0.85em; font-weight: 500;">
-                                        <i class="pi pi-ban" style="font-size: 0.8em;"></i> Ausente
-                                    </span>
-                                </h:panelGroup>
-                            </p:column>
-
-                            <p:column headerText="Ações" style="width: 180px;">
-                                <div style="display: flex; gap: 5px;">
-                                    <p:commandButton icon="pi pi-eye"
-                                                     title="Ver Detalhes"
-                                                     styleClass="ui-button-info ui-button-sm"
-                                                     update=":formDetalhes"
-                                                     oncomplete="PF('dialogDetalhes').show();"
-                                                     action="#{agendamentoController.selecionarAgendamento(agendamento)}">
-                                        <f:setPropertyActionListener value="#{agendamento}"
-                                                                     target="#{agendamentoController.agendamentoSelecionado}" />
-                                    </p:commandButton>
-
-                                    <p:commandButton icon="pi pi-times"
-                                                     title="Cancelar Agendamento"
-                                                     action="#{agendamentoController.cancelarAgendamento(agendamento.id)}"
-                                                     update=":formMeusAgendamentos:tabelaAgendamentos :formAgendamento:messages"
-                                                     styleClass="ui-button-danger ui-button-sm"
-                                                     rendered="#{agendamento.status.name() != 'CANCELADO' and agendamento.status.name() != 'CONCLUIDO'}"
-                                                     onclick="return confirm('Deseja realmente cancelar este agendamento?');"/>
-                                </div>
-                            </p:column>
-
-                        </p:dataTable>
-                    </h:form>
-                </p:panel>
-
-                <!-- Diálogo de Detalhes do Agendamento -->
-                <h:form id="formDetalhes">
-                    <p:dialog header="Detalhes do Agendamento"
-                              widgetVar="dialogDetalhes"
-                              modal="true"
-                              width="600"
-                              height="auto"
-                              responsive="true"
-                              styleClass="dialog-agendamento">
-
-                        <div style="padding: 15px;">
-                            <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado != null}">
-
-                                <!-- Status Badge Grande -->
-                                <div style="text-align: center; margin-bottom: 20px; padding: 15px; background: #f5f5f5; border-radius: 8px;">
-                                    <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'AGENDADO'}">
-                                        <span style="background: #2196F3; color: white; padding: 8px 20px; border-radius: 20px; font-size: 1.1em; font-weight: 600;">
-                                            <i class="pi pi-calendar-plus"></i> AGENDADO
-                                        </span>
-                                    </h:panelGroup>
-                                    <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'CONFIRMADO'}">
-                                        <span style="background: #4CAF50; color: white; padding: 8px 20px; border-radius: 20px; font-size: 1.1em; font-weight: 600;">
-                                            <i class="pi pi-check"></i> CONFIRMADO
-                                        </span>
-                                    </h:panelGroup>
-                                    <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'CANCELADO'}">
-                                        <span style="background: #F44336; color: white; padding: 8px 20px; border-radius: 20px; font-size: 1.1em; font-weight: 600;">
-                                            <i class="pi pi-times-circle"></i> CANCELADO
-                                        </span>
-                                    </h:panelGroup>
-                                    <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'CONCLUIDO'}">
-                                        <span style="background: #8BC34A; color: white; padding: 8px 20px; border-radius: 20px; font-size: 1.1em; font-weight: 600;">
-                                            <i class="pi pi-check-circle"></i> CONCLUÍDO
-                                        </span>
-                                    </h:panelGroup>
-                                    <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'EM_ATENDIMENTO'}">
-                                        <span style="background: #00BCD4; color: white; padding: 8px 20px; border-radius: 20px; font-size: 1.1em; font-weight: 600;">
-                                            <i class="pi pi-clock"></i> EM ATENDIMENTO
-                                        </span>
-                                    </h:panelGroup>
-                                </div>
-
-                                <!-- Informações Principais -->
-                                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 20px;">
-                                    <div style="background: #E3F2FD; padding: 15px; border-radius: 8px; border-left: 4px solid #2196F3;">
-                                        <div style="color: #1976D2; font-size: 0.85em; font-weight: 600; margin-bottom: 5px;">DATA</div>
-                                        <div style="font-size: 1.1em; font-weight: bold; color: #333;">
-                                            <i class="pi pi-calendar" style="margin-right: 8px;"></i>
-                                            #{agendamentoController.agendamentoSelecionado.dataFormatada}
-                                        </div>
-                                    </div>
-
-                                    <div style="background: #FFF3E0; padding: 15px; border-radius: 8px; border-left: 4px solid #FF9800;">
-                                        <div style="color: #F57C00; font-size: 0.85em; font-weight: 600; margin-bottom: 5px;">HORÁRIO</div>
-                                        <div style="font-size: 1.1em; font-weight: bold; color: #333;">
-                                            <i class="pi pi-clock" style="margin-right: 8px;"></i>
-                                            #{agendamentoController.agendamentoSelecionado.horaFormatada}
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Serviço -->
-                                <div style="background: #F3E5F5; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #9C27B0;">
-                                    <div style="color: #7B1FA2; font-size: 0.85em; font-weight: 600; margin-bottom: 5px;">SERVIÇO</div>
-                                    <div style="font-size: 1.05em; font-weight: 500; color: #333;">
-                                        <i class="pi pi-briefcase" style="margin-right: 8px;"></i>
-                                        #{agendamentoController.agendamentoSelecionado.nomeServico}
-                                    </div>
-                                </div>
-
-                                <!-- Funcionário -->
-                                <div style="background: #E8F5E9; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #4CAF50;">
-                                    <div style="color: #388E3C; font-size: 0.85em; font-weight: 600; margin-bottom: 5px;">PROFISSIONAL</div>
-                                    <div style="font-size: 1.05em; font-weight: 500; color: #333;">
-                                        <i class="pi pi-user" style="margin-right: 8px;"></i>
-                                        #{agendamentoController.agendamentoSelecionado.nomeFuncionario}
-                                    </div>
-                                </div>
-
-                                <!-- Guichê -->
-                                <div style="background: #FFF8E1; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #FFC107;">
-                                    <div style="color: #F57F17; font-size: 0.85em; font-weight: 600; margin-bottom: 5px;">LOCAL DE ATENDIMENTO</div>
-                                    <div style="font-size: 1.05em; font-weight: 500; color: #333;">
-                                        <i class="pi pi-building" style="margin-right: 8px;"></i>
-                                        #{agendamentoController.agendamentoSelecionado.nomeGuiche}
-                                    </div>
-                                </div>
-
-                                <!-- Observações -->
-                                <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado.observacoes != null and agendamentoController.agendamentoSelecionado.observacoes != ''}">
-                                    <div style="background: #ECEFF1; padding: 15px; border-radius: 8px; margin-bottom: 15px; border-left: 4px solid #607D8B;">
-                                        <div style="color: #455A64; font-size: 0.85em; font-weight: 600; margin-bottom: 5px;">OBSERVAÇÕES</div>
-                                        <div style="font-size: 0.95em; color: #555; line-height: 1.5;">
-                                            <i class="pi pi-comment" style="margin-right: 8px;"></i>
-                                            #{agendamentoController.agendamentoSelecionado.observacoes}
-                                        </div>
-                                    </div>
-                                </h:panelGroup>
-
-                                <!-- ID do Agendamento -->
-                                <div style="text-align: center; padding-top: 10px; border-top: 1px solid #e0e0e0; margin-top: 15px;">
-                                    <span style="color: #999; font-size: 0.85em;">
-                                        Código do Agendamento: <strong>#{agendamentoController.agendamentoSelecionado.id}</strong>
-                                    </span>
-                                </div>
-                            </h:panelGroup>
-                        </div>
-
-                        <f:facet name="footer">
-                            <div style="text-align: right;">
-                                <p:commandButton value="Fechar"
-                                                 icon="pi pi-times"
-                                                 onclick="PF('dialogDetalhes').hide();"
-                                                 styleClass="ui-button-secondary"
-                                                 type="button"/>
-                            </div>
-                        </f:facet>
-                    </p:dialog>
-                </h:form>
-
-
-
-
+                <!-- Card de Ajuda -->
+                <div class="help-card">
+                    <h3>
+                        <i class="pi pi-info-circle" style="color: #667eea;"></i>
+                        Como funciona?
+                    </h3>
+                    <ul>
+                        <li>Escolha o serviço que você precisa</li>
+                        <li>Selecione o profissional de sua preferência</li>
+                        <li>Escolha a data e horário disponível</li>
+                        <li>Adicione observações se necessário</li>
+                        <li>Confirme seu agendamento e pronto!</li>
+                    </ul>
+                </div>
             </div>
+        </div>
 
-            <footer style="background-color: #000000; color: white; padding: 20px; text-align: center;">
-                <p style="margin: 0;">Web Dev/2025</p>
-            </footer>
-        </h:body>
-    </f:view>
+        <!-- Footer -->
+        <div style="text-align: center; color: white; padding: 20px; margin-top: 40px;">
+            <p style="font-size: 0.9em; opacity: 0.8;">
+                © 2025 Sistema de Agendamento
+            </p>
+        </div>
+    </h:body>
 </html>
+

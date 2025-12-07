@@ -60,6 +60,9 @@ public class AgendamentoController implements Serializable {
     // Data mínima para o calendário (hoje)
     private Date dataMinima;
 
+    // Agendamento selecionado para visualização de detalhes
+    private Agendamento agendamentoSelecionado;
+
     @PostConstruct
     public void init() {
         loadServicosDisponiveis();
@@ -290,6 +293,14 @@ public class AgendamentoController implements Serializable {
     }
 
     /**
+     * Seleciona um agendamento para visualização de detalhes
+     */
+    public void selecionarAgendamento(Agendamento agendamento) {
+        this.agendamentoSelecionado = agendamento;
+        LOGGER.log(Level.INFO, "Agendamento selecionado para detalhes: {0}", agendamento != null ? agendamento.getId() : "null");
+    }
+
+    /**
      * Reseta o formulário
      */
     private void resetForm() {
@@ -400,5 +411,12 @@ public class AgendamentoController implements Serializable {
     public void setDataMinima(Date dataMinima) {
         this.dataMinima = dataMinima;
     }
-}
 
+    public Agendamento getAgendamentoSelecionado() {
+        return agendamentoSelecionado;
+    }
+
+    public void setAgendamentoSelecionado(Agendamento agendamentoSelecionado) {
+        this.agendamentoSelecionado = agendamentoSelecionado;
+    }
+}

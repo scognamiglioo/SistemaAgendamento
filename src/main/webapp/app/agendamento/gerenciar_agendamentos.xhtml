@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="primefaces">
+
+<h:head>
+    <title>Gerenciar Agendamentos</title>
+    <meta charset="UTF-8"/>
+    <h:outputStylesheet library="css" name="admin.css"/>
+    <style>
+        .agendamentos-container {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header-section {
+            background: #2c3e50;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .status-badge {
+            padding: 5px 10px;
+            border-radius: 3px;
+            font-size: 0.9em;
+            font-weight: bold;
+        }
+
+        .status-agendado { background-color: #3498db; color: white; }
+        .status-confirmado { background-color: #2ecc71; color: white; }
+        .status-em-atendimento { background-color: #f39c12; color: white; }
+        .status-concluido { background-color: #27ae60; color: white; }
+        .status-cancelado { background-color: #e74c3c; color: white; }
+        .status-nao-compareceu { background-color: #95a5a6; color: white; }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="agendamentos-container">
+        <div class="header-section">
+            <div>
+                <h1 style="margin: 0;">Gerenciar Agendamentos</h1>
+                <p style="margin: 5px 0 0 0;">Visualize e gerencie todos os agendamentos do sistema</p>
+            </div>
+            <div>
+                <h:form>
+                    <p:commandButton value="Voltar ao Admin"
+                                     action="/app/admin?faces-redirect=true"
+                                     styleClass="ui-button-secondary"
+                                     icon="pi pi-arrow-left"/>
+                </h:form>
+            </div>
+        </div>
+
+        <h:form id="formAgendamentos">
+            <p:growl id="messages" showDetail="true" life="3000"/>
+
+            <!-- Filtros -->
+            <p:panel header="Filtros" toggleable="true" collapsed="false" style="margin-bottom: 20px;">
+                <h:panelGrid columns="4" cellpadding="10">
+                    <p:outputLabel value="Data Início:"/>
+                    <p:calendar value="#{gerenciarAgendamentosController.filtroDataInicio}"
+                                pattern="dd/MM/yyyy"
+                                locale="pt"
+                                showButtonPanel="true"/>
+
+                    <p:outputLabel value="Data Fim:"/>
+                    <p:calendar value="#{gerenciarAgendamentosController.filtroDataFim}"
+                                pattern="dd/MM/yyyy"
+                                locale="pt"
+                                showButtonPanel="true"/>
+
+                    <p:outputLabel value="Status:"/>
+                    <p:selectOneMenu value="#{gerenciarAgendamentosController.filtroStatus}">
+                        <f:selectItem itemLabel="Todos" itemValue=""/>
+                        <f:selectItem itemLabel="Agendado" itemValue="AGENDADO"/>
+                        <f:selectItem itemLabel="Confirmado" itemValue="CONFIRMADO"/>
+                        <f:selectItem itemLabel="Em Atendimento" itemValue="EM_ATENDIMENTO"/>
+                        <f:selectItem itemLabel="Concluído" itemValue="CONCLUIDO"/>
+                        <f:selectItem itemLabel="Cancelado" itemValue="CANCELADO"/>
+                        <f:selectItem itemLabel="Não Compareceu" itemValue="NAO_COMPARECEU"/>
+                    </p:selectOneMenu>
+
+                    <p:commandButton value="Filtrar"
+                                     action="#{gerenciarAgendamentosController.aplicarFiltros}"
+                                     update="tabelaAgendamentos messages"
+                                     icon="pi pi-filter"/>
+                </h:panelGrid>
+            </p:panel>
+
+            <!-- Tabela de Agendamentos -->
+            <p:dataTable id="tabelaAgendamentos"
+                         value="#{gerenciarAgendamentosController.agendamentos}"
+                         var="agendamento"
+                         paginator="true"
+                         rows="10"
+                         rowsPerPageTemplate="5,10,15,20"
+                         emptyMessage="Nenhum agendamento encontrado"
+                         paginatorPosition="bottom">
+
+                <p:column headerText="ID" style="width: 60px;">
+                    <h:outputText value="#{agendamento.id}"/>
+                </p:column>
+
+                <p:column headerText="Data" sortBy="#{agendamento.data}" style="width: 120px;">
+                    <h:outputText value="#{agendamento.data}">
+                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Hora" sortBy="#{agendamento.hora}" style="width: 80px;">
+                    <h:outputText value="#{agendamento.hora}">
+                        <f:convertDateTime pattern="HH:mm" type="time"/>
+                    </h:outputText>
+                </p:column>
+
+                <p:column headerText="Paciente">
+                    <h:outputText value="#{agendamento.nomeUsuario}"/>
+                </p:column>
+
+                <p:column headerText="Serviço">
+                    <h:outputText value="#{agendamento.nomeServico}"/>
+                </p:column>
+
+                <p:column headerText="Funcionário">
+                    <h:outputText value="#{agendamento.nomeFuncionario}"/>
+                </p:column>
+
+                <p:column headerText="Guichê" style="width: 120px;">
+                    <h:outputText value="#{agendamento.nomeGuiche}"/>
+                </p:column>
+
+                <p:column headerText="Status" style="width: 140px;">
+                    <span class="status-badge status-#{agendamento.status.name().toLowerCase().replace('_', '-')}">
+                        #{agendamento.status.descricao}
+                    </span>
+                </p:column>
+
+                <p:column headerText="Ações" style="width: 200px;">
+                    <p:commandButton value="Editar"
+                                     action="#{gerenciarAgendamentosController.editarAgendamento(agendamento)}"
+                                     update=":formAgendamentos:dialogEditar"
+                                     oncomplete="PF('dialogEditar').show()"
+                                     icon="pi pi-pencil"
+                                     styleClass="ui-button-warning"
+                                     style="margin-right: 5px;"/>
+
+                    <p:commandButton value="Cancelar"
+                                     action="#{gerenciarAgendamentosController.cancelarAgendamento(agendamento.id)}"
+                                     update="tabelaAgendamentos messages"
+                                     icon="pi pi-times"
+                                     styleClass="ui-button-danger"
+                                     rendered="#{agendamento.status.name() != 'CANCELADO' and agendamento.status.name() != 'CONCLUIDO'}"
+                                     onclick="return confirm('Deseja realmente cancelar este agendamento?');">
+                    </p:commandButton>
+                </p:column>
+            </p:dataTable>
+
+            <!-- Dialog para Editar Agendamento -->
+            <p:dialog id="dialogEditar"
+                      header="Editar Agendamento"
+                      widgetVar="dialogEditar"
+                      modal="true"
+                      width="600"
+                      showEffect="fade"
+                      hideEffect="fade">
+
+                <h:panelGrid columns="2" cellpadding="10" style="width: 100%;">
+                    <p:outputLabel value="Paciente:"/>
+                    <h:outputText value="#{gerenciarAgendamentosController.agendamentoSelecionado.nomeUsuario}"
+                                  style="font-weight: bold;"/>
+
+                    <p:outputLabel value="Serviço:"/>
+                    <h:outputText value="#{gerenciarAgendamentosController.agendamentoSelecionado.nomeServico}"
+                                  style="font-weight: bold;"/>
+
+                    <p:outputLabel value="Data:"/>
+                    <h:outputText value="#{gerenciarAgendamentosController.agendamentoSelecionado.data}">
+                        <f:convertDateTime pattern="dd/MM/yyyy"/>
+                    </h:outputText>
+
+                    <p:outputLabel value="Hora:"/>
+                    <h:outputText value="#{gerenciarAgendamentosController.agendamentoSelecionado.hora}">
+                        <f:convertDateTime pattern="HH:mm" type="time"/>
+                    </h:outputText>
+
+                    <p:outputLabel value="Funcionário:"/>
+                    <p:selectOneMenu value="#{gerenciarAgendamentosController.funcionarioSelecionadoId}">
+                        <f:selectItem itemLabel="Selecione..." itemValue="#{null}"/>
+                        <f:selectItems value="#{gerenciarAgendamentosController.funcionariosDisponiveis}"
+                                       var="func"
+                                       itemLabel="#{func.nome}"
+                                       itemValue="#{func.id}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Guichê:"/>
+                    <p:selectOneMenu value="#{gerenciarAgendamentosController.guicheSelecionadoId}">
+                        <f:selectItem itemLabel="Selecione..." itemValue="#{null}"/>
+                        <f:selectItems value="#{gerenciarAgendamentosController.guichesDisponiveis}"
+                                       var="guiche"
+                                       itemLabel="#{guiche.nome}"
+                                       itemValue="#{guiche.id}"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Status:"/>
+                    <p:selectOneMenu value="#{gerenciarAgendamentosController.statusSelecionado}">
+                        <f:selectItem itemLabel="Agendado" itemValue="AGENDADO"/>
+                        <f:selectItem itemLabel="Confirmado" itemValue="CONFIRMADO"/>
+                        <f:selectItem itemLabel="Em Atendimento" itemValue="EM_ATENDIMENTO"/>
+                        <f:selectItem itemLabel="Concluído" itemValue="CONCLUIDO"/>
+                        <f:selectItem itemLabel="Cancelado" itemValue="CANCELADO"/>
+                        <f:selectItem itemLabel="Não Compareceu" itemValue="NAO_COMPARECEU"/>
+                    </p:selectOneMenu>
+
+                    <p:outputLabel value="Observações:"/>
+                    <p:inputTextarea value="#{gerenciarAgendamentosController.agendamentoSelecionado.observacoes}"
+                                     rows="3"
+                                     style="width: 100%;"/>
+                </h:panelGrid>
+
+                <f:facet name="footer">
+                    <p:commandButton value="Salvar"
+                                     action="#{gerenciarAgendamentosController.salvarEdicao}"
+                                     update=":formAgendamentos:tabelaAgendamentos :formAgendamentos:messages"
+                                     oncomplete="if (args.success) PF('dialogEditar').hide();"
+                                     icon="pi pi-check"/>
+
+                    <p:commandButton value="Cancelar"
+                                     onclick="PF('dialogEditar').hide();"
+                                     type="button"
+                                     icon="pi pi-times"
+                                     styleClass="ui-button-secondary"/>
+                </f:facet>
+            </p:dialog>
+        </h:form>
+    </div>
+</h:body>
+</html>
+

@@ -3,9 +3,10 @@
 <html 
     lang="en"
     xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:h="jakarta.faces.html"
-    xmlns:f="jakarta.faces.core"
-    xmlns:p="primefaces">
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:p="http://primefaces.org/ui"
+    xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
     <f:view>
         <h:head>
             <title>Minha Conta</title>
@@ -16,16 +17,16 @@
            
             <header style="padding: 20px; text-align: center; position: relative;">
                 <h1 style="margin: 0; color: #ffffff;">Sistema de Agendamento</h1>
-                <div style="position: absolute; top: 20px; right: 20px;">
-                    <p:outputLabel value="Usuário: #{userSessionController.currentUser}" 
-                                   style="color: white; margin-right: 10px;"/>
-                    <h:form>
-                        <p:commandButton value="Sair" 
+                <h:form>
+                    <div style="position: absolute; top: 20px; right: 20px;">
+                        <p:outputLabel value="Usuário: #{userSessionController.currentUser}"
+                                       style="color: white; margin-right: 10px;"/>
+                        <p:commandButton value="Sair"
                                          action="#{userSessionController.logout}"
                                          style="background: #dc3545; border: none; color: white;"
                                          ajax="false"/>
-                    </h:form>
-                </div>
+                    </div>
+                </h:form>
             </header>
 
             <div style="padding: 20px; max-width: 1200px; margin: 0 auto;">
@@ -42,82 +43,152 @@
 
                 <p:panel header="Novo Agendamento" style="margin-bottom: 20px;">
                     <h:form id="formAgendamento">
-                        <p:growl id="messages" showDetail="true" />
+                        <p:messages id="messages" showDetail="true" closable="true" />
 
-                        <h:panelGrid columns="2" cellpadding="10" style="width: 100%;">
+                        <div style="padding: 10px;">
+                            <!-- PASSO 1: Selecionar Serviço -->
+                            <div style="margin-bottom: 15px;">
+                                <p:outputLabel for="servico" value="1. Serviço *" style="display: block; margin-bottom: 5px; font-weight: bold;"/>
+                                <p:selectOneMenu id="servico"
+                                                 value="#{agendamentoController.servicoSelecionadoId}"
+                                                 required="true"
+                                                 requiredMessage="Selecione um serviço"
+                                                 style="width: 100%">
+                                    <f:selectItem itemLabel="Selecione um serviço..." itemValue="#{null}"/>
+                                    <f:selectItems value="#{agendamentoController.servicosDisponiveis}"
+                                                   var="s"
+                                                   itemLabel="#{s.nome} - R$ #{s.valor}"
+                                                   itemValue="#{s.id}"/>
+                                    <p:ajax event="change"
+                                            listener="#{agendamentoController.onServicoChange}"
+                                            update="panelFuncionario  messages"/>
+                                </p:selectOneMenu>
+                            </div>
 
-                            <h:outputLabel for="username" value="Nome de Usuário:" />
-                            <h:inputText id="username" value="#{agendamentoController.username}" 
-                                         required="true" requiredMessage="Nome de usuário é obrigatório" />
+                            <!-- PASSO 2: Selecionar Funcionário -->
+                            <p:outputPanel id="panelFuncionario" style="display: block; margin-bottom: 15px;">
+                                <p:outputLabel for="funcionario" value="2. Funcionário/Prestador *" style="display: block; margin-bottom: 5px; font-weight: bold;"/>
+                                <p:selectOneMenu id="funcionario"
+                                                 value="#{agendamentoController.funcionarioSelecionadoId}"
+                                                 required="true"
+                                                 requiredMessage="Selecione um funcionário"
+                                                 style="width: 100%">
+                                    <f:selectItem itemLabel="#{agendamentoController.servicoSelecionadoId == null ? 'Primeiro selecione um serviço...' : 'Selecione um funcionário...'}"
+                                                  itemValue="#{null}"/>
+                                    <f:selectItems value="#{agendamentoController.funcionariosDisponiveis}"
+                                                   var="f"
+                                                   itemLabel="#{f.nome} - #{f.cargo != null ? f.cargo.nome : 'Funcionário'}"
+                                                   itemValue="#{f.id}"/>
+                                    <p:ajax event="change"
+                                            listener="#{agendamentoController.onFuncionarioChange}"
+                                            update="panelData panelHora messages funcDebug"/>
+                                </p:selectOneMenu>
+                            </p:outputPanel>
 
-                            
-                                                <p:outputLabel for="servico" value="Serviço *"/>
-                                                <p:selectOneMenu id="servico" 
-                                                                 value="#{agendamentoController.agendamento.servico}"
-                                                                 required="true"
-                                                                 requiredMessage="Selecione um serviço"
-                                                                 style="width: 100%">
-                                                    <f:selectItem itemLabel="Selecione um serviço..." itemValue=""/>
-                                                    <f:selectItems value="#{agendamentoController.servicosDisponiveis}" />
-                                                </p:selectOneMenu>
-                    
-                                                <p:outputLabel for="data" value="Data *"/>
-                                                <p:calendar id="data" 
-                                                            value="#{agendamentoController.agendamento.data}"
-                                                            required="true"
-                                                            requiredMessage="Selecione uma data"
-                                                            mindate="#{agendamentoController.dataMinima}"
-                                                            pattern="dd/MM/yyyy"
-                                                            locale="pt"
-                                                            style="width: 100%"/>
-                    
-                                                <p:outputLabel for="hora" value="Hora *"/>
-                                                <p:selectOneMenu id="hora" 
-                                                                 value="#{agendamentoController.agendamento.hora}"
-                                                                 required="true"
-                                                                 requiredMessage="Selecione um horário"
-                                                                 style="width: 100%"
-                                                                 >
-                                                    <f:selectItem itemLabel="Selecione um horário..." itemValue=""/>
-                                                    <f:selectItems value="#{agendamentoController.horariosDisponiveis}" />
-                                                </p:selectOneMenu>
-                    
-                    
-                    
+
+
+
+                            <!-- PASSO 3: Selecionar Data -->
+                            <p:outputPanel id="panelData" style="display: block; margin-bottom: 15px;">
+                                <p:outputLabel for="data" value="3. Data *" style="display: block; margin-bottom: 5px; font-weight: bold;"/>
+                                <p:calendar id="data"
+                                            value="#{agendamentoController.dataSelecionada}"
+                                            required="true"
+                                            requiredMessage="Selecione uma data"
+                                            mindate="#{agendamentoController.dataMinima}"
+                                            pattern="dd/MM/yyyy"
+                                            locale="pt"
+                                            showButtonPanel="true"
+                                            style="width: 100%">
+                                    <p:ajax event="dateSelect"
+                                            listener="#{agendamentoController.onDataChange}"
+                                            update="panelHora messages funcDebug"/>
+                                </p:calendar>
+                            </p:outputPanel>
+
+                            <!-- PASSO 4: Selecionar Horário -->
+                            <p:outputPanel id="panelHora" style="display: block; margin-bottom: 15px;">
+                                <p:outputLabel for="hora" value="4. Horário Disponível *" style="display: block; margin-bottom: 5px; font-weight: bold;"/>
+                                <p:selectOneMenu id="hora"
+                                                 value="#{agendamentoController.horarioSelecionado}"
+                                                 required="true"
+                                                 requiredMessage="Selecione um horário"
+                                                 style="width: 100%">
+                                    <f:selectItem itemLabel="#{agendamentoController.dataSelecionada == null ? 'Primeiro selecione uma data...' : 'Selecione um horário disponível...'}"
+                                                  itemValue="#{null}"/>
+                                    <f:selectItems value="#{agendamentoController.horariosDisponiveis}" />
+                                </p:selectOneMenu>
+                            </p:outputPanel>
+
+                            <!-- Observações (Opcional) -->
+                            <div style="margin-bottom: 15px;">
+                                <p:outputLabel for="observacoes" value="Observações" style="display: block; margin-bottom: 5px; font-weight: bold;"/>
+                                <p:inputTextarea id="observacoes"
+                                                 value="#{agendamentoController.observacoes}"
+                                                 rows="3"
+                                                 placeholder="Informações adicionais sobre o agendamento..."
+                                                 style="width: 100%"/>
+                            </div>
+
                             <!-- BOTÃO AGENDAR -->
-                            <p:commandButton value="Agendar" 
+                            <p:commandButton value="Confirmar Agendamento"
                                              action="#{agendamentoController.salvarAgendamento}"
-                                             update="messages"
+                                             update="@form :formMeusAgendamentos:tabelaAgendamentos"
                                              process="@form"
-                                             style="width: 100%; margin-top: 10px;"/>
-
-                        </h:panelGrid>
+                                             icon="pi pi-calendar-plus"
+                                             styleClass="ui-button-success"
+                                             style="width: 100%; padding: 10px; font-size: 1.1em;"/>
+                        </div>
                     </h:form>
                 </p:panel>
 
                 <!-- Meus Agendamentos -->
                 <p:panel header="Meus Agendamentos">
-                    <p:dataTable value="#{agendamentoController.meusAgendamentos}" 
-                                 var="agendamento"
-                                 emptyMessage="Nenhum agendamento encontrado"
-                                 style="width: 100%"
-                                 >
+                    <h:form id="formMeusAgendamentos">
+                        <p:dataTable id="tabelaAgendamentos"
+                                     value="#{agendamentoController.meusAgendamentos}"
+                                     var="agendamento"
+                                     emptyMessage="Nenhum agendamento encontrado"
+                                     paginator="true"
+                                     rows="5"
+                                     style="width: 100%">
 
-                        <p:column headerText="Data" style="width: 120px;">
-                            <h:outputText value="#{agendamento.data}">
-                                <f:convertDateTime pattern="dd/MM/yyyy"/>
-                            </h:outputText>
-                        </p:column>
+                            <p:column headerText="Data" style="width: 120px;">
+                                <h:outputText value="#{agendamento.dataFormatada}"/>
+                            </p:column>
 
-                        <p:column headerText="Hora" style="width: 80px;">
-                            <h:outputText value="#{agendamento.hora}"/>
-                        </p:column>
+                            <p:column headerText="Hora" style="width: 100px;">
+                                <h:outputText value="#{agendamento.horaFormatada}"/>
+                            </p:column>
 
-                        <p:column headerText="Serviço" style="width: 200px;">
-                            <h:outputText value="#{agendamento.servico}"/>
-                        </p:column>
+                            <p:column headerText="Serviço">
+                                <h:outputText value="#{agendamento.nomeServico}"/>
+                            </p:column>
 
-                    </p:dataTable>
+                            <p:column headerText="Status" style="width: 120px;">
+                                <h:outputText value="#{agendamento.status.descricao}"/>
+                            </p:column>
+
+                            <p:column headerText="Funcionário" style="width: 150px;">
+                                <h:outputText value="#{agendamento.nomeFuncionario}"/>
+                            </p:column>
+
+                            <p:column headerText="Guichê" style="width: 100px;">
+                                <h:outputText value="#{agendamento.nomeGuiche}"/>
+                            </p:column>
+
+                            <p:column headerText="Ações" style="width: 100px;">
+                                <p:commandButton value="Cancelar"
+                                                 action="#{agendamentoController.cancelarAgendamento(agendamento.id)}"
+                                                 update=":formMeusAgendamentos:tabelaAgendamentos :formAgendamento:messages"
+                                                 icon="pi pi-times"
+                                                 styleClass="ui-button-danger ui-button-sm"
+                                                 rendered="#{agendamento.status.name() != 'CANCELADO' and agendamento.status.name() != 'CONCLUIDO'}"
+                                                 onclick="return confirm('Deseja realmente cancelar este agendamento?');"/>
+                            </p:column>
+
+                        </p:dataTable>
+                    </h:form>
                 </p:panel>
 
 

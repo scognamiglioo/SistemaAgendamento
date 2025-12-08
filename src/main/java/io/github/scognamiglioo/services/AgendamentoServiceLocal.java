@@ -110,5 +110,10 @@ public interface AgendamentoServiceLocal {
      * Gera horários disponíveis para agendamento
      */
     List<String> getHorariosDisponiveis();
+
+    /**
+     * Verifica se um funcionário presta um serviço específico
+     */
+    boolean funcionarioPrestServico(Long funcionarioId, Long servicoId);
 }
 

@@ -307,9 +307,14 @@ public class GerenciarAgendamentosController implements Serializable {
             agendamentoService.cancelarAgendamento(agendamentoId);
             addSuccessMessage("Agendamento cancelado com sucesso!");
             carregarAgendamentos();
+        } catch (IllegalArgumentException ex) {
+            // Erro de validação (ex: menos de 24h de antecedência)
+            LOGGER.log(Level.WARNING, "Validação de cancelamento falhou: {0}", ex.getMessage());
+            addErrorMessage(ex.getMessage());
         } catch (Exception ex) {
+            // Erro inesperado
             LOGGER.log(Level.SEVERE, "Erro ao cancelar agendamento", ex);
-            addErrorMessage("Erro ao cancelar agendamento: " + ex.getMessage());
+            addErrorMessage("Erro inesperado ao cancelar agendamento. Tente novamente.");
         }
     }
 

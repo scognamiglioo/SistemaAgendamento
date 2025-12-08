@@ -89,10 +89,33 @@ public class AgendamentoService implements AgendamentoServiceLocal {
             throw new IllegalArgumentException("Agendamento não encontrado");
         }
 
+        // Verifica se o cancelamento está sendo feito com pelo menos 24 horas de antecedência
+        LocalDate dataAgendamento = agendamento.getData();
+        LocalTime horaAgendamento = agendamento.getHora();
+
+        // Combina data e hora do agendamento
+        java.time.LocalDateTime dataHoraAgendamento = java.time.LocalDateTime.of(dataAgendamento, horaAgendamento);
+
+        // Obtém data/hora atual
+        java.time.LocalDateTime agora = java.time.LocalDateTime.now();
+
+        // Calcula diferença em horas
+        long horasRestantes = java.time.Duration.between(agora, dataHoraAgendamento).toHours();
+
+        // Valida se há pelo menos 24 horas de antecedência
+        if (horasRestantes < 24) {
+            throw new IllegalArgumentException(
+                "Não é possível cancelar o agendamento com menos de 24 horas de antecedência. " +
+                "Agendamento marcado para " + agendamento.getDataFormatada() + " às " + agendamento.getHoraFormatada() + "."
+            );
+
+        }
+
         agendamento.setStatus(StatusAgendamento.CANCELADO);
         em.merge(agendamento);
         em.flush();
-        LOGGER.log(Level.INFO, "Agendamento cancelado: {0}", agendamentoId);
+        LOGGER.log(Level.INFO, "Agendamento {0} cancelado com {1} horas de antecedência",
+                new Object[]{agendamentoId, horasRestantes});
     }
 
     @Override
@@ -323,5 +346,30 @@ public class AgendamentoService implements AgendamentoServiceLocal {
         horarios.add("18:00");
 
         return horarios;
+    }
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public boolean funcionarioPrestServico(Long funcionarioId, Long servicoId) {
+        if (funcionarioId == null || servicoId == null) {
+            return false;
+        }
+
+        try {
+            // Query para verificar se existe relação entre funcionário e serviço
+            Long count = em.createQuery(
+                "SELECT COUNT(s) FROM Funcionario f " +
+                "JOIN f.servicos s " +
+                "WHERE f.id = :funcionarioId AND s.id = :servicoId",
+                Long.class)
+                .setParameter("funcionarioId", funcionarioId)
+                .setParameter("servicoId", servicoId)
+                .getSingleResult();
+
+            return count > 0;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao verificar se funcionário presta serviço", e);
+            return false;
+        }
     }
 }

@@ -108,7 +108,6 @@ public class AgendamentoService implements AgendamentoServiceLocal {
                 "Não é possível cancelar o agendamento com menos de 24 horas de antecedência. " +
                 "Agendamento marcado para " + agendamento.getDataFormatada() + " às " + agendamento.getHoraFormatada() + "."
             );
-
         }
 
         agendamento.setStatus(StatusAgendamento.CANCELADO);

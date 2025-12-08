@@ -19,6 +19,7 @@ public class Funcionario implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
 
     // cada Funcionario referencia um User
     @OneToOne(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -40,13 +41,9 @@ public class Funcionario implements Serializable {
     @Column(nullable = false)
     private boolean ativo = true;
 
-    @ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
-    @JoinTable(
-        name = "funcionario_servico",
-        joinColumns = @JoinColumn(name = "funcionario_id"),
-        inverseJoinColumns = @JoinColumn(name = "servico_id")
-    )
-    private List<Servico> servicos = new ArrayList<>();
+    // Relacionamento OneToMany com a entidade associativa FuncionarioServico
+    @OneToMany(mappedBy = "funcionario", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<FuncionarioServico> funcionarioServicos = new ArrayList<>();
 
     public Funcionario() {
     }
@@ -133,31 +130,42 @@ public class Funcionario implements Serializable {
         this.ativo = ativo;
     }
 
+    public List<FuncionarioServico> getFuncionarioServicos() {
+        return funcionarioServicos;
+    }
+
+    public void setFuncionarioServicos(List<FuncionarioServico> funcionarioServicos) {
+        this.funcionarioServicos = funcionarioServicos;
+    }
+
+    // Métodos de conveniência para trabalhar com serviços
     public List<Servico> getServicos() {
+        List<Servico> servicos = new ArrayList<>();
+        if (funcionarioServicos != null) {
+            for (FuncionarioServico fs : funcionarioServicos) {
+                if (!servicos.contains(fs.getServico())) {
+                    servicos.add(fs.getServico());
+                }
+            }
+        }
         return servicos;
     }
 
-    public void setServicos(List<Servico> servicos) {
-        this.servicos = servicos;
+    // Métodos para gerenciar associações funcionário-serviço-localização
+    public void addServicoLocalizacao(Servico servico, Localizacao localizacao) {
+        FuncionarioServico fs = new FuncionarioServico(this, servico, localizacao);
+        funcionarioServicos.add(fs);
     }
 
-    // helpers many-to-many
-    public void addServico(Servico servico) {
-        if (!servicos.contains(servico)) {
-            servicos.add(servico);
-            if (!servico.getFuncionarios().contains(this)) {
-                servico.getFuncionarios().add(this);
-            }
-        }
+    public void removeServicoLocalizacao(Servico servico, Localizacao localizacao) {
+        funcionarioServicos.removeIf(fs -> 
+            fs.getServico().equals(servico) && fs.getLocalizacao().equals(localizacao));
     }
 
-    public void removeServico(Servico servico) {
-        if (servicos.contains(servico)) {
-            servicos.remove(servico);
-            if (servico.getFuncionarios().contains(this)) {
-                servico.getFuncionarios().remove(this);
-            }
-        }
+    public boolean hasServicoInLocalizacao(Servico servico, Localizacao localizacao) {
+        return funcionarioServicos.stream()
+            .anyMatch(fs -> fs.getServico().equals(servico) && 
+                           fs.getLocalizacao().equals(localizacao));
     }
 
     
@@ -204,6 +212,25 @@ public class Funcionario implements Serializable {
     public void setPassword(String password) {
         if (this.user == null) this.user = new User();
         this.user.setUserPassword(password);
+    }
+
+    // Métodos de compatibilidade para o sistema legado
+    public void setServicos(List<Servico> servicos) {
+        throw new UnsupportedOperationException(
+            "setServicos() is not supported. Use FuncionarioServico to manage services instead."
+        );
+    }
+
+    public void addServico(Servico servico) {
+        throw new UnsupportedOperationException(
+            "addServico() is not supported. Use addServicoLocalizacao() instead."
+        );
+    }
+
+    public void removeServico(Servico servico) {
+        throw new UnsupportedOperationException(
+            "removeServico() is not supported. Use removeServicoLocalizacao() instead."
+        );
     }
 
     @Override

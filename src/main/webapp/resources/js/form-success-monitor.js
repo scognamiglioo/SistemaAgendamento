@@ -4,6 +4,10 @@
 (function() {
     'use strict';
 
+    // Rastreia a última mensagem exibida para evitar duplicação
+    let lastDisplayedMessage = null;
+    let lastDisplayedTime = 0;
+
     /**
      * Busca campos hidden com mensagens do JSF
      */
@@ -28,15 +32,24 @@
      * Encontra o botão alvo para posicionar a mensagem
      */
     function findTargetButton() {
-        return document.querySelector('input[value="Salvar e Continuar"], .btn-outline-primary, .btn-primary');
+        return document.querySelector('input[value="Salvar e Continuar"], .btn-outline-primary, .btn-primary, .btn-danger');
     }
 
     /**
-     * Limpa os campos de mensagem após exibição
+     * Verifica se a mensagem já foi exibida recentemente
      */
-    function clearMessageFields(messageField, typeField) {
-        if (messageField) messageField.value = '';
-        if (typeField) typeField.value = '';
+    function shouldShowMessage(message) {
+        const now = Date.now();
+        const timeSinceLastDisplay = now - lastDisplayedTime;
+        
+        // Se é uma mensagem diferente OU passaram mais de 500ms desde a última exibição
+        if (message !== lastDisplayedMessage || timeSinceLastDisplay > 500) {
+            lastDisplayedMessage = message;
+            lastDisplayedTime = now;
+            return true;
+        }
+        
+        return false;
     }
 
     /**
@@ -45,7 +58,7 @@
     function monitorSuccessMessage() {
         let attempts = 0;
         const maxAttempts = 15;
-        const checkInterval = 300;
+        const checkInterval = 200;
         
         const interval = setInterval(() => {
             attempts++;
@@ -55,13 +68,16 @@
             if (messageField && messageField.value.trim() !== '') {
                 const message = messageField.value;
                 const type = (typeField && typeField.value) ? typeField.value : 'success';
-                const targetButton = findTargetButton();
                 
-                if (targetButton && window.FloatingMessages) {
-                    window.FloatingMessages.show(message, targetButton, type);
+                // Só exibe se não foi mostrada recentemente
+                if (shouldShowMessage(message)) {
+                    const targetButton = findTargetButton();
+                    
+                    if (targetButton && window.FloatingMessages) {
+                        window.FloatingMessages.show(message, targetButton, type);
+                    }
                 }
                 
-                clearMessageFields(messageField, typeField);
                 clearInterval(interval);
             } else if (attempts >= maxAttempts) {
                 clearInterval(interval);

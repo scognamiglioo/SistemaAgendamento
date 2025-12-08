@@ -2,8 +2,11 @@ package io.github.scognamiglioo.services;
 
 import io.github.scognamiglioo.entities.Cargo;
 import io.github.scognamiglioo.entities.Funcionario;
+import io.github.scognamiglioo.entities.FuncionarioServico;
+import io.github.scognamiglioo.entities.FuncionarioServicoId;
 import io.github.scognamiglioo.entities.Guiche;
 import io.github.scognamiglioo.entities.Role;
+import io.github.scognamiglioo.entities.Servico;
 import io.github.scognamiglioo.entities.User;
 import jakarta.ejb.LocalBean;
 import java.util.HashMap;
@@ -24,9 +27,6 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.UUID;
-import io.github.scognamiglioo.entities.Servico;
-
-import java.util.List;
 
 @Stateless
 @LocalBean
@@ -401,27 +401,16 @@ public class DataService
         Guiche guiche = (guicheId != null) ? findGuicheById(guicheId) : null;
         Cargo cargo = (cargoId != null) ? em.find(Cargo.class, cargoId) : null;
 
-        List<Servico> servicos = new ArrayList<>();
-        if (servicosIds != null && !servicosIds.isEmpty()) {
-            servicos = em.createQuery("SELECT s FROM Servico s WHERE s.id IN :ids", Servico.class)
-                    .setParameter("ids", servicosIds)
-                    .getResultList();
-        }
-
         Funcionario funcionario = new Funcionario(
                 user, role, guiche, cargo, ativo
         );
 
-        funcionario.setServicos(servicos);
-
         em.persist(funcionario);
+        em.flush(); // Garante que o ID seja gerado
 
-        // garantir associação bidirecional
-        for (Servico s : servicos) {
-            if (!s.getFuncionarios().contains(funcionario)) {
-                s.getFuncionarios().add(funcionario);
-            }
-        }
+        // Nota: As associações FuncionarioServico devem ser criadas separadamente
+        // através do gerenciamento de associações, pois requerem Localização.
+        // servicosIds aqui será ignorado - use o sistema de gerenciamento de associações.
 
         return funcionario;
     }

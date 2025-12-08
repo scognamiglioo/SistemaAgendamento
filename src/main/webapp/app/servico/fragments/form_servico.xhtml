@@ -4,11 +4,13 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="primefaces">
 
+    <!-- Campos hidden para capturar mensagens -->
+    <h:inputHidden id="hiddenLastMessage" value="#{servicoController.lastMessage}" />
+    <h:inputHidden id="hiddenMessageType" value="#{servicoController.messageType}" />
+
     <div class="servico-form">
         <div class="form-section">
             <h3>Dados do Serviço</h3>
-
-            <h:messages showDetail="true" showSummary="true" styleClass="error-message"/>
 
             <div class="form-group">
                 <h:outputLabel for="nome" value="Nome do Serviço:" styleClass="form-label required" />
@@ -91,7 +93,7 @@
                 <h:commandButton value="#{servicoController.saveButtonText}" 
                                  action="#{servicoController.saveAndReturn}"
                                  styleClass="btn btn-primary">
-                    <f:ajax execute="@form" render="@form" />
+                    <f:ajax execute="@form" render="@form" onevent="monitorarMensagens" />
                 </h:commandButton>
 
                 <h:commandButton value="Cancelar" 
@@ -103,7 +105,7 @@
                                  action="#{servicoController.save}"
                                  styleClass="btn btn-outline-primary"
                                  rendered="#{!servicoController.editMode}">
-                    <f:ajax execute="@form" render="@form" />
+                    <f:ajax execute="@form" render="@form" onevent="monitorarMensagens" />
                 </h:commandButton>
             </div>
         </div>

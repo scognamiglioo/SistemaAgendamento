@@ -21,8 +21,15 @@
         <!-- Lista de serviços com funcionalidade JavaScript otimizada -->
         <h:panelGroup rendered="#{not empty servicoController.servicos}">
             <script type="text/javascript">
-                // Função otimizada para toggle de funcionários
+                // Função otimizada para toggle de funcionários (mantida para compatibilidade)
                 function toggleFuncionarios(servicoId) {
+                    // Delega para o sistema modularizado
+                    if (window.toggleFuncionariosServico) {
+                        window.toggleFuncionariosServico(servicoId);
+                        return;
+                    }
+                    
+                    // Fallback caso os módulos não estejam carregados
                     const contentDiv = document.getElementById('funcionarios-content-' + servicoId);
                     const button = document.getElementById('btn-funcionarios-' + servicoId);
                     
@@ -37,12 +44,12 @@
                         // Expandir
                         contentDiv.style.display = 'block';
                         contentDiv.style.padding = '15px 20px';
-                        if (button) button.textContent = '⮟ Esconder Funcionários';
+                        if (button) button.textContent = '👥 Esconder Funcionários';
                     } else {
                         // Esconder
                         contentDiv.style.display = 'none';
                         contentDiv.style.padding = '0';
-                        if (button) button.textContent = '⮞ Ver Funcionários';
+                        if (button) button.textContent = '👥 Ver Funcionários';
                     }
                 }
             </script>
@@ -76,9 +83,11 @@
                                                    action="#{servicoController.delete(servico.id)}"
                                                    styleClass="btn btn-sm btn-danger"
                                                    title="Excluir serviço"
-                                                   onclick="return confirm('Tem certeza que deseja excluir o serviço #{servico.nome}?');"
-                                                   immediate="true">
-                                        <f:ajax render="@form" />
+                                                   onclick="return verificarExclusaoAntesServico(this);">
+                                        <f:passThroughAttribute name="data-funcionarios" value="#{servicoController.getFuncionariosCountByServico(servico.id)}" />
+                                        <f:passThroughAttribute name="data-nome" value="#{servico.nome}" />
+                                        <f:passThroughAttribute name="data-id" value="#{servico.id}" />
+                                        <f:ajax execute="@this" render=":servicosForm:lista-servicos :servicosForm:hiddenLastMessage :servicosForm:hiddenMessageType" onevent="monitorarMensagens" />
                                     </h:commandButton>
                                 </div>
                             </div>
@@ -90,7 +99,7 @@
                                     type="button"
                                     class="btn-funcionarios-arrow"
                                     onclick="toggleFuncionarios('#{servico.id}');">
-                                    ⮞ Ver Funcionários
+                                    👥 Ver Funcionários
                                 </button>
                             </div>
                                 

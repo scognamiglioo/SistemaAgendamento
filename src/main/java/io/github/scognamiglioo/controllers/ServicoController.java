@@ -55,6 +55,20 @@ public class ServicoController implements Serializable {
     // Para seleção múltipla de funcionários na edição/criação
     private List<Long> selectedFuncionarioIds = new ArrayList<>();
     private List<Funcionario> funcionariosDoServico = new ArrayList<>();
+    
+    // Mensagem para exibição flutuante
+    /**
+     * Stores the last floating message to be displayed via JavaScript integration.
+     * Used for communication with the floating message system in the frontend.
+     * Should be cleared after being read by the JavaScript code to avoid repeated display.
+     */
+    private String lastMessage = "";
+    /**
+     * Indicates the type of the last floating message (e.g., "success", "error").
+     * Used for JavaScript integration with the floating message system.
+     * Should be cleared after being read by the JavaScript code.
+     */
+    private String messageType = "";
 
     @PostConstruct
     public void init() {
@@ -75,6 +89,10 @@ public class ServicoController implements Serializable {
     }
 
     public String save() {
+        // Limpa mensagens antigas
+        lastMessage = "";
+        messageType = "";
+        
         try {
             if (editMode && selectedServicoId != null) {
                 updateExistingServico();
@@ -89,17 +107,28 @@ public class ServicoController implements Serializable {
                 }
             }
             
+            // Salvar mensagem antes de resetar
+            String savedMessage = lastMessage;
+            String savedMessageType = messageType;
+            
             resetForm();
             loadServicos();
             loadAllFuncionariosPorServico();
+            
+            // Restaurar mensagem após reset
+            lastMessage = savedMessage;
+            messageType = savedMessageType;
+            
             return null;
             
         } catch (IllegalArgumentException ex) {
-            addErrorMessage(ex.getMessage());
+            lastMessage = ex.getMessage();
+            messageType = "error";
             return null;
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Erro ao salvar serviço", ex);
-            addErrorMessage("Erro interno: " + ex.getMessage());
+            lastMessage = "Erro interno: " + ex.getMessage();
+            messageType = "error";
             return null;
         }
     }
@@ -110,13 +139,15 @@ public class ServicoController implements Serializable {
             servicoParaAtualizar.setNome(servico.getNome());
             servicoParaAtualizar.setValor(servico.getValor());
             servicoService.updateServico(servicoParaAtualizar);
-            addSuccessMessage("Serviço atualizado com sucesso!");
+            lastMessage = "Serviço atualizado com sucesso!";
+            messageType = "success";
         }
     }
     
     private Servico createNewServico() {
         Servico servicoCriado = servicoService.createServico(servico.getNome(), servico.getValor());
-        addSuccessMessage("Serviço criado com sucesso!");
+        lastMessage = "Serviço criado com sucesso!";
+        messageType = "success";
         return servicoCriado;
     }
     
@@ -145,14 +176,39 @@ public class ServicoController implements Serializable {
     }
 
     public void delete(Long id) {
+        // Limpa mensagens antigas
+        lastMessage = "";
+        messageType = "";
+        
         try {
+            // Verificar primeiro se há funcionários associados
+            int funcionariosCount = getFuncionariosCountByServico(id);
+            if (funcionariosCount > 0) {
+                // Buscar nome do serviço para mensagem mais clara
+                Servico servicoParaExcluir = servicoService.findServicoById(id);
+                String nomeServico = servicoParaExcluir != null ? servicoParaExcluir.getNome() : "este serviço";
+                
+                lastMessage = "Não é possível excluir \"" + nomeServico + "\" pois há " + funcionariosCount + 
+                             " funcionário" + (funcionariosCount > 1 ? "s" : "") + " associado" + 
+                             (funcionariosCount > 1 ? "s" : "") + " a este serviço. Remova os funcionários primeiro.";
+                messageType = "error";
+                loadServicos();
+                loadAllFuncionariosPorServico();
+                return;
+            }
+            
             servicoService.deleteServico(id);
             loadServicos();
             loadAllFuncionariosPorServico();
-            addSuccessMessage("Serviço excluído com sucesso!");
+            lastMessage = "Serviço excluído com sucesso!";
+            messageType = "success";
+        } catch (IllegalStateException ex) {
+            lastMessage = ex.getMessage();
+            messageType = "error";
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Erro ao excluir serviço", ex);
-            addErrorMessage("Erro ao excluir serviço: " + ex.getMessage());
+            lastMessage = "Erro ao excluir serviço: " + ex.getMessage();
+            messageType = "error";
         }
     }
 
@@ -429,5 +485,21 @@ public class ServicoController implements Serializable {
 
     public void setFuncionariosDoServico(List<Funcionario> funcionariosDoServico) {
         this.funcionariosDoServico = funcionariosDoServico;
+    }
+    
+    public String getLastMessage() {
+        return lastMessage;
+    }
+    
+    public void setLastMessage(String lastMessage) {
+        this.lastMessage = lastMessage;
+    }
+    
+    public String getMessageType() {
+        return messageType;
+    }
+    
+    public void setMessageType(String messageType) {
+        this.messageType = messageType;
     }
 }

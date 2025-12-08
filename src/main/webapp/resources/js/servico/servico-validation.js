@@ -127,9 +127,5 @@
     };
 
     // Mantém compatibilidade com funções antigas
-    window.verificarCamposServico = validateRequiredFields;
-    window.verificarExclusaoAntesServico = confirmDeleteFromList;
-    window.toggleFuncionarios = toggleEmployeesList;
-    window.handleDeleteCompleteServico = handleDeleteComplete;
 
 })();

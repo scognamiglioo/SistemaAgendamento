@@ -89,6 +89,10 @@ public class ServicoController implements Serializable {
     }
 
     public String save() {
+        // Limpa mensagens antigas
+        lastMessage = "";
+        messageType = "";
+        
         try {
             if (editMode && selectedServicoId != null) {
                 updateExistingServico();
@@ -103,17 +107,28 @@ public class ServicoController implements Serializable {
                 }
             }
             
+            // Salvar mensagem antes de resetar
+            String savedMessage = lastMessage;
+            String savedMessageType = messageType;
+            
             resetForm();
             loadServicos();
             loadAllFuncionariosPorServico();
+            
+            // Restaurar mensagem após reset
+            lastMessage = savedMessage;
+            messageType = savedMessageType;
+            
             return null;
             
         } catch (IllegalArgumentException ex) {
-            addErrorMessage(ex.getMessage());
+            lastMessage = ex.getMessage();
+            messageType = "error";
             return null;
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Erro ao salvar serviço", ex);
-            addErrorMessage("Erro interno: " + ex.getMessage());
+            lastMessage = "Erro interno: " + ex.getMessage();
+            messageType = "error";
             return null;
         }
     }
@@ -124,13 +139,15 @@ public class ServicoController implements Serializable {
             servicoParaAtualizar.setNome(servico.getNome());
             servicoParaAtualizar.setValor(servico.getValor());
             servicoService.updateServico(servicoParaAtualizar);
-            addSuccessMessage("Serviço atualizado com sucesso!");
+            lastMessage = "Serviço atualizado com sucesso!";
+            messageType = "success";
         }
     }
     
     private Servico createNewServico() {
         Servico servicoCriado = servicoService.createServico(servico.getNome(), servico.getValor());
-        addSuccessMessage("Serviço criado com sucesso!");
+        lastMessage = "Serviço criado com sucesso!";
+        messageType = "success";
         return servicoCriado;
     }
     

@@ -83,12 +83,11 @@
                                                    action="#{servicoController.delete(servico.id)}"
                                                    styleClass="btn btn-sm btn-danger"
                                                    title="Excluir serviço"
-                                                   onclick="return verificarExclusaoAntesServico(this);"
-                                                   immediate="true">
+                                                   onclick="return verificarExclusaoAntesServico(this);">
                                         <f:passThroughAttribute name="data-funcionarios" value="#{servicoController.getFuncionariosCountByServico(servico.id)}" />
                                         <f:passThroughAttribute name="data-nome" value="#{servico.nome}" />
                                         <f:passThroughAttribute name="data-id" value="#{servico.id}" />
-                                        <f:ajax render="@form" onevent="handleDeleteCompleteServico" />
+                                        <f:ajax execute="@this" render=":servicosForm:lista-servicos :servicosForm:hiddenLastMessage :servicosForm:hiddenMessageType" onevent="monitorarMensagens" />
                                     </h:commandButton>
                                 </div>
                             </div>

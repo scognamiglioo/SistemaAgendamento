@@ -15,6 +15,18 @@
         <h:outputScript name="js/form-success-monitor.js" />
         <h:outputScript name="js/servico/servico-validation.js" />
         <h:outputScript name="js/servico/servico-main.js" />
+        
+        <script>
+            //<![CDATA[
+            function monitorarMensagens(data) {
+                if (data.status === 'success' && window.FormSuccessMonitor) {
+                    setTimeout(function() {
+                        window.FormSuccessMonitor.monitor();
+                    }, 100);
+                }
+            }
+            //]]>
+        </script>
     </h:head>
 
     <h:body>
@@ -35,7 +47,7 @@
                 </div>
             </div>
 
-            <h:form>
+            <h:form id="servicosForm">
                 <!-- Campos hidden para capturar mensagens -->
                 <h:inputHidden id="hiddenLastMessage" value="#{servicoController.lastMessage}" />
                 <h:inputHidden id="hiddenMessageType" value="#{servicoController.messageType}" />
@@ -50,13 +62,13 @@
                         <h:commandButton value="Buscar"
                                          action="#{servicoController.searchByNome}"
                                          styleClass="btn btn-info">
-                            <f:ajax execute="@form" render="lista-servicos" />
+                            <f:ajax execute="@form" render=":servicosForm:lista-servicos :servicosForm:hiddenLastMessage :servicosForm:hiddenMessageType" />
                         </h:commandButton>
 
                         <h:commandButton value="Limpar"
                                          action="#{servicoController.clearFilters}"
                                          styleClass="btn btn-secondary">
-                            <f:ajax execute="@form" render="lista-servicos" />
+                            <f:ajax execute="@form" render=":servicosForm:lista-servicos :servicosForm:hiddenLastMessage :servicosForm:hiddenMessageType" />
                         </h:commandButton>
 
                     </div>
@@ -68,6 +80,9 @@
                 </h:panelGroup>
 
             </h:form>
+            
+            <!-- Container dedicado para mensagens flutuantes -->
+            <div id="floating-message" class="floating-message" style="display: none;"></div>
         </div>
     </h:body>
 </html>

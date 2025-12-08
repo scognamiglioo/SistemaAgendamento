@@ -176,6 +176,10 @@ public class ServicoController implements Serializable {
     }
 
     public void delete(Long id) {
+        // Limpa mensagens antigas
+        lastMessage = "";
+        messageType = "";
+        
         try {
             // Verificar primeiro se há funcionários associados
             int funcionariosCount = getFuncionariosCountByServico(id);
@@ -196,7 +200,8 @@ public class ServicoController implements Serializable {
             servicoService.deleteServico(id);
             loadServicos();
             loadAllFuncionariosPorServico();
-            addSuccessMessage(lastMessage);
+            lastMessage = "Serviço excluído com sucesso!";
+            messageType = "success";
         } catch (IllegalStateException ex) {
             lastMessage = ex.getMessage();
             messageType = "error";
@@ -204,7 +209,6 @@ public class ServicoController implements Serializable {
             LOGGER.log(Level.SEVERE, "Erro ao excluir serviço", ex);
             lastMessage = "Erro ao excluir serviço: " + ex.getMessage();
             messageType = "error";
-            addErrorMessage("Erro ao excluir serviço: " + ex.getMessage());
         }
     }
 

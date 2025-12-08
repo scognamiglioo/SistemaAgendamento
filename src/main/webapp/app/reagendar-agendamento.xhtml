@@ -474,7 +474,7 @@
                                          styleClass="ui-button-success"
                                          action="#{reagendamentoController.confirmarReagendamento}"
                                          update="@form"
-                                         onclick="if(!confirm('Confirma o reagendamento deste atendimento?')) return false;"/>
+                                         onclick="if(!confirm('#{msg.confirmReagendamento}')) return false;"/>
                     </div>
                 </h:form>
             </div>

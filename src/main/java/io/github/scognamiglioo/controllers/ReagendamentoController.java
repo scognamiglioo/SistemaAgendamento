@@ -99,7 +99,7 @@ public class ReagendamentoController implements Serializable {
             FacesContext context = FacesContext.getCurrentInstance();
             String loggedUsername = context.getExternalContext().getRemoteUser();
 
-            if (!agendamentoOriginal.getUser().getUsername().equals(loggedUsername)) {
+            if (agendamentoOriginal.getUser() == null || !agendamentoOriginal.getUser().getUsername().equals(loggedUsername)) {
                 addErrorMessage("Você não tem permissão para reagendar este agendamento.");
                 LOGGER.log(Level.WARNING, "Usuário {0} tentou acessar agendamento de outro usuário", loggedUsername);
                 agendamentoOriginal = null;

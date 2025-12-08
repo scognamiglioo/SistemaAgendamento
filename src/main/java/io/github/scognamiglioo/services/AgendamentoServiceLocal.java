@@ -113,6 +113,10 @@ public interface AgendamentoServiceLocal {
 
     /**
      * Verifica se um funcionário presta um serviço específico
+     * 
+     * @param funcionarioId o ID do funcionário a ser verificado
+     * @param servicoId o ID do serviço a ser verificado
+     * @return true se o funcionário presta o serviço, false caso contrário
      */
     boolean funcionarioPrestServico(Long funcionarioId, Long servicoId);
 }

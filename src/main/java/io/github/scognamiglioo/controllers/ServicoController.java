@@ -195,7 +195,7 @@ public class ServicoController implements Serializable {
             loadAllFuncionariosPorServico();
             lastMessage = MSG_SERVICO_EXCLUIDO_SUCESSO;
             messageType = "success";
-            addSuccessMessage(MSG_SERVICO_EXCLUIDO_SUCESSO);
+            addSuccessMessage(lastMessage);
         } catch (IllegalStateException ex) {
             lastMessage = ex.getMessage();
             messageType = "error";

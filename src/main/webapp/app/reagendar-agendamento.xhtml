@@ -310,32 +310,34 @@
                     <p:messages id="messages" showDetail="true" closable="true"/>
 
                     <!-- Informações do Agendamento Original -->
-                    <div class="original-info">
-                        <h3>
-                            <i class="pi pi-info-circle"></i>
-                            Agendamento Atual
-                        </h3>
-                        <div class="info-grid">
-                            <div class="info-item">
-                                <div class="info-label">Código</div>
-                                <div class="info-value">##{reagendamentoController.agendamentoOriginal.id}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Serviço</div>
-                                <div class="info-value">#{reagendamentoController.agendamentoOriginal.nomeServico}</div>
-                            </div>
-                            <div class="info-item">
-                                <div class="info-label">Data/Hora Atual</div>
-                                <div class="info-value">
-                                    #{reagendamentoController.agendamentoOriginal.dataFormatada} às #{reagendamentoController.agendamentoOriginal.horaFormatada}
+                    <h:panelGroup rendered="#{reagendamentoController.agendamentoOriginal != null}">
+                        <div class="original-info">
+                            <h3>
+                                <i class="pi pi-info-circle"></i>
+                                Agendamento Atual
+                            </h3>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Código</div>
+                                    <div class="info-value">##{reagendamentoController.agendamentoOriginal.id}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Serviço</div>
+                                    <div class="info-value">#{reagendamentoController.agendamentoOriginal.nomeServico}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Data/Hora Atual</div>
+                                    <div class="info-value">
+                                        #{reagendamentoController.agendamentoOriginal.dataFormatada} às #{reagendamentoController.agendamentoOriginal.horaFormatada}
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Profissional Atual</div>
+                                    <div class="info-value">#{reagendamentoController.agendamentoOriginal.nomeFuncionario}</div>
                                 </div>
                             </div>
-                            <div class="info-item">
-                                <div class="info-label">Profissional Atual</div>
-                                <div class="info-value">#{reagendamentoController.agendamentoOriginal.nomeFuncionario}</div>
-                            </div>
                         </div>
-                    </div>
+                    </h:panelGroup>
 
                     <div class="alert-info">
                         <i class="pi pi-info-circle"></i>

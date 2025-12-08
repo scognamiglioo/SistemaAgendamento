@@ -183,6 +183,36 @@
                 color: white !important;
             }
 
+            /* Mensagens de Feedback */
+            .ui-messages {
+                margin-bottom: 20px !important;
+                border-radius: 8px !important;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1) !important;
+            }
+
+            .ui-messages-info {
+                background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+                border: none !important;
+                color: white !important;
+            }
+
+            .ui-messages-error {
+                background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+                border: none !important;
+                color: white !important;
+            }
+
+            .ui-messages-warn {
+                background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+                border: none !important;
+                color: white !important;
+            }
+
+            .ui-messages .ui-messages-icon,
+            .ui-messages .ui-messages-close {
+                color: white !important;
+            }
+
             /* Responsivo */
             @media (max-width: 768px) {
                 .app-header {
@@ -236,6 +266,11 @@
                 </div>
 
                 <h:form id="formMeusAgendamentos">
+
+                    <!-- Mensagens de Feedback -->
+                    <p:messages id="messages" showDetail="true" closable="true" escape="false">
+                        <p:autoUpdate />
+                    </p:messages>
 
                     <!-- Filtros de Pesquisa -->
                     <div class="search-filters">
@@ -358,8 +393,8 @@
                             </h:panelGroup>
                         </p:column>
 
-                        <p:column headerText="Ações" style="width: 150px; text-align: center;">
-                            <div style="display: flex; gap: 5px; justify-content: center;">
+                        <p:column headerText="Ações" style="width: 200px; text-align: center;">
+                            <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
                                 <p:commandButton icon="pi pi-eye"
                                                  title="Ver Detalhes"
                                                  styleClass="ui-button-info ui-button-rounded ui-button-sm"
@@ -368,6 +403,14 @@
                                     <f:setPropertyActionListener value="#{ag}"
                                                                  target="#{agendamentoController.agendamentoSelecionado}"/>
                                 </p:commandButton>
+
+                                <p:button icon="pi pi-refresh"
+                                          title="Reagendar"
+                                          styleClass="ui-button-warning ui-button-rounded ui-button-sm"
+                                          rendered="#{ag.status.name() != 'CANCELADO' and ag.status.name() != 'CONCLUIDO'}"
+                                          outcome="reagendar-agendamento">
+                                    <f:param name="id" value="#{ag.id}"/>
+                                </p:button>
 
                                 <p:commandButton icon="pi pi-trash"
                                                  title="Cancelar"

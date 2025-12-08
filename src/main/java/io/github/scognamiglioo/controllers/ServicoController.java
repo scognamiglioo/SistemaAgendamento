@@ -57,7 +57,17 @@ public class ServicoController implements Serializable {
     private List<Funcionario> funcionariosDoServico = new ArrayList<>();
     
     // Mensagem para exibição flutuante
+    /**
+     * Stores the last floating message to be displayed via JavaScript integration.
+     * Used for communication with the floating message system in the frontend.
+     * Should be cleared after being read by the JavaScript code to avoid repeated display.
+     */
     private String lastMessage = "";
+    /**
+     * Indicates the type of the last floating message (e.g., "success", "error").
+     * Used for JavaScript integration with the floating message system.
+     * Should be cleared after being read by the JavaScript code.
+     */
     private String messageType = "";
 
     @PostConstruct
@@ -161,15 +171,15 @@ public class ServicoController implements Serializable {
                              " funcionário" + (funcionariosCount > 1 ? "s" : "") + " associado" + 
                              (funcionariosCount > 1 ? "s" : "") + " a este serviço. Remova os funcionários primeiro.";
                 messageType = "error";
+                loadServicos();
+                loadAllFuncionariosPorServico();
                 return;
             }
             
             servicoService.deleteServico(id);
             loadServicos();
             loadAllFuncionariosPorServico();
-            lastMessage = "Serviço excluído com sucesso!";
-            messageType = "success";
-            addSuccessMessage("Serviço excluído com sucesso!");
+            addSuccessMessage(lastMessage);
         } catch (IllegalStateException ex) {
             lastMessage = ex.getMessage();
             messageType = "error";

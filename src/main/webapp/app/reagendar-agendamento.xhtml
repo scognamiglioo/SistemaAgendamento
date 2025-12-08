@@ -416,6 +416,11 @@
                                             update="horario messages"
                                             listener="#{reagendamentoController.onNovaDataChange}"/>
                                 </p:calendar>
+                                <h:panelGroup rendered="#{reagendamentoController.novoFuncionarioId == null}">
+                                    <small style="color: #6c757d; margin-top: 5px; display: block;">
+                                        Selecione um profissional para habilitar a escolha da data.
+                                    </small>
+                                </h:panelGroup>
                             </div>
 
                             <!-- Novo Horário -->

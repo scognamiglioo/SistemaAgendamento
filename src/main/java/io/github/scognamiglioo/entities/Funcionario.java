@@ -216,18 +216,21 @@ public class Funcionario implements Serializable {
 
     // Métodos de compatibilidade para o sistema legado
     public void setServicos(List<Servico> servicos) {
-        // Por compatibilidade, mas não faz nada na nova estrutura
-        // Os serviços agora são gerenciados através de FuncionarioServico
+        throw new UnsupportedOperationException(
+            "setServicos() is not supported. Use FuncionarioServico to manage services instead."
+        );
     }
 
     public void addServico(Servico servico) {
-        // Método de compatibilidade - não implementado na nova estrutura
-        // Use addServicoLocalizacao() em vez disso
+        throw new UnsupportedOperationException(
+            "addServico() is not supported. Use addServicoLocalizacao() instead."
+        );
     }
 
     public void removeServico(Servico servico) {
-        // Método de compatibilidade - não implementado na nova estrutura  
-        // Use removeServicoLocalizacao() em vez disso
+        throw new UnsupportedOperationException(
+            "removeServico() is not supported. Use removeServicoLocalizacao() instead."
+        );
     }
 
     @Override

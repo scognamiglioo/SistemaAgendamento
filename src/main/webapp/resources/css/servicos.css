@@ -884,3 +884,52 @@ div[id*="funcionarios-content"][style*="display: none"] {
     max-height: 200px;
     overflow-y: auto;
 }
+
+/* Estilos para mensagens flutuantes */
+.floating-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    max-width: 400px;
+    word-wrap: break-word;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.floating-message.success {
+    background: #28a745;
+    border-left: 4px solid #1e7e34;
+}
+
+.floating-message.error {
+    background: #dc3545;
+    border-left: 4px solid #b02a37;
+}
+
+.floating-message.warning {
+    background: #ffc107;
+    color: #212529;
+    border-left: 4px solid #d39e00;
+}
+
+.floating-message.info {
+    background: #17a2b8;
+    border-left: 4px solid #138496;
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+
+    <h:head>
+        <title>#{localizacaoController.formTitle}</title>
+        <h:outputStylesheet library="css" name="admin.css"/>
+        <h:outputStylesheet library="css" name="localizacoes.css"/>
+        
+        <!-- Scripts para validação -->
+        <h:outputScript name="js/floating-messages.js" />
+        <h:outputScript name="js/form-success-monitor.js" />
+    </h:head>
+
+    <h:body>
+        <div class="localizacoes-container">
+            <!-- Header -->
+            <div class="localizacoes-header">
+                <h1>#{localizacaoController.formTitle}</h1>
+                <div class="localizacoes-actions">
+                    <h:form>
+                        <h:commandButton value="Voltar à Lista" 
+                                         action="#{localizacaoController.navigateToList}"
+                                         styleClass="btn btn-secondary"
+                                         immediate="true" />
+                    </h:form>
+                </div>
+            </div>
+
+            <!-- Formulário -->
+            <div class="localizacao-form-container">
+                <h:form id="localizacaoForm" styleClass="localizacao-form">
+                    <!-- Campos hidden para capturar mensagens -->
+                    <h:inputHidden id="hiddenLastMessage" value="#{localizacaoController.lastMessage}" />
+                    <h:inputHidden id="hiddenMessageType" value="#{localizacaoController.messageType}" />
+                    
+                    <div class="form-group">
+                        <h:outputLabel for="nome" value="Nome da Localização:" />
+                        <p:inputText id="nome" 
+                                     value="#{localizacaoController.localizacao.nome}"
+                                     required="true"
+                                     requiredMessage="Nome é obrigatório"
+                                     maxlength="100"
+                                     styleClass="form-control" />
+                        <p:message for="nome" styleClass="error-message" />
+                    </div>
+
+                    <div class="form-group">
+                        <h:outputLabel for="descricao" value="Descrição:" />
+                        <p:inputTextarea id="descricao" 
+                                         value="#{localizacaoController.localizacao.descricao}"
+                                         rows="4"
+                                         maxlength="500"
+                                         styleClass="form-control" />
+                        <p:message for="descricao" styleClass="error-message" />
+                    </div>
+
+                    <div class="form-actions">
+                        <h:commandButton value="#{localizacaoController.saveButtonText}"
+                                         action="#{localizacaoController.saveAndReturn}"
+                                         styleClass="btn btn-primary" />
+                        
+                        <h:commandButton value="Cancelar"
+                                         action="#{localizacaoController.navigateToList}"
+                                         styleClass="btn btn-secondary"
+                                         immediate="true" />
+                    </div>
+                </h:form>
+            </div>
+        </div>
+
+        <!-- Container para mensagens flutuantes -->
+        <div id="floating-message-container"></div>
+
+        <f:metadata>
+            <f:viewParam name="id" value="#{localizacaoController.selectedLocalId}" />
+            <f:viewAction action="#{localizacaoController.loadLocalizacaoForEdit}" />
+        </f:metadata>
+    </h:body>
+</html>

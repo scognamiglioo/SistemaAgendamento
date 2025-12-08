@@ -1,0 +1,68 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+                xmlns:ui="jakarta.faces.facelets"
+                xmlns:h="jakarta.faces.html"
+                xmlns:f="jakarta.faces.core">
+
+    <div class="lista-container">
+        <div class="lista-stats">
+            <h:outputText value="Total de associações: #{funcionarioServicoController.totalAssociacoes}" 
+                          styleClass="stats-text" />
+        </div>
+
+        <div class="lista-content">
+            <h:panelGroup rendered="#{empty funcionarioServicoController.associacoes}">
+                <div class="empty-state">
+                    <p>Nenhuma associação encontrada.</p>
+                    <p class="text-muted">Use o formulário acima para criar uma nova associação.</p>
+                </div>
+            </h:panelGroup>
+
+            <h:panelGroup rendered="#{not empty funcionarioServicoController.associacoes}">
+                <div class="funcionarios-grupos">
+                    <!-- Agrupar por funcionário usando ui:repeat com funcionários -->
+                    <ui:repeat value="#{funcionarioServicoController.funcionarios}" var="funcionario">
+                        <!-- Verificar se funcionário tem associações -->
+                        <h:panelGroup rendered="#{funcionarioServicoController.funcionarioTemAssociacoes(funcionario.id)}">
+                            <div class="funcionario-card">
+                                <div class="funcionario-header">
+                                    <h4>#{funcionario.nome}</h4>
+                                    <span class="cargo-badge">#{empty funcionario.cargo ? 'Sem cargo' : funcionario.cargo.nome}</span>
+                                </div>
+                                
+                                <div class="associacoes-grid">
+                                    <!-- Listar associações deste funcionário -->
+                                    <ui:repeat value="#{funcionarioServicoController.associacoes}" var="assoc">
+                                        <h:panelGroup rendered="#{assoc.funcionario.id == funcionario.id}">
+                                            <div class="associacao-card">
+                                                <div class="associacao-content">
+                                                    <div class="servico-info">
+                                                        <strong>#{assoc.servico.nome}</strong>
+                                                        <span class="valor">R$ #{assoc.servico.valor}</span>
+                                                    </div>
+                                                    <div class="localizacao-info">
+                                                        <i class="icon-location"></i>
+                                                        <span>#{assoc.localizacao.nome}</span>
+                                                    </div>
+                                                </div>
+                                                <div class="associacao-actions">
+                                                    <h:commandButton value="×"
+                                                                     action="#{funcionarioServicoController.deleteAssociacao(assoc.funcionario.id, assoc.servico.id, assoc.localizacao.id)}"
+                                                                     onclick="return confirm('Tem certeza que deseja excluir esta associação?')"
+                                                                     styleClass="btn btn-sm btn-danger btn-remove"
+                                                                     title="Excluir associação">
+                                                        <f:ajax execute="@this" render=":associacoesForm:associacoes-panel :associacoesForm:hiddenLastMessage :associacoesForm:hiddenMessageType" />
+                                                    </h:commandButton>
+                                                </div>
+                                            </div>
+                                        </h:panelGroup>
+                                    </ui:repeat>
+                                </div>
+                            </div>
+                        </h:panelGroup>
+                    </ui:repeat>
+                </div>
+            </h:panelGroup>
+        </div>
+    </div>
+
+</ui:composition>

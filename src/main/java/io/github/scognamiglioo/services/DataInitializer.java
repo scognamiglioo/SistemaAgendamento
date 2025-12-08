@@ -1,11 +1,16 @@
 package io.github.scognamiglioo.services;
 
 import io.github.scognamiglioo.entities.Funcionario;
-import io.github.scognamiglioo.entities.Guiche;
-import io.github.scognamiglioo.entities.Role;
+import io.github.scognamiglioo.entities.Localizacao;
+import io.github.scognamiglioo.entities.Servico;
 import io.github.scognamiglioo.entities.User;
+import io.github.scognamiglioo.entities.Guiche;
 import io.github.scognamiglioo.entities.Cargo;
+import io.github.scognamiglioo.entities.Role;
 import jakarta.ejb.EJB;
+import jakarta.ejb.Singleton;
+import jakarta.ejb.TransactionAttribute;
+import jakarta.ejb.TransactionAttributeType;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Initialized;
 import jakarta.enterprise.event.Observes;
@@ -14,8 +19,11 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.ArrayList;
 
 
+@Singleton
+@jakarta.ejb.Startup
 @ApplicationScoped
 public class DataInitializer {
 
@@ -27,10 +35,17 @@ public class DataInitializer {
     
     @EJB
     private CargoServiceLocal cargoService;
-
+    
+    @EJB
+    private LocalizacaoServiceLocal localizacaoService;
+    
+    @EJB
+    private FuncionarioServicoServiceLocal funcionarioServicoService;
+   
     @EJB
     private AgendamentoServiceLocal agendamentoService;
-
+    
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void execute(@Observes @Initialized(ApplicationScoped.class) Object event) {
         
          if (dataService.listGuiches().isEmpty()) {
@@ -42,6 +57,25 @@ public class DataInitializer {
             dataService.createGuiche("Sala 102");
 
             System.out.println(">>> Guichês iniciais criados.");
+        }
+        
+        // Criar localizações iniciais
+        if (localizacaoService.getAllLocalizacoes().isEmpty()) {
+            
+            localizacaoService.createLocalizacao("Consultório Odontológico", "Sala equipada para atendimentos odontológicos");
+            localizacaoService.createLocalizacao("Mesa de Recepção", "Local de atendimento inicial e cadastro de pacientes");
+            localizacaoService.createLocalizacao("Guichê 1", "Primeiro guichê de atendimento");
+            localizacaoService.createLocalizacao("Guichê 2", "Segundo guichê de atendimento");
+            localizacaoService.createLocalizacao("Sala de Exames", "Sala para realização de exames clínicos");
+            localizacaoService.createLocalizacao("Laboratório", "Local para coleta de exames laboratoriais");
+            localizacaoService.createLocalizacao("Sala de Raio-X", "Sala equipada com aparelho de Raio-X");
+            localizacaoService.createLocalizacao("Consultório Cardiológico", "Sala especializada em cardiologia");
+            localizacaoService.createLocalizacao("Consultório Dermatológico", "Sala para consultas dermatológicas");
+            localizacaoService.createLocalizacao("Sala de Vacinação", "Local específico para aplicação de vacinas");
+            localizacaoService.createLocalizacao("Consultório Pediátrico", "Sala especializada em pediatria");
+            localizacaoService.createLocalizacao("Posto de Enfermagem", "Central de procedimentos de enfermagem");
+            
+            System.out.println(">>> Localizações iniciais criadas.");
         }
         
         // Criar cargos iniciais
@@ -241,15 +275,16 @@ public class DataInitializer {
             System.out.println(">>> Funcionários iniciais criados com cargos associados.");
         }
         
-        // Associar funcionários aos serviços (relacionamento many-to-many)
-        if (dataService.getAllFuncionarios().size() > 0 && servicoService.getAllServicos().size() > 0) {
+        // Associar funcionários aos serviços com localizações (nova estrutura FuncionarioServico)
+        if (dataService.getAllFuncionarios().size() > 0 && servicoService.getAllServicos().size() > 0 && localizacaoService.getAllLocalizacoes().size() > 0) {
             
             try {
-                // Buscar alguns funcionários e serviços para criar associações
+                // Buscar funcionários, serviços e localizações
                 var funcionarios = dataService.getAllFuncionarios();
                 var servicos = servicoService.getAllServicos();
+                var localizacoes = localizacaoService.getAllLocalizacoes();
                 
-                // Encontrar médicos/atendentes (Dr. Roberto, Dra. Patricia, etc.)
+                // Encontrar médicos/atendentes
                 Funcionario drRoberto = funcionarios.stream()
                     .filter(f -> f.getNome().contains("Roberto Almeida"))
                     .findFirst().orElse(null);
@@ -298,42 +333,107 @@ public class DataInitializer {
                 var consultaPediatrica = servicos.stream()
                     .filter(s -> s.getNome().contains("Consulta Pediátrica"))
                     .findFirst().orElse(null);
+                    
+                var limpezaDentaria = servicos.stream()
+                    .filter(s -> s.getNome().contains("Limpeza Dentária"))
+                    .findFirst().orElse(null);
                 
-                // Criar associações lógicas
+                // Encontrar localizações específicas
+                var consultorioOdonto = localizacoes.stream()
+                    .filter(l -> l.getNome().contains("Consultório Odontológico"))
+                    .findFirst().orElse(null);
+                    
+                var salaExames = localizacoes.stream()
+                    .filter(l -> l.getNome().contains("Sala de Exames"))
+                    .findFirst().orElse(null);
+                    
+                var laboratorio = localizacoes.stream()
+                    .filter(l -> l.getNome().contains("Laboratório"))
+                    .findFirst().orElse(null);
+                    
+                var salaRaioX = localizacoes.stream()
+                    .filter(l -> l.getNome().contains("Sala de Raio-X"))
+                    .findFirst().orElse(null);
+                    
+                var consultorioCardio = localizacoes.stream()
+                    .filter(l -> l.getNome().contains("Consultório Cardiológico"))
+                    .findFirst().orElse(null);
+                    
+                var consultorioDermo = localizacoes.stream()
+                    .filter(l -> l.getNome().contains("Consultório Dermatológico"))
+                    .findFirst().orElse(null);
+                    
+                var salaVacinacao = localizacoes.stream()
+                    .filter(l -> l.getNome().contains("Sala de Vacinação"))
+                    .findFirst().orElse(null);
+                    
+                var consultorioPediatrico = localizacoes.stream()
+                    .filter(l -> l.getNome().contains("Consultório Pediátrico"))
+                    .findFirst().orElse(null);
+                    
+                var postoEnfermagem = localizacoes.stream()
+                    .filter(l -> l.getNome().contains("Posto de Enfermagem"))
+                    .findFirst().orElse(null);
                 
-                // Dr. Roberto (Clínico Geral) - pode fazer consultas gerais, exames básicos
+                // Criar associações funcionário-serviço-localização usando o novo service
+                
+                // Dr. Roberto (Clínico Geral) - consultas gerais e exames básicos
                 if (drRoberto != null) {
-                    if (consultaMedica != null) servicoService.associarFuncionarioAoServico(drRoberto.getId(), consultaMedica.getId());
-                    if (examesSangue != null) servicoService.associarFuncionarioAoServico(drRoberto.getId(), examesSangue.getId());
+                    if (consultaMedica != null && salaExames != null) {
+                        funcionarioServicoService.createAssociacao(drRoberto.getId(), consultaMedica.getId(), salaExames.getId());
+                    }
+                    if (examesSangue != null && laboratorio != null) {
+                        funcionarioServicoService.createAssociacao(drRoberto.getId(), examesSangue.getId(), laboratorio.getId());
+                    }
                 }
                 
                 // Dra. Patricia (Cardiologista) - especializada em cardiologia
                 if (draPatricia != null) {
-                    if (consultaCardio != null) servicoService.associarFuncionarioAoServico(draPatricia.getId(), consultaCardio.getId());
-                    if (consultaMedica != null) servicoService.associarFuncionarioAoServico(draPatricia.getId(), consultaMedica.getId());
+                    if (consultaCardio != null && consultorioCardio != null) {
+                        funcionarioServicoService.createAssociacao(draPatricia.getId(), consultaCardio.getId(), consultorioCardio.getId());
+                    }
+                    if (consultaMedica != null && consultorioCardio != null) {
+                        funcionarioServicoService.createAssociacao(draPatricia.getId(), consultaMedica.getId(), consultorioCardio.getId());
+                    }
                 }
                 
                 // Dr. João (Radiologista) - exames de imagem
                 if (drJoao != null) {
-                    if (raioX != null) servicoService.associarFuncionarioAoServico(drJoao.getId(), raioX.getId());
+                    if (raioX != null && salaRaioX != null) {
+                        funcionarioServicoService.createAssociacao(drJoao.getId(), raioX.getId(), salaRaioX.getId());
+                    }
                 }
                 
                 // Dra. Fernanda (Dermatologista + Pediatra)
                 if (draFernanda != null) {
-                    if (consultaDermo != null) servicoService.associarFuncionarioAoServico(draFernanda.getId(), consultaDermo.getId());
-                    if (consultaPediatrica != null) servicoService.associarFuncionarioAoServico(draFernanda.getId(), consultaPediatrica.getId());
+                    if (consultaDermo != null && consultorioDermo != null) {
+                        funcionarioServicoService.createAssociacao(draFernanda.getId(), consultaDermo.getId(), consultorioDermo.getId());
+                    }
+                    if (consultaPediatrica != null && consultorioPediatrico != null) {
+                        funcionarioServicoService.createAssociacao(draFernanda.getId(), consultaPediatrica.getId(), consultorioPediatrico.getId());
+                    }
                 }
                 
-                // Enfermeiro Lucas - vacinação e procedimentos básicos
+                // Enfermeiro Lucas - vacinação e procedimentos de enfermagem
                 if (enfLucas != null) {
-                    if (vacinacao != null) servicoService.associarFuncionarioAoServico(enfLucas.getId(), vacinacao.getId());
-                    if (examesSangue != null) servicoService.associarFuncionarioAoServico(enfLucas.getId(), examesSangue.getId());
+                    if (vacinacao != null && salaVacinacao != null) {
+                        funcionarioServicoService.createAssociacao(enfLucas.getId(), vacinacao.getId(), salaVacinacao.getId());
+                    }
+                    if (examesSangue != null && postoEnfermagem != null) {
+                        funcionarioServicoService.createAssociacao(enfLucas.getId(), examesSangue.getId(), postoEnfermagem.getId());
+                    }
                 }
                 
-                System.out.println(">>> Associações funcionário-serviço criadas.");
+                // Adicionar associação odontológica se houver dentista ou serviço odontológico
+                if (limpezaDentaria != null && consultorioOdonto != null && drRoberto != null) {
+                    funcionarioServicoService.createAssociacao(drRoberto.getId(), limpezaDentaria.getId(), consultorioOdonto.getId());
+                }
+                
+                System.out.println(">>> Associações funcionário-serviço-localização criadas com nova estrutura.");
                 
             } catch (Exception e) {
-                System.err.println(">>> Erro ao criar associações funcionário-serviço: " + e.getMessage());
+                System.err.println(">>> Erro ao criar associações funcionário-serviço-localização: " + e.getMessage());
+                e.printStackTrace();
             }
         }
 

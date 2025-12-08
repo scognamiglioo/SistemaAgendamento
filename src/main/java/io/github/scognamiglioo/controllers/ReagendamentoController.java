@@ -290,8 +290,8 @@ public class ReagendamentoController implements Serializable {
                 return null;
             }
 
-            // Cancela o agendamento original ? Acho que não, só cria um novo e mantém o antigo como está
-            //agendamentoService.cancelarAgendamento(agendamentoOriginal.getId());
+            // Cancela o agendamento original ao reagendar para evitar duplicidade
+            agendamentoService.cancelarAgendamento(agendamentoOriginal.getId());
 
             // Cria o novo agendamento
             Agendamento novoAgendamento = agendamentoService.createAgendamento(user, servico, novoFuncionario, data, hora);

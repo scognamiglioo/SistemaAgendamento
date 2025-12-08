@@ -72,9 +72,19 @@ public class ServicoController implements Serializable {
 
     @PostConstruct
     public void init() {
+        clearMessages();
         loadServicos();
         loadTodosFuncionarios();
         loadAllFuncionariosPorServico();
+    }
+    
+    /**
+     * Clears the message fields to prevent stale messages from appearing.
+     * Should be called at the beginning of operations or after messages are displayed.
+     */
+    private void clearMessages() {
+        lastMessage = "";
+        messageType = "";
     }
 
     // ========== CRUD SERVIÇOS ==========
@@ -89,6 +99,7 @@ public class ServicoController implements Serializable {
     }
 
     public String save() {
+        clearMessages();
         try {
             if (editMode && selectedServicoId != null) {
                 updateExistingServico();
@@ -143,6 +154,7 @@ public class ServicoController implements Serializable {
     }
 
     public void edit(Long id) {
+        clearMessages();
         try {
             Servico servicoParaEditar = servicoService.findServicoById(id);
             if (servicoParaEditar != null) {
@@ -159,6 +171,7 @@ public class ServicoController implements Serializable {
     }
 
     public void delete(Long id) {
+        clearMessages();
         try {
             // Verificar primeiro se há funcionários associados
             int funcionariosCount = getFuncionariosCountByServico(id);
@@ -179,7 +192,9 @@ public class ServicoController implements Serializable {
             servicoService.deleteServico(id);
             loadServicos();
             loadAllFuncionariosPorServico();
-            addSuccessMessage(lastMessage);
+            lastMessage = "Serviço excluído com sucesso!";
+            messageType = "success";
+            addSuccessMessage("Serviço excluído com sucesso!");
         } catch (IllegalStateException ex) {
             lastMessage = ex.getMessage();
             messageType = "error";
@@ -192,12 +207,14 @@ public class ServicoController implements Serializable {
     }
 
     public void cancel() {
+        clearMessages();
         resetForm();
     }
 
     // ========== BUSCA ==========
     
     public void searchByNome() {
+        clearMessages();
         try {
             if (searchNome != null && !searchNome.trim().isEmpty()) {
                 // Usa busca parcial para melhor experiência do usuário
@@ -213,6 +230,7 @@ public class ServicoController implements Serializable {
     }
 
     public void clearFilters() {
+        clearMessages();
         searchNome = "";
         loadServicos();
         loadAllFuncionariosPorServico();
@@ -298,6 +316,7 @@ public class ServicoController implements Serializable {
     // ========== NAVEGAÇÃO ==========
     
     public void loadServicoForEdit() {
+        clearMessages();
         if (selectedServicoId != null && selectedServicoId > 0) {
             try {
                 Servico servicoParaEditar = servicoService.findServicoById(selectedServicoId);

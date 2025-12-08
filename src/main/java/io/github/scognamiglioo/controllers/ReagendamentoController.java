@@ -1,9 +1,6 @@
 package io.github.scognamiglioo.controllers;
 
-import io.github.scognamiglioo.entities.Agendamento;
-import io.github.scognamiglioo.entities.Funcionario;
-import io.github.scognamiglioo.entities.Servico;
-import io.github.scognamiglioo.entities.User;
+import io.github.scognamiglioo.entities.*;
 import io.github.scognamiglioo.services.AgendamentoServiceLocal;
 import io.github.scognamiglioo.services.DataServiceLocal;
 import jakarta.annotation.PostConstruct;
@@ -290,8 +287,10 @@ public class ReagendamentoController implements Serializable {
                 return null;
             }
 
-            // Cancela o agendamento original ao reagendar para evitar duplicidade
-            agendamentoService.cancelarAgendamento(agendamentoOriginal.getId());
+            // Cancela o agendamento original apenas se estiver como agendado
+            if(agendamentoOriginal.getStatus() == StatusAgendamento.AGENDADO) {
+                agendamentoService.cancelarAgendamento(agendamentoOriginal.getId());
+            }
 
             // Cria o novo agendamento
             Agendamento novoAgendamento = agendamentoService.createAgendamento(user, servico, novoFuncionario, data, hora);

@@ -31,6 +31,7 @@ import java.util.logging.Level;
 public class ServicoController implements Serializable {
 
     private static final Logger LOGGER = Logger.getLogger(ServicoController.class.getName());
+    private static final String MSG_SERVICO_EXCLUIDO_SUCESSO = "Serviço excluído com sucesso!";
 
     @EJB
     private ServicoServiceLocal servicoService;
@@ -192,9 +193,9 @@ public class ServicoController implements Serializable {
             servicoService.deleteServico(id);
             loadServicos();
             loadAllFuncionariosPorServico();
-            lastMessage = "Serviço excluído com sucesso!";
+            lastMessage = MSG_SERVICO_EXCLUIDO_SUCESSO;
             messageType = "success";
-            addSuccessMessage("Serviço excluído com sucesso!");
+            addSuccessMessage(MSG_SERVICO_EXCLUIDO_SUCESSO);
         } catch (IllegalStateException ex) {
             lastMessage = ex.getMessage();
             messageType = "error";

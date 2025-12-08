@@ -40,12 +40,12 @@ public class LocalizacaoController implements Serializable {
 
     @PostConstruct
     public void init() {
-        loadLocalizacaoizacoes();
+        loadLocalizacoes();
     }
 
     // ========== CRUD LOCAIS ==========
     
-    public void loadLocalizacaoizacoes() {
+    public void loadLocalizacoes() {
         try {
             locais = localizacaoService.getAllLocalizacoes();
         } catch (Exception e) {
@@ -90,7 +90,7 @@ public class LocalizacaoController implements Serializable {
             String savedMessageType = messageType;
             
             resetForm();
-            loadLocalizacaoizacoes();
+            loadLocalizacoes();
             
             // Restaurar mensagem após reset
             lastMessage = savedMessage;
@@ -168,7 +168,7 @@ public class LocalizacaoController implements Serializable {
             }
             
             localizacaoService.deleteLocalizacao(id);
-            loadLocalizacaoizacoes();
+            loadLocalizacoes();
             lastMessage = "Localização excluída com sucesso!";
             messageType = "success";
         } catch (IllegalStateException ex) {
@@ -192,7 +192,7 @@ public class LocalizacaoController implements Serializable {
             if (searchNome != null && !searchNome.trim().isEmpty()) {
                 locais = localizacaoService.findLocalizacoesByNomePartial(searchNome.trim());
             } else {
-                loadLocalizacaoizacoes();
+                loadLocalizacoes();
                 return;
             }
         } catch (Exception ex) {
@@ -203,7 +203,7 @@ public class LocalizacaoController implements Serializable {
 
     public void clearFilters() {
         searchNome = "";
-        loadLocalizacaoizacoes();
+        loadLocalizacoes();
     }
 
     // ========== NAVEGAÇÃO ==========

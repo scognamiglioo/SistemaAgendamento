@@ -140,7 +140,7 @@ public class FuncionarioServicoController implements Serializable {
                 return null;
             }
             
-            if (editMode && funcionarioId != null && servicoId != null && localizacaoId != null) {
+            if (editMode) {
                 updateExistingAssociacao();
             } else {
                 createNewAssociacao();

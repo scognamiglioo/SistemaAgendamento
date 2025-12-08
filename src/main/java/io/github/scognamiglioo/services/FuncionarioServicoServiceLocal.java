@@ -5,13 +5,13 @@ import io.github.scognamiglioo.entities.Funcionario;
 import io.github.scognamiglioo.entities.Servico;
 import io.github.scognamiglioo.entities.Localizacao;
 import io.github.scognamiglioo.entities.FuncionarioServico;
-
+import jakarta.ejb.Local;
 import java.util.List;
 
 /**
  * Interface local para o serviço de FuncionarioServico
  */
-@LocalBean
+@Local
 public interface FuncionarioServicoServiceLocal {
 
     // ========== CRIAÇÃO ==========

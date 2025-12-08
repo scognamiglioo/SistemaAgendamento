@@ -41,7 +41,6 @@
         // Extrair dados dos atributos data-*
         const funcionariosCount = parseInt(buttonElement.getAttribute('data-funcionarios') || '0');
         const servicoNome = buttonElement.getAttribute('data-nome') || 'Serviço';
-
         
         // Verificar se há funcionários associados
         if (funcionariosCount > 0) {

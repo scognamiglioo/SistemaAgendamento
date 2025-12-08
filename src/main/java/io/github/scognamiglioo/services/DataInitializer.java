@@ -14,6 +14,10 @@ import jakarta.ejb.TransactionAttributeType;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.Initialized;
 import jakarta.enterprise.event.Observes;
+
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ArrayList;
 
@@ -37,7 +41,10 @@ public class DataInitializer {
     
     @EJB
     private FuncionarioServicoServiceLocal funcionarioServicoService;
-
+   
+    @EJB
+    private AgendamentoServiceLocal agendamentoService;
+    
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void execute(@Observes @Initialized(ApplicationScoped.class) Object event) {
         
@@ -426,6 +433,101 @@ public class DataInitializer {
                 
             } catch (Exception e) {
                 System.err.println(">>> Erro ao criar associações funcionário-serviço-localização: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+
+        // Criar agendamentos de exemplo para o usuário guisso
+        if (dataService.getAllUsers().size() > 0 && servicoService.getAllServicos().size() > 0) {
+            try {
+                // Buscar usuário guisso
+                User guisso = dataService.getAllUsers().stream()
+                    .filter(u -> u.getUsername().equals("guisso"))
+                    .findFirst().orElse(null);
+
+                if (guisso != null) {
+                    var funcionarios = dataService.getAllFuncionarios();
+                    var servicos = servicoService.getAllServicos();
+                    var guiches = dataService.listGuiches();
+
+                    // Buscar funcionários
+                    Funcionario drRoberto = funcionarios.stream()
+                        .filter(f -> f.getNome().contains("Roberto Almeida"))
+                        .findFirst().orElse(null);
+
+                    Funcionario draPatricia = funcionarios.stream()
+                        .filter(f -> f.getNome().contains("Patricia Fernandes"))
+                        .findFirst().orElse(null);
+
+                    Funcionario draFernanda = funcionarios.stream()
+                        .filter(f -> f.getNome().contains("Fernanda Souza"))
+                        .findFirst().orElse(null);
+
+                    // Buscar serviços
+                    var consultaMedica = servicos.stream()
+                        .filter(s -> s.getNome().contains("Consulta Médica Geral"))
+                        .findFirst().orElse(null);
+
+                    var consultaCardio = servicos.stream()
+                        .filter(s -> s.getNome().contains("Consulta Cardiológica"))
+                        .findFirst().orElse(null);
+
+                    var consultaDermo = servicos.stream()
+                        .filter(s -> s.getNome().contains("Consulta Dermatológica"))
+                        .findFirst().orElse(null);
+
+                    // Buscar guichês
+                    Guiche sala101 = guiches.stream()
+                        .filter(g -> g.getNome().contains("Sala 101"))
+                        .findFirst().orElse(null);
+
+                    Guiche sala102 = guiches.stream()
+                        .filter(g -> g.getNome().contains("Sala 102"))
+                        .findFirst().orElse(null);
+
+                    // Importar classes necessárias
+                    LocalDate hoje = LocalDate.now();
+                    LocalTime hora1 = LocalTime.of(14, 0); // 14:00
+                    LocalTime hora2 = LocalTime.of(15, 30); // 15:30
+                    LocalTime hora3 = LocalTime.of(10, 0); // 10:00
+
+                    LocalDate amanha = hoje.plusDays(1);
+                    LocalDate doisDias = hoje.plusDays(2);
+
+                    // Agendamento 1: Status AGENDADO para hoje
+                    if (consultaMedica != null && drRoberto != null) {
+                        io.github.scognamiglioo.entities.Agendamento ag1 =
+                            agendamentoService.createAgendamento(guisso, consultaMedica, drRoberto, hoje, hora1);
+                        ag1.setObservacoes("Consulta de rotina");
+                        agendamentoService.updateAgendamento(ag1);
+                        System.out.println(">>> Agendamento 1 criado: AGENDADO (Consulta Médica Geral)");
+                    }
+
+                    // Agendamento 2: Status CONFIRMADO para amanhã
+                    if (consultaCardio != null && draPatricia != null) {
+                        io.github.scognamiglioo.entities.Agendamento ag2 =
+                            agendamentoService.createAgendamento(guisso, consultaCardio, draPatricia, amanha, hora2);
+                        agendamentoService.alterarStatus(ag2.getId(), io.github.scognamiglioo.entities.StatusAgendamento.CONFIRMADO);
+                        ag2.setObservacoes("Retorno cardiológico");
+                        agendamentoService.updateAgendamento(ag2);
+                        System.out.println(">>> Agendamento 2 criado: CONFIRMADO (Consulta Cardiológica)");
+                    }
+
+                    // Agendamento 3: Status EM_ATENDIMENTO para daqui a 2 dias
+                    if (consultaDermo != null && draFernanda != null) {
+                        io.github.scognamiglioo.entities.Agendamento ag3 =
+                            agendamentoService.createAgendamento(guisso, consultaDermo, draFernanda, doisDias, hora3);
+                        agendamentoService.alterarStatus(ag3.getId(), io.github.scognamiglioo.entities.StatusAgendamento.EM_ATENDIMENTO);
+                        ag3.setObservacoes("Avaliação dermatológica");
+                        agendamentoService.updateAgendamento(ag3);
+                        System.out.println(">>> Agendamento 3 criado: EM_ATENDIMENTO (Consulta Dermatológica)");
+                    }
+
+                    System.out.println(">>> 3 agendamentos de exemplo criados para o usuário guisso.");
+                }
+
+            } catch (Exception e) {
+                System.err.println(">>> Erro ao criar agendamentos de exemplo: " + e.getMessage());
                 e.printStackTrace();
             }
         }

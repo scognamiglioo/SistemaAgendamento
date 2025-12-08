@@ -224,7 +224,7 @@ public class User
     //</editor-fold>
 
     public String getPassword() {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+        return userPassword;
     }
 
 }

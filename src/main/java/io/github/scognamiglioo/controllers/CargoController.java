@@ -60,6 +60,13 @@ public class CargoController implements Serializable {
             cargos = new ArrayList<>();
             funcionariosPorCargoMap = new HashMap<>();
         }
+        
+        // Recupera mensagens do Flash Scope (vindas de redirect)
+        FacesContext context = FacesContext.getCurrentInstance();
+        if (context != null && context.getExternalContext().getFlash().containsKey("lastMessage")) {
+            lastMessage = (String) context.getExternalContext().getFlash().get("lastMessage");
+            messageType = (String) context.getExternalContext().getFlash().get("messageType");
+        }
     }
 
     // ========== CRUD CARGOS ==========
@@ -274,11 +281,68 @@ public class CargoController implements Serializable {
     }
 
     public String saveAndReturn() {
-        String result = save();
-        if (result == null && !hasErrors()) {
+        // Limpa mensagens antigas
+        lastMessage = "";
+        messageType = "";
+        
+        try {
+            // Validação do nome do cargo
+            if (cargo == null || cargo.getNome() == null || cargo.getNome().trim().isEmpty()) {
+                FacesContext.getCurrentInstance().getExternalContext().getFlash().put("lastMessage", "Nome do cargo é obrigatório");
+                FacesContext.getCurrentInstance().getExternalContext().getFlash().put("messageType", "error");
+                return navigateToList();
+            }
+            
+            String nomeValidado = cargo.getNome().trim();
+            if (nomeValidado.length() < 2) {
+                FacesContext.getCurrentInstance().getExternalContext().getFlash().put("lastMessage", "O nome do cargo deve ter pelo menos 2 caracteres");
+                FacesContext.getCurrentInstance().getExternalContext().getFlash().put("messageType", "error");
+                return navigateToList();
+            }
+            
+            if (nomeValidado.length() > 100) {
+                FacesContext.getCurrentInstance().getExternalContext().getFlash().put("lastMessage", "O nome do cargo deve ter no máximo 100 caracteres");
+                FacesContext.getCurrentInstance().getExternalContext().getFlash().put("messageType", "error");
+                return navigateToList();
+            }
+            
+            // Atualizar o nome limpo
+            cargo.setNome(nomeValidado);
+            
+            String mensagemSucesso = "";
+            
+            if (editMode && selectedCargoId != null) {
+                Cargo cargoParaAtualizar = cargoService.findCargoById(selectedCargoId);
+                if (cargoParaAtualizar != null) {
+                    cargoParaAtualizar.setNome(cargo.getNome());
+                    cargoService.updateCargo(cargoParaAtualizar);
+                    mensagemSucesso = "Cargo atualizado com sucesso!";
+                } else {
+                    FacesContext.getCurrentInstance().getExternalContext().getFlash().put("lastMessage", "Cargo não encontrado!");
+                    FacesContext.getCurrentInstance().getExternalContext().getFlash().put("messageType", "error");
+                    return navigateToList();
+                }
+            } else {
+                cargoService.createCargo(cargo.getNome());
+                mensagemSucesso = "Cargo criado com sucesso!";
+            }
+            
+            // Usa Flash Scope para passar mensagem flutuante para a próxima página
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("lastMessage", mensagemSucesso);
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("messageType", "success");
+            
+            return navigateToList();
+            
+        } catch (IllegalArgumentException ex) {
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("lastMessage", ex.getMessage());
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("messageType", "error");
+            return navigateToList();
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Erro ao salvar cargo", ex);
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("lastMessage", "Erro interno: " + ex.getMessage());
+            FacesContext.getCurrentInstance().getExternalContext().getFlash().put("messageType", "error");
             return navigateToList();
         }
-        return null;
     }
 
     public String navigateToEdit(Long cargoId) {

@@ -3,6 +3,7 @@ package io.github.scognamiglioo.entities;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
+
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 
@@ -13,22 +14,26 @@ import jakarta.validation.constraints.*;
 @Entity
 @Table(name = "agendamento")
 @NamedQueries({
-    @NamedQuery(name = "Agendamento.findAll",
+        @NamedQuery(name = "Agendamento.findAll",
                 query = "SELECT a FROM Agendamento a ORDER BY a.data DESC, a.hora DESC"),
-    @NamedQuery(name = "Agendamento.findByUser",
+        @NamedQuery(name = "Agendamento.findByUser",
                 query = "SELECT a FROM Agendamento a WHERE a.user.id = :userId ORDER BY a.data DESC, a.hora DESC"),
-    @NamedQuery(name = "Agendamento.findByUsername",
+        @NamedQuery(name = "Agendamento.findByUsername",
                 query = "SELECT a FROM Agendamento a WHERE a.user.username = :username ORDER BY a.data DESC, a.hora DESC"),
-    @NamedQuery(name = "Agendamento.findByFuncionario",
+        @NamedQuery(name = "Agendamento.findByFuncionario",
                 query = "SELECT a FROM Agendamento a WHERE a.funcionario.id = :funcionarioId ORDER BY a.data, a.hora"),
-    @NamedQuery(name = "Agendamento.findByDataAndFuncionario",
+        @NamedQuery(name = "Agendamento.findByDataAndFuncionario",
                 query = "SELECT a FROM Agendamento a WHERE a.data = :data AND a.funcionario.id = :funcionarioId"),
-    @NamedQuery(name = "Agendamento.findByStatus",
+        @NamedQuery(name = "Agendamento.findByStatus",
                 query = "SELECT a FROM Agendamento a WHERE a.status = :status ORDER BY a.data, a.hora"),
-    @NamedQuery(name = "Agendamento.findByDataBetween",
+        @NamedQuery(name = "Agendamento.findByDataBetween",
                 query = "SELECT a FROM Agendamento a WHERE a.data BETWEEN :dataInicio AND :dataFim ORDER BY a.data, a.hora"),
-    @NamedQuery(name = "Agendamento.countByDataHoraFuncionario",
-                query = "SELECT COUNT(a) FROM Agendamento a WHERE a.data = :data AND a.hora = :hora AND a.funcionario.id = :funcionarioId AND a.status <> 'CANCELADO'")
+        @NamedQuery(name = "Agendamento.countByDataHoraFuncionario",
+                query = "SELECT COUNT(a) FROM Agendamento a WHERE a.data = :data AND a.hora = :hora AND a.funcionario.id = :funcionarioId AND a.status <> 'CANCELADO'"),
+        @NamedQuery(name = "Agendamento.findLocalizacaoServicoPrestado",
+                query = "SELECT fs.localizacao FROM Agendamento a " +
+                        "JOIN FuncionarioServico fs ON fs.funcionario.id = a.funcionario.id AND fs.servico.id = a.servico.id " +
+                        "WHERE a.id = :agendamentoId"),
 })
 public class Agendamento implements Serializable {
 
@@ -238,4 +243,6 @@ public class Agendamento implements Serializable {
                 ", status=" + status +
                 '}';
     }
+
+
 }

@@ -50,7 +50,9 @@
                                                                      onclick="return confirm('Tem certeza que deseja excluir esta associação?')"
                                                                      styleClass="btn btn-sm btn-danger btn-remove"
                                                                      title="Excluir associação">
-                                                        <f:ajax execute="@this" render=":associacoesForm:associacoes-panel :associacoesForm:hiddenLastMessage :associacoesForm:hiddenMessageType" />
+                                                        <f:ajax execute="@this" 
+                                                                render=":associacoesForm:associacoes-panel :associacoesForm:hiddenLastMessage :associacoesForm:hiddenMessageType" 
+                                                                onevent="monitorarMensagens" />
                                                     </h:commandButton>
                                                 </div>
                                             </div>

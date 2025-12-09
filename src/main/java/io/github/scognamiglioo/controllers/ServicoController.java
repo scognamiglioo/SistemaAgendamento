@@ -48,13 +48,7 @@ public class ServicoController implements Serializable {
     private String searchNome = "";
     
     // Funcionários (otimizado para carregamento único)
-    private List<Funcionario> todosFuncionarios;
-    private Long selectedFuncionarioId;
     private Map<Long, List<Funcionario>> funcionariosPorServicoMap;
-    
-    // Para seleção múltipla de funcionários na edição/criação
-    private List<Long> selectedFuncionarioIds = new ArrayList<>();
-    private List<Funcionario> funcionariosDoServico = new ArrayList<>();
     
     // Mensagem para exibição flutuante
     /**
@@ -73,8 +67,14 @@ public class ServicoController implements Serializable {
     @PostConstruct
     public void init() {
         loadServicos();
-        loadTodosFuncionarios();
         loadAllFuncionariosPorServico();
+        
+        // Recupera mensagens do Flash Scope (vindas de redirect)
+        FacesContext context = FacesContext.getCurrentInstance();
+        if (context != null && context.getExternalContext().getFlash().containsKey("lastMessage")) {
+            lastMessage = (String) context.getExternalContext().getFlash().get("lastMessage");
+            messageType = (String) context.getExternalContext().getFlash().get("messageType");
+        }
     }
 
     // ========== CRUD SERVIÇOS ==========
@@ -96,15 +96,8 @@ public class ServicoController implements Serializable {
         try {
             if (editMode && selectedServicoId != null) {
                 updateExistingServico();
-                // Salva associações de funcionários para serviço existente
-                salvarAssociacoesFuncionarios();
             } else {
-                Servico servicoCriado = createNewServico();
-                // Para novo serviço, salva associações se houver funcionários selecionados
-                if (servicoCriado != null && !selectedFuncionarioIds.isEmpty()) {
-                    selectedServicoId = servicoCriado.getId();
-                    salvarAssociacoesFuncionarios();
-                }
+                createNewServico();
             }
             
             // Salvar mensagem antes de resetar
@@ -155,8 +148,6 @@ public class ServicoController implements Serializable {
         servico = new Servico();
         editMode = false;
         selectedServicoId = null;
-        selectedFuncionarioIds.clear();
-        funcionariosDoServico.clear();
     }
 
     public void edit(Long id) {
@@ -239,20 +230,13 @@ public class ServicoController implements Serializable {
         loadAllFuncionariosPorServico();
     }
 
-    // ========== FUNCIONÁRIOS ==========
-    
-    public void loadTodosFuncionarios() {
-        try {
-            todosFuncionarios = dataService.getAllFuncionarios();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Erro ao carregar funcionários", e);
-            addErrorMessage("Erro ao carregar lista de funcionários");
-        }
-    }
+    // ========== FUNCIONÁRIOS (SOMENTE LEITURA) ==========
     
     /**
      * Carrega todos os funcionários por serviço de uma só vez para otimizar performance.
      * Esta abordagem reduz o número de consultas ao banco e melhora a experiência do usuário.
+     * NOTA: A associação de funcionários a serviços é feita através da tela de associações,
+     * onde também é necessário vincular uma localização.
      */
     public void loadAllFuncionariosPorServico() {
         funcionariosPorServicoMap = new HashMap<>();
@@ -268,53 +252,6 @@ public class ServicoController implements Serializable {
             }
         }
     }
-    
-    /**
-     * Salva as associações de funcionários ao serviço (método privado)
-     */
-    private void salvarAssociacoesFuncionarios() {
-        if (selectedServicoId != null && selectedFuncionarioIds != null) {
-            try {
-                // Remove todas as associações atuais
-                List<Funcionario> funcionariosAtuais = servicoService.findFuncionariosByServico(selectedServicoId);
-                for (Funcionario func : funcionariosAtuais) {
-                    servicoService.desassociarFuncionarioDoServico(func.getId(), selectedServicoId);
-                }
-                
-                // Adiciona as novas associações
-                for (Long funcionarioId : selectedFuncionarioIds) {
-                    servicoService.associarFuncionarioAoServico(funcionarioId, selectedServicoId);
-                }
-                
-                loadAllFuncionariosPorServico();
-                
-            } catch (Exception ex) {
-                LOGGER.log(Level.SEVERE, "Erro ao salvar associações", ex);
-                addErrorMessage("Erro ao associar funcionários: " + ex.getMessage());
-            }
-        }
-    }
-    
-    /**
-     * Carrega os funcionários já associados ao serviço para edição
-     */
-    public void loadFuncionariosDoServico() {
-        if (selectedServicoId != null) {
-            try {
-                funcionariosDoServico = servicoService.findFuncionariosByServico(selectedServicoId);
-                selectedFuncionarioIds.clear();
-                
-                // Preenche a lista de IDs selecionados
-                for (Funcionario func : funcionariosDoServico) {
-                    selectedFuncionarioIds.add(func.getId());
-                }
-                
-            } catch (Exception ex) {
-                LOGGER.log(Level.SEVERE, "Erro ao carregar funcionários do serviço", ex);
-                addErrorMessage("Erro ao carregar funcionários associados");
-            }
-        }
-    }
 
     // ========== NAVEGAÇÃO ==========
     
@@ -327,9 +264,6 @@ public class ServicoController implements Serializable {
                     servico.setNome(servicoParaEditar.getNome());
                     servico.setValor(servicoParaEditar.getValor());
                     editMode = true;
-                    
-                    // Carrega funcionários associados para edição
-                    loadFuncionariosDoServico();
                 } else {
                     addErrorMessage("Serviço não encontrado!");
                 }
@@ -340,17 +274,47 @@ public class ServicoController implements Serializable {
         } else {
             editMode = false;
             servico = new Servico();
-            selectedFuncionarioIds.clear();
-            funcionariosDoServico.clear();
         }
     }
 
     public String saveAndReturn() {
-        String result = save();
-        if (result == null && !hasErrors()) {
+        // Limpa mensagens antigas
+        lastMessage = "";
+        messageType = "";
+        
+        try {
+            String mensagemSucesso = "";
+            
+            if (editMode && selectedServicoId != null) {
+                updateExistingServico();
+                mensagemSucesso = "Serviço atualizado com sucesso!";
+            } else {
+                Servico servicoCriado = createNewServico();
+                if (servicoCriado != null) {
+                    mensagemSucesso = "Serviço criado com sucesso!";
+                }
+            }
+            
+            // Usa Flash Scope para passar mensagem flutuante para a próxima página
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.getExternalContext().getFlash().put("lastMessage", mensagemSucesso);
+            context.getExternalContext().getFlash().put("messageType", "success");
+            
+            // Navega para a lista (o @PostConstruct da lista recarregará os dados)
+            return navigateToList();
+            
+        } catch (IllegalArgumentException ex) {
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.getExternalContext().getFlash().put("lastMessage", ex.getMessage());
+            context.getExternalContext().getFlash().put("messageType", "error");
+            return navigateToList();
+        } catch (Exception ex) {
+            LOGGER.log(Level.SEVERE, "Erro ao salvar serviço", ex);
+            FacesContext context = FacesContext.getCurrentInstance();
+            context.getExternalContext().getFlash().put("lastMessage", "Erro interno: " + ex.getMessage());
+            context.getExternalContext().getFlash().put("messageType", "error");
             return navigateToList();
         }
-        return null;
     }
 
     public String navigateToEdit(Long servicoId) {
@@ -435,22 +399,6 @@ public class ServicoController implements Serializable {
         this.searchNome = searchNome;
     }
 
-    public List<Funcionario> getTodosFuncionarios() {
-        return todosFuncionarios;
-    }
-
-    public void setTodosFuncionarios(List<Funcionario> todosFuncionarios) {
-        this.todosFuncionarios = todosFuncionarios;
-    }
-
-    public Long getSelectedFuncionarioId() {
-        return selectedFuncionarioId;
-    }
-
-    public void setSelectedFuncionarioId(Long selectedFuncionarioId) {
-        this.selectedFuncionarioId = selectedFuncionarioId;
-    }
-
     public Map<Long, List<Funcionario>> getFuncionariosPorServicoMap() {
         return funcionariosPorServicoMap;
     }
@@ -469,22 +417,6 @@ public class ServicoController implements Serializable {
         }
         List<Funcionario> funcionarios = funcionariosPorServicoMap.get(servicoId);
         return funcionarios != null ? funcionarios.size() : 0;
-    }
-    
-    public List<Long> getSelectedFuncionarioIds() {
-        return selectedFuncionarioIds;
-    }
-
-    public void setSelectedFuncionarioIds(List<Long> selectedFuncionarioIds) {
-        this.selectedFuncionarioIds = selectedFuncionarioIds;
-    }
-
-    public List<Funcionario> getFuncionariosDoServico() {
-        return funcionariosDoServico;
-    }
-
-    public void setFuncionariosDoServico(List<Funcionario> funcionariosDoServico) {
-        this.funcionariosDoServico = funcionariosDoServico;
     }
     
     public String getLastMessage() {

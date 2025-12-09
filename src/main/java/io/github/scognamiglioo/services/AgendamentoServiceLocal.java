@@ -91,10 +91,6 @@ public interface AgendamentoServiceLocal {
      */
     void atribuirFuncionario(Long agendamentoId, Long funcionarioId);
 
-    /**
-     * Atribui um guichê a um agendamento
-     */
-    void atribuirGuiche(Long agendamentoId, Long guicheId);
 
     /**
      * Altera o status de um agendamento

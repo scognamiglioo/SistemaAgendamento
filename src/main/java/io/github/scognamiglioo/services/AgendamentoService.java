@@ -264,25 +264,6 @@ public class AgendamentoService implements AgendamentoServiceLocal {
                 new Object[]{funcionarioId, agendamentoId});
     }
 
-    @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public void atribuirGuiche(Long agendamentoId, Long guicheId) {
-        Agendamento agendamento = findAgendamentoById(agendamentoId);
-        if (agendamento == null) {
-            throw new IllegalArgumentException("Agendamento não encontrado");
-        }
-
-        Guiche guiche = em.find(Guiche.class, guicheId);
-        if (guiche == null) {
-            throw new IllegalArgumentException("Guichê não encontrado");
-        }
-
-        agendamento.setGuiche(guiche);
-        em.merge(agendamento);
-        em.flush();
-        LOGGER.log(Level.INFO, "Guichê {0} atribuído ao agendamento {1}",
-                new Object[]{guicheId, agendamentoId});
-    }
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)

@@ -57,9 +57,6 @@ public class Agendamento implements Serializable {
     @JoinColumn(name = "funcionario_id")
     private Funcionario funcionario;
 
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "guiche_id")
-    private Guiche guiche;
 
     @NotNull(message = "Data é obrigatória")
     @Column(nullable = false)
@@ -139,13 +136,6 @@ public class Agendamento implements Serializable {
         this.funcionario = funcionario;
     }
 
-    public Guiche getGuiche() {
-        return guiche;
-    }
-
-    public void setGuiche(Guiche guiche) {
-        this.guiche = guiche;
-    }
 
     public LocalDate getData() {
         return data;
@@ -208,9 +198,6 @@ public class Agendamento implements Serializable {
         return funcionario != null ? funcionario.getNome() : "Não atribuído";
     }
 
-    public String getNomeGuiche() {
-        return guiche != null ? guiche.getNome() : "Não atribuído";
-    }
 
     /**
      * Retorna a data formatada para exibição (dd/MM/yyyy)

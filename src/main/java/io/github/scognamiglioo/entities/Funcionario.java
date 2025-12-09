@@ -29,9 +29,6 @@ public class Funcionario implements Serializable {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    @ManyToOne
-    @JoinColumn(name = "guiche_id")
-    private Guiche guiche; // opcional para atendente
 
     // Relacionamento ManyToOne com Cargo
     @ManyToOne(fetch = FetchType.LAZY)
@@ -49,17 +46,15 @@ public class Funcionario implements Serializable {
     }
 
     // construtor utilitário usando User
-    public Funcionario(User user, Role role, Guiche guiche, boolean ativo) {
+    public Funcionario(User user, Role role, boolean ativo) {
         this.user = user;
         this.role = role;
-        this.guiche = guiche;
         this.ativo = ativo;
     }
 
-    public Funcionario(User user, Role role, Guiche guiche, Cargo cargo, boolean ativo) {
+    public Funcionario(User user, Role role, Cargo cargo, boolean ativo) {
         this.user = user;
         this.role = role;
-        this.guiche = guiche;
         this.cargo = cargo;
         this.ativo = ativo;
     }
@@ -106,13 +101,6 @@ public class Funcionario implements Serializable {
         this.role = role;
     }
 
-    public Guiche getGuiche() {
-        return guiche;
-    }
-
-    public void setGuiche(Guiche guiche) {
-        this.guiche = guiche;
-    }
 
     public Cargo getCargo() {
         return cargo;

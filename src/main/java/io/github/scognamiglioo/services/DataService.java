@@ -2,11 +2,7 @@ package io.github.scognamiglioo.services;
 
 import io.github.scognamiglioo.entities.Cargo;
 import io.github.scognamiglioo.entities.Funcionario;
-import io.github.scognamiglioo.entities.FuncionarioServico;
-import io.github.scognamiglioo.entities.FuncionarioServicoId;
-import io.github.scognamiglioo.entities.Guiche;
 import io.github.scognamiglioo.entities.Role;
-import io.github.scognamiglioo.entities.Servico;
 import io.github.scognamiglioo.entities.User;
 import jakarta.ejb.LocalBean;
 import java.util.HashMap;
@@ -24,8 +20,6 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.UUID;
 
 @Stateless
@@ -358,19 +352,9 @@ public class DataService
 
     // ----------------------------------FUNCIONARIO CADASTRO--------------------------------------------
     @Override
-    public List<Guiche> listGuiches() {
-        return em.createQuery("SELECT g FROM Guiche g ORDER BY g.nome", Guiche.class).getResultList();
-    }
-
-    @Override
-    public Guiche findGuicheById(Long id) {
-        return em.find(Guiche.class, id);
-    }
-
-    @Override
     public Funcionario createFuncionario(String nome, String cpf, String email, String telefone,
             String username, String password, Role role,
-            Long guicheId, Long cargoId, boolean ativo,
+            Long cargoId, boolean ativo,
             List<Long> servicosIds) {
 
         if (cpf == null || cpf.isBlank()) {
@@ -398,11 +382,10 @@ public class DataService
         user.setActive(true);
         em.persist(user);
 
-        Guiche guiche = (guicheId != null) ? findGuicheById(guicheId) : null;
         Cargo cargo = (cargoId != null) ? em.find(Cargo.class, cargoId) : null;
 
         Funcionario funcionario = new Funcionario(
-                user, role, guiche, cargo, ativo
+                user, role, cargo, ativo
         );
 
         em.persist(funcionario);
@@ -440,15 +423,6 @@ public class DataService
     @Override
     public List<Funcionario> listEmployees() {
         return em.createNamedQuery("Funcionario.all", Funcionario.class).getResultList();
-
-    }
-
-    @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public Guiche createGuiche(String nome) {
-        Guiche g = new Guiche(nome);
-        em.persist(g);
-        return g;
     }
 
     // ----------------------------------UPDATE FUNCIONARIO E USERS--------------------------------------------

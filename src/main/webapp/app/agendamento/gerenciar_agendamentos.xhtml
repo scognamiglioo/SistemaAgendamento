@@ -459,9 +459,10 @@
                         <h:outputText value="#{agendamento.nomeFuncionario}"/>
                     </p:column>
 
-                    <p:column headerText="Local" style="width: 120px;">
-                        <i class="pi pi-building" style="color: #00f2fe; margin-right: 8px;"></i>
-                        <h:outputText value="#{agendamento}"/>
+                    <p:column headerText="Local do Atendimento" style="width: 180px;">
+                        <i class="pi pi-map-marker" style="color: #00f2fe; margin-right: 8px;"></i>
+                        <h:outputText value="#{gerenciarAgendamentosController.getNomeLocalizacao(agendamento.id)}"
+                                      style="font-weight: 500; color: #2196F3;"/>
                     </p:column>
 
                     <p:column headerText="Status" style="width: 160px; text-align: center;">
@@ -590,17 +591,6 @@
                             </p:selectOneMenu>
                         </div>
 
-                        <!--                        <div class="dialog-field">-->
-                        <!--                            <label><i class="pi pi-building icon"></i> Local de Atendimento</label>-->
-                        <!--                            <p:selectOneMenu value="#{gerenciarAgendamentosController.guicheSelecionadoId}"-->
-                        <!--                                             style="width: 100%;">-->
-                        <!--                                <f:selectItem itemLabel="Selecione o guichê..." itemValue="#{null}"/>-->
-                        <!--                                <f:selectItems value="#{gerenciarAgendamentosController}"-->
-                        <!--                                               var="guiche"-->
-                        <!--                                               itemLabel="#{guiche.nome}"-->
-                        <!--                                               itemValue="#{guiche.id}"/>-->
-                        <!--                            </p:selectOneMenu>-->
-                        <!--                        </div>-->
 
                         <div class="dialog-field">
                             <label><i class="pi pi-info-circle icon"></i> Status do Atendimento</label>

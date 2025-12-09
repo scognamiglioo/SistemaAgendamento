@@ -6,9 +6,12 @@ import io.github.scognamiglioo.services.DataServiceLocal;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
 import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
+import jakarta.inject.Inject;
 import jakarta.inject.Named;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,6 +35,10 @@ public class GerenciarAgendamentosController implements Serializable {
 
     @EJB
     private DataServiceLocal dataService;
+    
+    @Inject
+    private FacesContext facesContext;
+
 
     // Listas
     private List<Agendamento> agendamentos;
@@ -81,7 +88,8 @@ public class GerenciarAgendamentosController implements Serializable {
     }
 
     /**
-     * Carrega apenas os funcionários que prestam o serviço do agendamento selecionado
+     * Carrega apenas os funcionários que prestam o serviço do agendamento
+     * selecionado
      */
     private void carregarFuncionariosDoServico() {
         try {
@@ -135,9 +143,9 @@ public class GerenciarAgendamentosController implements Serializable {
             if (filtroUsuario != null && !filtroUsuario.trim().isEmpty()) {
                 String usuarioLower = filtroUsuario.trim().toLowerCase();
                 resultado = resultado.stream()
-                        .filter(a -> a.getUser() != null &&
-                                     a.getUser().getNome() != null &&
-                                     a.getUser().getNome().toLowerCase().contains(usuarioLower))
+                        .filter(a -> a.getUser() != null
+                        && a.getUser().getNome() != null
+                        && a.getUser().getNome().toLowerCase().contains(usuarioLower))
                         .collect(Collectors.toList());
             }
 
@@ -146,9 +154,9 @@ public class GerenciarAgendamentosController implements Serializable {
                 LocalDate inicio = new java.sql.Date(filtroDataInicio.getTime()).toLocalDate();
                 LocalDate fim = new java.sql.Date(filtroDataFim.getTime()).toLocalDate();
                 resultado = resultado.stream()
-                        .filter(a -> a.getData() != null &&
-                                     !a.getData().isBefore(inicio) &&
-                                     !a.getData().isAfter(fim))
+                        .filter(a -> a.getData() != null
+                        && !a.getData().isBefore(inicio)
+                        && !a.getData().isAfter(fim))
                         .collect(Collectors.toList());
             } else if (filtroDataInicio != null) {
                 LocalDate inicio = new java.sql.Date(filtroDataInicio.getTime()).toLocalDate();
@@ -203,8 +211,8 @@ public class GerenciarAgendamentosController implements Serializable {
             }
 
             // Inicializa os valores dos campos editáveis
-            this.funcionarioSelecionadoId = this.agendamentoSelecionado.getFuncionario() != null ?
-                    this.agendamentoSelecionado.getFuncionario().getId() : null;
+            this.funcionarioSelecionadoId = this.agendamentoSelecionado.getFuncionario() != null
+                    ? this.agendamentoSelecionado.getFuncionario().getId() : null;
             this.statusSelecionado = this.agendamentoSelecionado.getStatus().name();
 
             // Carrega apenas os funcionários que prestam o serviço deste agendamento
@@ -234,12 +242,12 @@ public class GerenciarAgendamentosController implements Serializable {
 
             // Atribui funcionário APENAS se mudou
             if (funcionarioSelecionadoId != null) {
-                Long funcionarioAtualId = agendamentoSelecionado.getFuncionario() != null ?
-                    agendamentoSelecionado.getFuncionario().getId() : null;
+                Long funcionarioAtualId = agendamentoSelecionado.getFuncionario() != null
+                        ? agendamentoSelecionado.getFuncionario().getId() : null;
 
                 if (!funcionarioSelecionadoId.equals(funcionarioAtualId)) {
                     LOGGER.log(Level.INFO, "Atribuindo funcionário ID: {0} (anterior: {1})",
-                        new Object[]{funcionarioSelecionadoId, funcionarioAtualId});
+                            new Object[]{funcionarioSelecionadoId, funcionarioAtualId});
                     agendamentoService.atribuirFuncionario(agendamentoId, funcionarioSelecionadoId);
                 } else {
                     LOGGER.log(Level.INFO, "Funcionário não mudou (ID: {0}), pulando atribuição", funcionarioSelecionadoId);
@@ -253,7 +261,7 @@ public class GerenciarAgendamentosController implements Serializable {
                 if (!statusSelecionado.equals(statusAtual)) {
                     StatusAgendamento novoStatus = StatusAgendamento.valueOf(statusSelecionado);
                     LOGGER.log(Level.INFO, "Alterando status de {0} para {1}",
-                        new Object[]{statusAtual, novoStatus});
+                            new Object[]{statusAtual, novoStatus});
                     agendamentoService.alterarStatus(agendamentoId, novoStatus);
                 } else {
                     LOGGER.log(Level.INFO, "Status não mudou ({0}), pulando alteração", statusAtual);
@@ -318,7 +326,6 @@ public class GerenciarAgendamentosController implements Serializable {
     }
 
     // Métodos auxiliares de mensagens
-
     private void addErrorMessage(String message) {
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro", message));
@@ -340,7 +347,6 @@ public class GerenciarAgendamentosController implements Serializable {
     }
 
     // Métodos para estatísticas
-
     /**
      * Total de agendamentos
      */
@@ -352,7 +358,9 @@ public class GerenciarAgendamentosController implements Serializable {
      * Agendamentos de hoje
      */
     public long getAgendamentosHoje() {
-        if (agendamentos == null) return 0;
+        if (agendamentos == null) {
+            return 0;
+        }
         LocalDate hoje = LocalDate.now();
         return agendamentos.stream()
                 .filter(a -> a.getData() != null && a.getData().equals(hoje))
@@ -363,10 +371,12 @@ public class GerenciarAgendamentosController implements Serializable {
      * Agendamentos pendentes (Agendado + Confirmado)
      */
     public long getAgendamentosPendentes() {
-        if (agendamentos == null) return 0;
+        if (agendamentos == null) {
+            return 0;
+        }
         return agendamentos.stream()
-                .filter(a -> a.getStatus() == StatusAgendamento.AGENDADO ||
-                           a.getStatus() == StatusAgendamento.CONFIRMADO)
+                .filter(a -> a.getStatus() == StatusAgendamento.AGENDADO
+                || a.getStatus() == StatusAgendamento.CONFIRMADO)
                 .count();
     }
 
@@ -374,14 +384,29 @@ public class GerenciarAgendamentosController implements Serializable {
      * Agendamentos concluídos
      */
     public long getAgendamentosConcluidos() {
-        if (agendamentos == null) return 0;
+        if (agendamentos == null) {
+            return 0;
+        }
         return agendamentos.stream()
                 .filter(a -> a.getStatus() == StatusAgendamento.CONCLUIDO)
                 .count();
     }
 
-    // Getters e Setters
+    /* logout */
+    public String logout() throws IOException {
+        // Invalida a sessão atual
+        ExternalContext ec = getExternalContext();
+        ec.invalidateSession();
 
+        // Redireciona para a página de login
+        return "/login.xhtml?faces-redirect=true";
+    }
+
+    private ExternalContext getExternalContext() {
+        return facesContext.getExternalContext();
+    }
+
+    // Getters e Setters
     public List<Agendamento> getAgendamentos() {
         return agendamentos;
     }
@@ -397,8 +422,6 @@ public class GerenciarAgendamentosController implements Serializable {
     public void setFuncionariosDisponiveis(List<Funcionario> funcionariosDisponiveis) {
         this.funcionariosDisponiveis = funcionariosDisponiveis;
     }
-
-
 
     public Date getFiltroDataInicio() {
         return filtroDataInicio;
@@ -465,8 +488,8 @@ public class GerenciarAgendamentosController implements Serializable {
     }
 
     /**
-     * Busca o nome da localização onde o serviço do agendamento é prestado.
-     * Usa o JOIN: Agendamento -> FuncionarioServico -> Localizacao
+     * Busca o nome da localização onde o serviço do agendamento é prestado. Usa
+     * o JOIN: Agendamento -> FuncionarioServico -> Localizacao
      *
      * @param agendamentoId ID do agendamento
      * @return Nome da localização ou "Não definido" se não encontrar

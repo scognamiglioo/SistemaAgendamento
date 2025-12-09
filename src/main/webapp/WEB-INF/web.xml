@@ -28,6 +28,16 @@
         <description>System administrator</description>
         <role-name>admin</role-name>
     </security-role>
+
+    <security-role>
+        <description>Reception staff</description>
+        <role-name>recepcionista</role-name>
+    </security-role>
+    
+    <security-role>
+        <description>Attendance staff</description>
+        <role-name>atendente</role-name>
+    </security-role>
     
     <security-role>
         <description>Common authenticated user</description>
@@ -68,7 +78,6 @@
             <web-resource-name>User Pages</web-resource-name>
             <url-pattern>/app/index.xhtml</url-pattern>
             <url-pattern>/app/meus-agendamentos.xhtml</url-pattern>
-            <url-pattern>/app/reagendar-agendamento.xhtml</url-pattern>
             <url-pattern>/password/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
@@ -76,6 +85,33 @@
             <role-name>user</role-name>
         </auth-constraint>
     </security-constraint>
+    
+    <security-constraint>
+        <display-name>Recepcionista and Atendente</display-name>
+        <web-resource-collection>
+            <web-resource-name>Agendamento Pages</web-resource-name>
+            <url-pattern>/app/agendamento/*</url-pattern>
+            <url-pattern>/password/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+            <role-name>recepcionista</role-name>
+            <role-name>atendente</role-name>
+        </auth-constraint>
+    </security-constraint>
+    
+    <!-- FUNCIONÁRIO: área específica -->
+    <security-constraint>
+        <web-resource-collection>
+            <web-resource-name>Funcionario Area</web-resource-name>
+            <url-pattern>/funcionario/*</url-pattern>
+            <url-pattern>/password/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>funcionario</role-name>
+        </auth-constraint>
+    </security-constraint>
+
     
     <!-- Área Funcionários -->
     <security-constraint>

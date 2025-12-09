@@ -1,0 +1,484 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html
+    lang="pt-BR"
+    xmlns="http://www.w3.org/1999/xhtml"
+    xmlns:h="http://xmlns.jcp.org/jsf/html"
+    xmlns:f="http://xmlns.jcp.org/jsf/core"
+    xmlns:p="http://primefaces.org/ui">
+
+    <h:head>
+        <title>Reagendar Agendamento - Sistema de Agendamento</title>
+        <meta content=""/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <style type="text/css">
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                min-height: 100vh;
+                padding-bottom: 40px;
+            }
+
+            /* Header moderno */
+            .app-header {
+                background: rgba(255, 255, 255, 0.95);
+                box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+                padding: 20px 40px;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                position: sticky;
+                top: 0;
+                z-index: 1000;
+                backdrop-filter: blur(10px);
+            }
+
+            .app-header h1 {
+                color: #667eea;
+                font-size: 1.8em;
+                font-weight: 700;
+            }
+
+            .header-actions {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+            }
+
+            .user-info {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                background: #f8f9fa;
+                padding: 8px 16px;
+                border-radius: 20px;
+                color: #495057;
+                font-weight: 500;
+            }
+
+            /* Container principal */
+            .main-container {
+                max-width: 1200px;
+                margin: 30px auto;
+                padding: 0 20px;
+            }
+
+            /* Card principal */
+            .main-card {
+                background: white;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+                padding: 40px;
+                animation: fadeIn 0.5s ease-out;
+            }
+
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+
+            .page-title {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 30px;
+                padding-bottom: 20px;
+                border-bottom: 2px solid #e9ecef;
+            }
+
+            .page-title h2 {
+                color: #2d3748;
+                font-size: 2em;
+                font-weight: 700;
+            }
+
+            /* Info Card do Agendamento Original */
+            .original-info {
+                background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+                border-radius: 12px;
+                padding: 25px;
+                margin-bottom: 30px;
+                border-left: 5px solid #667eea;
+            }
+
+            .original-info h3 {
+                color: #667eea;
+                margin-bottom: 20px;
+                font-size: 1.3em;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .info-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+                gap: 15px;
+            }
+
+            .info-item {
+                background: white;
+                padding: 15px;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            }
+
+            .info-label {
+                color: #6c757d;
+                font-size: 0.85em;
+                font-weight: 600;
+                text-transform: uppercase;
+                letter-spacing: 0.5px;
+                margin-bottom: 5px;
+            }
+
+            .info-value {
+                color: #2d3748;
+                font-size: 1.1em;
+                font-weight: 600;
+            }
+
+            /* Formulário */
+            .form-section {
+                margin-bottom: 30px;
+            }
+
+            .form-section h3 {
+                color: #2d3748;
+                margin-bottom: 20px;
+                font-size: 1.3em;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+            }
+
+            .form-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 20px;
+            }
+
+            .form-field {
+                display: flex;
+                flex-direction: column;
+            }
+
+            .form-field label {
+                color: #495057;
+                font-weight: 600;
+                margin-bottom: 8px;
+                font-size: 0.95em;
+            }
+
+            .required {
+                color: #e53e3e;
+                margin-left: 4px;
+            }
+
+            .ui-inputfield {
+                padding: 12px;
+                border: 2px solid #e2e8f0;
+                border-radius: 8px;
+                font-size: 1em;
+                transition: all 0.3s ease;
+            }
+
+            .ui-inputfield:focus {
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            }
+
+            /* Botões de ação */
+            .action-buttons {
+                display: flex;
+                gap: 15px;
+                justify-content: flex-end;
+                margin-top: 30px;
+                padding-top: 20px;
+                border-top: 2px solid #e9ecef;
+            }
+
+            .ui-button {
+                border-radius: 8px !important;
+                font-weight: 600 !important;
+                padding: 12px 30px !important;
+                transition: all 0.3s ease !important;
+            }
+
+            .ui-button:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+            }
+
+            /* Mensagens */
+            .ui-messages {
+                margin-bottom: 20px;
+                border-radius: 8px;
+            }
+
+            /* Responsivo */
+            @media (max-width: 768px) {
+                .app-header {
+                    flex-direction: column;
+                    gap: 15px;
+                }
+
+                .info-grid,
+                .form-grid {
+                    grid-template-columns: 1fr;
+                }
+
+                .main-card {
+                    padding: 20px;
+                }
+
+                .action-buttons {
+                    flex-direction: column;
+                }
+            }
+
+            /* Disabled field styling */
+            .disabled-field {
+                background-color: #f8f9fa;
+                color: #6c757d;
+                cursor: not-allowed;
+            }
+
+            .alert-info {
+                background: #e7f3ff;
+                border-left: 4px solid #2196F3;
+                padding: 15px;
+                border-radius: 8px;
+                margin-bottom: 20px;
+                color: #1565c0;
+                font-weight: 500;
+            }
+        </style>
+    </h:head>
+
+    <h:body>
+        <!-- Header -->
+        <div class="app-header">
+            <h1>
+                <i class="pi pi-calendar"></i>
+                Sistema de Agendamento
+            </h1>
+            <div class="header-actions">
+                <p:button value="Voltar"
+                          icon="pi pi-arrow-left"
+                          styleClass="ui-button-secondary"
+                          href="meus-agendamentos.xhtml"/>
+
+                <div class="user-info">
+                    <i class="pi pi-user"></i>
+                    <span>#{facesContext.externalContext.remoteUser}</span>
+                </div>
+
+                <h:form>
+                    <p:commandButton value="Sair"
+                                     action="#{userSessionController.logout}"
+                                     icon="pi pi-sign-out"
+                                     styleClass="ui-button-danger ui-button-sm"
+                                     ajax="false"/>
+                </h:form>
+            </div>
+        </div>
+
+        <!-- Container Principal -->
+        <div class="main-container">
+            <div class="main-card">
+
+                <!-- Título da Página -->
+                <div class="page-title">
+                    <i class="pi pi-refresh" style="font-size: 2em; color: #667eea;"></i>
+                    <h2>Reagendar Atendimento</h2>
+                </div>
+
+                <h:form id="formReagendar">
+                    <p:messages id="messages" showDetail="true" closable="true"/>
+
+                    <!-- Informações do Agendamento Original -->
+                    <h:panelGroup rendered="#{reagendamentoController.agendamentoOriginal != null}">
+                        <div class="original-info">
+                            <h3>
+                                <i class="pi pi-info-circle"></i>
+                                Agendamento Atual
+                            </h3>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <div class="info-label">Código</div>
+                                    <div class="info-value">##{reagendamentoController.agendamentoOriginal.id}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Serviço</div>
+                                    <div class="info-value">#{reagendamentoController.agendamentoOriginal.nomeServico}</div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Data/Hora Atual</div>
+                                    <div class="info-value">
+                                        #{reagendamentoController.agendamentoOriginal.dataFormatada} às #{reagendamentoController.agendamentoOriginal.horaFormatada}
+                                    </div>
+                                </div>
+                                <div class="info-item">
+                                    <div class="info-label">Profissional Atual</div>
+                                    <div class="info-value">#{reagendamentoController.agendamentoOriginal.nomeFuncionario}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+
+                    <div class="alert-info">
+                        <i class="pi pi-info-circle"></i>
+                        <strong>Atenção:</strong> Ao reagendar, você poderá escolher uma nova data, horário e profissional.
+                        O serviço permanecerá o mesmo do agendamento original.
+                    </div>
+
+                    <!-- Formulário de Reagendamento -->
+                    <div class="form-section">
+                        <h3>
+                            <i class="pi pi-calendar-plus"></i>
+                            Novos Dados do Agendamento
+                        </h3>
+
+                        <div class="form-grid">
+                            <!-- Serviço (Desabilitado) -->
+                            <div class="form-field">
+                                <label>
+                                    <i class="pi pi-briefcase"></i>
+                                    Serviço
+                                </label>
+                                <p:inputText id="servico"
+                                             value="#{reagendamentoController.agendamentoOriginal.nomeServico}"
+                                             disabled="true"
+                                             styleClass="disabled-field"
+                                             style="width: 100%;"/>
+                                <small style="color: #6c757d; margin-top: 5px; display: block;">
+                                    O serviço não pode ser alterado no reagendamento
+                                </small>
+                            </div>
+
+                            <!-- Novo Profissional -->
+                            <div class="form-field">
+                                <label>
+                                    <i class="pi pi-user"></i>
+                                    Novo Profissional
+                                    <span class="required">*</span>
+                                </label>
+                                <p:selectOneMenu id="funcionario"
+                                                 value="#{reagendamentoController.novoFuncionarioId}"
+                                                 style="width: 100%;"
+                                                 required="true"
+                                                 requiredMessage="Selecione um profissional">
+                                    <f:selectItem itemLabel="Selecione um profissional..." itemValue="#{null}"/>
+                                    <f:selectItems value="#{reagendamentoController.funcionariosDisponiveis}"
+                                                   var="func"
+                                                   itemLabel="#{func.nome} - #{func.cargo.nome}"
+                                                   itemValue="#{func.id}"/>
+                                    <p:ajax event="change"
+                                            update="data horario"
+                                            listener="#{reagendamentoController.onNovoFuncionarioChange}"/>
+                                </p:selectOneMenu>
+                            </div>
+                        </div>
+
+                        <div class="form-grid" style="margin-top: 20px;">
+                            <!-- Nova Data -->
+                            <div class="form-field">
+                                <label>
+                                    <i class="pi pi-calendar"></i>
+                                    Nova Data
+                                    <span class="required">*</span>
+                                </label>
+                                <p:calendar id="data"
+                                            value="#{reagendamentoController.novaData}"
+                                            pattern="dd/MM/yyyy"
+                                            locale="pt"
+                                            showButtonPanel="true"
+                                            mindate="#{reagendamentoController.dataMinima}"
+                                            placeholder="Selecione a nova data"
+                                            style="width: 100%;"
+                                            required="true"
+                                            requiredMessage="Selecione uma data"
+                                            disabled="#{reagendamentoController.novoFuncionarioId == null}">
+                                    <p:ajax event="dateSelect"
+                                            update="horario messages"
+                                            listener="#{reagendamentoController.onNovaDataChange}"/>
+                                </p:calendar>
+                                <h:panelGroup rendered="#{reagendamentoController.novoFuncionarioId == null}">
+                                    <small style="color: #6c757d; margin-top: 5px; display: block;">
+                                        Selecione um profissional para habilitar a escolha da data.
+                                    </small>
+                                </h:panelGroup>
+                            </div>
+
+                            <!-- Novo Horário -->
+                            <div class="form-field">
+                                <label>
+                                    <i class="pi pi-clock"></i>
+                                    Novo Horário
+                                    <span class="required">*</span>
+                                </label>
+                                <p:selectOneMenu id="horario"
+                                                 value="#{reagendamentoController.novoHorario}"
+                                                 style="width: 100%;"
+                                                 required="true"
+                                                 requiredMessage="Selecione um horário"
+                                                 disabled="#{reagendamentoController.novaData == null or reagendamentoController.novoFuncionarioId == null}">
+                                    <f:selectItem itemLabel="Selecione um horário..." itemValue="#{null}"/>
+                                    <f:selectItems value="#{reagendamentoController.horariosDisponiveis}"/>
+                                </p:selectOneMenu>
+                                <small style="color: #6c757d; margin-top: 5px; display: block;">
+                                    Apenas horários disponíveis são exibidos
+                                </small>
+                            </div>
+                        </div>
+
+                        <!-- Observações -->
+                        <div class="form-field" style="margin-top: 20px;">
+                            <label>
+                                <i class="pi pi-comment"></i>
+                                Observações Adicionais
+                            </label>
+                            <p:inputTextarea id="observacoes"
+                                             value="#{reagendamentoController.novasObservacoes}"
+                                             rows="4"
+                                             maxlength="500"
+                                             placeholder="Adicione observações para o novo agendamento (opcional)"
+                                             style="width: 100%;"/>
+                        </div>
+                    </div>
+
+                    <!-- Botões de Ação -->
+                    <div class="action-buttons">
+                        <p:commandButton value="Cancelar"
+                                         icon="pi pi-times"
+                                         styleClass="ui-button-secondary"
+                                         action="meus-agendamentos"
+                                         ajax="false"
+                                         immediate="true"/>
+
+                        <p:commandButton value="Confirmar Reagendamento"
+                                         icon="pi pi-check"
+                                         styleClass="ui-button-success"
+                                         action="#{reagendamentoController.confirmarReagendamento}"
+                                         update="@form"
+                                         onclick="if(!confirm('Deseja confirmar o reagendamento para a nova data e horário selecionados?')) return false;"/>
+                    </div>
+                </h:form>
+            </div>
+        </div>
+    </h:body>
+</html>
+

@@ -68,6 +68,7 @@
             <web-resource-name>User Pages</web-resource-name>
             <url-pattern>/app/index.xhtml</url-pattern>
             <url-pattern>/app/meus-agendamentos.xhtml</url-pattern>
+            <url-pattern>/app/reagendar-agendamento.xhtml</url-pattern>
             <url-pattern>/password/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>

@@ -1,7 +1,6 @@
 package io.github.scognamiglioo.controllers;
 
 import io.github.scognamiglioo.entities.Funcionario;
-import io.github.scognamiglioo.entities.Guiche;
 import io.github.scognamiglioo.entities.Role;
 import io.github.scognamiglioo.entities.Cargo;
 import io.github.scognamiglioo.services.DataServiceLocal;
@@ -40,7 +39,6 @@ public class EmployeeController implements Serializable {
     private Funcionario employee;
     private Role selectedRole;
 
-    private Long selectedGuicheId;
     private Long selectedCargoId;
 
     private List<Servico> servicos;
@@ -89,14 +87,6 @@ public class EmployeeController implements Serializable {
         this.selectedServicosIds = ids;
     }
 
-    public Long getSelectedGuicheId() {
-        return selectedGuicheId;
-    }
-
-    public void setSelectedGuicheId(Long id) {
-        this.selectedGuicheId = id;
-    }
-
     public Long getSelectedCargoId() {
         return selectedCargoId;
     }
@@ -126,7 +116,6 @@ public class EmployeeController implements Serializable {
                 employee.getUsername(),
                 employee.getPassword(),
                 selectedRole,
-                selectedGuicheId,
                 selectedCargoId,
                 employee.isAtivo(),
                 selectedServicosIds

@@ -1,7 +1,6 @@
 package io.github.scognamiglioo.services;
 
 import io.github.scognamiglioo.entities.Funcionario;
-import io.github.scognamiglioo.entities.Guiche;
 import io.github.scognamiglioo.entities.Role;
 import io.github.scognamiglioo.entities.User;
 import java.util.List;
@@ -18,7 +17,6 @@ public interface DataServiceLocal {
 
     public User createInitialUser(String nome, String cpf, String email, String telefone, String username, String userPassword, String userGroup);
 
-    Guiche createGuiche(String nome);
 
     public List<User> getAllUsers();
 
@@ -42,13 +40,9 @@ public interface DataServiceLocal {
 
     public Funcionario createFuncionario(String nome, String cpf, String email, String telefone,
             String username, String password, Role role,
-            Long guicheId, Long cargoId, boolean ativo,
+            Long cargoId, boolean ativo,
             List<Long> servicosIds);
 
-
-    List<Guiche> listGuiches();
-
-    Guiche findGuicheById(Long id);
 
     List<Funcionario> listEmployees();
 

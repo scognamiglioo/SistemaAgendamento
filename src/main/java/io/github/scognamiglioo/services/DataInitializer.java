@@ -4,7 +4,6 @@ import io.github.scognamiglioo.entities.Funcionario;
 import io.github.scognamiglioo.entities.Localizacao;
 import io.github.scognamiglioo.entities.Servico;
 import io.github.scognamiglioo.entities.User;
-import io.github.scognamiglioo.entities.Guiche;
 import io.github.scognamiglioo.entities.Cargo;
 import io.github.scognamiglioo.entities.Role;
 import jakarta.ejb.EJB;
@@ -19,8 +18,6 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.ArrayList;
-
 
 @Singleton
 @jakarta.ejb.Startup
@@ -47,17 +44,6 @@ public class DataInitializer {
     
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
     public void execute(@Observes @Initialized(ApplicationScoped.class) Object event) {
-        
-         if (dataService.listGuiches().isEmpty()) {
-
-            dataService.createGuiche("Guichê 1");
-            dataService.createGuiche("Guichê 2");
-            dataService.createGuiche("Guichê 3");
-            dataService.createGuiche("Sala 101");
-            dataService.createGuiche("Sala 102");
-
-            System.out.println(">>> Guichês iniciais criados.");
-        }
         
         // Criar localizações iniciais
         if (localizacaoService.getAllLocalizacoes().isEmpty()) {
@@ -143,12 +129,6 @@ public class DataInitializer {
         // Criar funcionários iniciais
         if (dataService.getAllFuncionarios().isEmpty()) {
             
-            // Buscar guichês para associar aos funcionários
-            Guiche guiche1 = dataService.listGuiches().get(0); // Guichê 1
-            Guiche guiche2 = dataService.listGuiches().get(1); // Guichê 2
-            Guiche sala101 = dataService.listGuiches().get(3); // Sala 101
-            Guiche sala102 = dataService.listGuiches().get(4); // Sala 102
-            
             // Buscar cargos para associar aos funcionários (apenas cargos técnicos/médicos)
             Cargo cargoMedicoGeral = cargoService.findCargoByNome("Médico Clínico Geral");
             Cargo cargoCardiologista = cargoService.findCargoByNome("Cardiologista");
@@ -166,7 +146,6 @@ public class DataInitializer {
                 "maria.santos",
                 "asdf",
                 Role.admin,
-                null, // Admin não precisa de guichê
                 null, // Admin não precisa de cargo específico
                 true,
                 new ArrayList<>() // Lista vazia de serviços
@@ -181,7 +160,6 @@ public class DataInitializer {
                 "ana.costa",
                 "senha123",
                 Role.recepcionista,
-                guiche1.getId(),
                 null, // Recepcionista não precisa de cargo específico
                 true,
                 new ArrayList<>() // Lista vazia de serviços
@@ -190,18 +168,17 @@ public class DataInitializer {
             Funcionario carlos = dataService.createFuncionario(
                 "Carlos Eduardo Lima",
                 "34567890123",
-                "carlos.lima@clinica.com", 
+                "carlos.lima@clinica.com",
                 "11987654323",
                 "carlos.lima",
                 "senha123",
                 Role.recepcionista,
-                guiche2.getId(),
                 null, // Recepcionista não precisa de cargo específico
                 true,
-                new ArrayList<>() // Lista vazia de serviços
+                new ArrayList<>()
             );
             
-            // Atendentes/Médicos
+            // Médicos/Atendentes (com cargos específicos)
             Funcionario drRoberto = dataService.createFuncionario(
                 "Dr. Roberto Almeida",
                 "45678901234",
@@ -210,10 +187,9 @@ public class DataInitializer {
                 "roberto.almeida",
                 "senha123",
                 Role.atendente,
-                sala101.getId(),
                 cargoMedicoGeral != null ? cargoMedicoGeral.getId() : null,
                 true,
-                new ArrayList<>() // Lista vazia de serviços
+                new ArrayList<>()
             );
             
             Funcionario draPatricia = dataService.createFuncionario(
@@ -224,10 +200,9 @@ public class DataInitializer {
                 "patricia.fernandes", 
                 "senha123",
                 Role.atendente,
-                sala102.getId(),
                 cargoCardiologista != null ? cargoCardiologista.getId() : null,
                 true,
-                new ArrayList<>() // Lista vazia de serviços
+                new ArrayList<>()
             );
             
             Funcionario drJoao = dataService.createFuncionario(
@@ -238,10 +213,9 @@ public class DataInitializer {
                 "joao.oliveira",
                 "senha123", 
                 Role.atendente,
-                sala101.getId(),
                 cargoRadiologista != null ? cargoRadiologista.getId() : null,
                 true,
-                new ArrayList<>() // Lista vazia de serviços
+                new ArrayList<>()
             );
             
             Funcionario draFernanda = dataService.createFuncionario(
@@ -252,10 +226,9 @@ public class DataInitializer {
                 "fernanda.souza",
                 "senha123",
                 Role.atendente,
-                sala102.getId(),
                 cargoDermatologista != null ? cargoDermatologista.getId() : null,
                 true,
-                new ArrayList<>() // Lista vazia de serviços
+                new ArrayList<>()
             );
             
             Funcionario enfLucas = dataService.createFuncionario(
@@ -266,10 +239,9 @@ public class DataInitializer {
                 "lucas.santos",
                 "senha123",
                 Role.atendente,
-                guiche1.getId(),
                 cargoEnfermeiro != null ? cargoEnfermeiro.getId() : null,
                 true,
-                new ArrayList<>() // Lista vazia de serviços
+                new ArrayList<>()
             );
             
             System.out.println(">>> Funcionários iniciais criados com cargos associados.");
@@ -448,7 +420,6 @@ public class DataInitializer {
                 if (guisso != null) {
                     var funcionarios = dataService.getAllFuncionarios();
                     var servicos = servicoService.getAllServicos();
-                    var guiches = dataService.listGuiches();
 
                     // Buscar funcionários
                     Funcionario drRoberto = funcionarios.stream()
@@ -476,16 +447,7 @@ public class DataInitializer {
                         .filter(s -> s.getNome().contains("Consulta Dermatológica"))
                         .findFirst().orElse(null);
 
-                    // Buscar guichês
-                    Guiche sala101 = guiches.stream()
-                        .filter(g -> g.getNome().contains("Sala 101"))
-                        .findFirst().orElse(null);
-
-                    Guiche sala102 = guiches.stream()
-                        .filter(g -> g.getNome().contains("Sala 102"))
-                        .findFirst().orElse(null);
-
-                    // Importar classes necessárias
+                    // Datas e horários
                     LocalDate hoje = LocalDate.now();
                     LocalTime hora1 = LocalTime.of(14, 0); // 14:00
                     LocalTime hora2 = LocalTime.of(15, 30); // 15:30

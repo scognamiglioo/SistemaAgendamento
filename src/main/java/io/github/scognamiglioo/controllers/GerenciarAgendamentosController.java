@@ -36,7 +36,6 @@ public class GerenciarAgendamentosController implements Serializable {
     // Listas
     private List<Agendamento> agendamentos;
     private List<Funcionario> funcionariosDisponiveis;
-    private List<Guiche> guichesDisponiveis;
 
     // Filtros
     private Date filtroDataInicio;
@@ -48,14 +47,12 @@ public class GerenciarAgendamentosController implements Serializable {
     // Seleção/Edição
     private Agendamento agendamentoSelecionado;
     private Long funcionarioSelecionadoId;
-    private Long guicheSelecionadoId;
     private String statusSelecionado;
 
     @PostConstruct
     public void init() {
         carregarAgendamentos();
         carregarFuncionarios();
-        carregarGuiches();
     }
 
     /**
@@ -84,14 +81,30 @@ public class GerenciarAgendamentosController implements Serializable {
     }
 
     /**
-     * Carrega todos os guichês
+     * Carrega apenas os funcionários que prestam o serviço do agendamento selecionado
      */
-    private void carregarGuiches() {
+    private void carregarFuncionariosDoServico() {
         try {
-            guichesDisponiveis = dataService.listGuiches();
+            if (agendamentoSelecionado != null && agendamentoSelecionado.getServico() != null) {
+                Long servicoId = agendamentoSelecionado.getServico().getId();
+                LOGGER.log(Level.INFO, "Carregando funcionários para o serviço ID: {0}", servicoId);
+
+                funcionariosDisponiveis = agendamentoService.findFuncionariosDisponiveisParaServico(servicoId);
+
+                LOGGER.log(Level.INFO, "Funcionários encontrados: {0}", funcionariosDisponiveis.size());
+
+                if (funcionariosDisponiveis.isEmpty()) {
+                    LOGGER.log(Level.WARNING, "Nenhum funcionário disponível para o serviço ID: {0}", servicoId);
+                    addWarnMessage("Nenhum funcionário disponível para este serviço");
+                }
+            } else {
+                LOGGER.log(Level.WARNING, "Agendamento ou serviço não definido");
+                funcionariosDisponiveis = new ArrayList<>();
+            }
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Erro ao carregar guichês", e);
-            guichesDisponiveis = new ArrayList<>();
+            LOGGER.log(Level.SEVERE, "Erro ao carregar funcionários do serviço", e);
+            addErrorMessage("Erro ao carregar funcionários: " + e.getMessage());
+            funcionariosDisponiveis = new ArrayList<>();
         }
     }
 
@@ -192,9 +205,10 @@ public class GerenciarAgendamentosController implements Serializable {
             // Inicializa os valores dos campos editáveis
             this.funcionarioSelecionadoId = this.agendamentoSelecionado.getFuncionario() != null ?
                     this.agendamentoSelecionado.getFuncionario().getId() : null;
-            this.guicheSelecionadoId = this.agendamentoSelecionado.getGuiche() != null ?
-                    this.agendamentoSelecionado.getGuiche().getId() : null;
             this.statusSelecionado = this.agendamentoSelecionado.getStatus().name();
+
+            // Carrega apenas os funcionários que prestam o serviço deste agendamento
+            carregarFuncionariosDoServico();
 
             LOGGER.log(Level.INFO, "Agendamento #{0} preparado para edição", agendamento.getId());
 
@@ -229,20 +243,6 @@ public class GerenciarAgendamentosController implements Serializable {
                     agendamentoService.atribuirFuncionario(agendamentoId, funcionarioSelecionadoId);
                 } else {
                     LOGGER.log(Level.INFO, "Funcionário não mudou (ID: {0}), pulando atribuição", funcionarioSelecionadoId);
-                }
-            }
-
-            // Atribui guichê APENAS se mudou
-            if (guicheSelecionadoId != null) {
-                Long guicheAtualId = agendamentoSelecionado.getGuiche() != null ?
-                    agendamentoSelecionado.getGuiche().getId() : null;
-
-                if (!guicheSelecionadoId.equals(guicheAtualId)) {
-                    LOGGER.log(Level.INFO, "Atribuindo guichê ID: {0} (anterior: {1})",
-                        new Object[]{guicheSelecionadoId, guicheAtualId});
-                    agendamentoService.atribuirGuiche(agendamentoId, guicheSelecionadoId);
-                } else {
-                    LOGGER.log(Level.INFO, "Guichê não mudou (ID: {0}), pulando atribuição", guicheSelecionadoId);
                 }
             }
 
@@ -287,7 +287,6 @@ public class GerenciarAgendamentosController implements Serializable {
             // Limpa a seleção
             agendamentoSelecionado = null;
             funcionarioSelecionadoId = null;
-            guicheSelecionadoId = null;
             statusSelecionado = null;
 
         } catch (IllegalArgumentException ex) {
@@ -307,9 +306,14 @@ public class GerenciarAgendamentosController implements Serializable {
             agendamentoService.cancelarAgendamento(agendamentoId);
             addSuccessMessage("Agendamento cancelado com sucesso!");
             carregarAgendamentos();
+        } catch (IllegalArgumentException ex) {
+            // Erro de validação (ex: menos de 24h de antecedência)
+            LOGGER.log(Level.WARNING, "Validação de cancelamento falhou: {0}", ex.getMessage());
+            addErrorMessage(ex.getMessage());
         } catch (Exception ex) {
+            // Erro inesperado
             LOGGER.log(Level.SEVERE, "Erro ao cancelar agendamento", ex);
-            addErrorMessage("Erro ao cancelar agendamento: " + ex.getMessage());
+            addErrorMessage("Erro inesperado ao cancelar agendamento. Tente novamente.");
         }
     }
 
@@ -328,6 +332,11 @@ public class GerenciarAgendamentosController implements Serializable {
     private void addInfoMessage(String message) {
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_INFO, "Informação", message));
+    }
+
+    private void addWarnMessage(String message) {
+        FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage(FacesMessage.SEVERITY_WARN, "Atenção", message));
     }
 
     // Métodos para estatísticas
@@ -389,13 +398,7 @@ public class GerenciarAgendamentosController implements Serializable {
         this.funcionariosDisponiveis = funcionariosDisponiveis;
     }
 
-    public List<Guiche> getGuichesDisponiveis() {
-        return guichesDisponiveis;
-    }
 
-    public void setGuichesDisponiveis(List<Guiche> guichesDisponiveis) {
-        this.guichesDisponiveis = guichesDisponiveis;
-    }
 
     public Date getFiltroDataInicio() {
         return filtroDataInicio;
@@ -437,14 +440,6 @@ public class GerenciarAgendamentosController implements Serializable {
         this.funcionarioSelecionadoId = funcionarioSelecionadoId;
     }
 
-    public Long getGuicheSelecionadoId() {
-        return guicheSelecionadoId;
-    }
-
-    public void setGuicheSelecionadoId(Long guicheSelecionadoId) {
-        this.guicheSelecionadoId = guicheSelecionadoId;
-    }
-
     public String getStatusSelecionado() {
         return statusSelecionado;
     }
@@ -467,5 +462,22 @@ public class GerenciarAgendamentosController implements Serializable {
 
     public void setFiltroUsuario(String filtroUsuario) {
         this.filtroUsuario = filtroUsuario;
+    }
+
+    /**
+     * Busca o nome da localização onde o serviço do agendamento é prestado.
+     * Usa o JOIN: Agendamento -> FuncionarioServico -> Localizacao
+     *
+     * @param agendamentoId ID do agendamento
+     * @return Nome da localização ou "Não definido" se não encontrar
+     */
+    public String getNomeLocalizacao(Long agendamentoId) {
+        try {
+            Localizacao localizacao = agendamentoService.buscarLocalizacaoDoAgendamento(agendamentoId);
+            return (localizacao != null) ? localizacao.getNome() : "Não definido";
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao obter nome da localização para agendamento: " + agendamentoId, e);
+            return "Erro ao carregar";
+        }
     }
 }

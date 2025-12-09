@@ -91,10 +91,6 @@ public interface AgendamentoServiceLocal {
      */
     void atribuirFuncionario(Long agendamentoId, Long funcionarioId);
 
-    /**
-     * Atribui um guichê a um agendamento
-     */
-    void atribuirGuiche(Long agendamentoId, Long guicheId);
 
     /**
      * Altera o status de um agendamento
@@ -110,5 +106,32 @@ public interface AgendamentoServiceLocal {
      * Gera horários disponíveis para agendamento
      */
     List<String> getHorariosDisponiveis();
+
+    /**
+     * Verifica se um funcionário presta um serviço específico
+     * 
+     * @param funcionarioId o ID do funcionário a ser verificado
+     * @param servicoId o ID do serviço a ser verificado
+     * @return true se o funcionário presta o serviço, false caso contrário
+     */
+    boolean funcionarioPrestServico(Long funcionarioId, Long servicoId);
+
+    /**
+     * Busca a localização onde o funcionário presta o serviço do agendamento.
+     * Faz o JOIN: Agendamento -> FuncionarioServico -> Localizacao
+     *
+     * @param agendamentoId ID do agendamento
+     * @return Localizacao ou null se não encontrar
+     */
+    io.github.scognamiglioo.entities.Localizacao buscarLocalizacaoDoAgendamento(Long agendamentoId);
+
+    /**
+     * Busca a localização usando query dinâmica (alternativa à NamedQuery).
+     * Útil para entender como funciona o JOIN em JPQL.
+     *
+     * @param agendamentoId ID do agendamento
+     * @return Localizacao ou null se não encontrar
+     */
+    io.github.scognamiglioo.entities.Localizacao buscarLocalizacaoComQueryDinamica(Long agendamentoId);
 }
 

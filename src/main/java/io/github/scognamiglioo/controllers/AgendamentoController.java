@@ -1,6 +1,7 @@
 package io.github.scognamiglioo.controllers;
 
 import io.github.scognamiglioo.entities.*;
+import io.github.scognamiglioo.entities.Localizacao;
 import io.github.scognamiglioo.services.AgendamentoServiceLocal;
 import io.github.scognamiglioo.services.DataServiceLocal;
 import io.github.scognamiglioo.services.ServicoServiceLocal;
@@ -10,6 +11,7 @@ import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
+
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.LocalTime;
@@ -68,6 +70,9 @@ public class AgendamentoController implements Serializable {
     private Date filtroData;
     private String filtroStatus;
     private List<Agendamento> agendamentosFiltrados;
+
+    // Campo para teste de localização
+    private Long agendamentoIdTeste;
 
     @PostConstruct
     public void init() {
@@ -317,9 +322,9 @@ public class AgendamentoController implements Serializable {
             }
 
             LOGGER.log(Level.INFO, "Aplicando filtros. Total de agendamentos: {0}",
-                meusAgendamentos != null ? meusAgendamentos.size() : 0);
+                    meusAgendamentos != null ? meusAgendamentos.size() : 0);
             LOGGER.log(Level.INFO, "Filtros - Código: {0}, Data: {1}, Status: {2}",
-                new Object[]{filtroCodigo, filtroData, filtroStatus});
+                    new Object[]{filtroCodigo, filtroData, filtroStatus});
 
             agendamentosFiltrados = new ArrayList<>(meusAgendamentos);
 
@@ -543,5 +548,61 @@ public class AgendamentoController implements Serializable {
 
     public void setAgendamentosFiltrados(List<Agendamento> agendamentosFiltrados) {
         this.agendamentosFiltrados = agendamentosFiltrados;
+    }
+
+    /**
+     * EXEMPLO DE USO: Busca e exibe a localização onde o serviço está sendo prestado.
+     * Este método demonstra como usar o JOIN: Agendamento -> FuncionarioServico -> Localizacao
+     * <p>
+     * Pode ser chamado de um XHTML assim:
+     * <p:commandButton value="Ver Localização"
+     * action="#{agendamentoController.exibirLocalizacaoDoAgendamento(agendamento.id)}"
+     * update="messages" />
+     */
+    public void exibirLocalizacaoDoAgendamento(Long agendamentoId) {
+        try {
+            Localizacao localizacao = agendamentoService.buscarLocalizacaoDoAgendamento(agendamentoId);
+
+            if (localizacao != null) {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_INFO,
+                                "Localização encontrada",
+                                "O serviço será prestado em: " + localizacao.getNome()));
+
+                LOGGER.log(Level.INFO, "Localização do agendamento {0}: {1}",
+                        new Object[]{agendamentoId, localizacao.getNome()});
+            } else {
+                FacesContext.getCurrentInstance().addMessage(null,
+                        new FacesMessage(FacesMessage.SEVERITY_WARN,
+                                "Localização não definida",
+                                "Este agendamento não possui uma localização associada."));
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao buscar localização", e);
+            FacesContext.getCurrentInstance().addMessage(null,
+                    new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                            "Erro",
+                            "Erro ao buscar localização: " + e.getMessage()));
+        }
+    }
+
+
+    public String getNomeLocalizacao(Long agendamentoId) {
+        try {
+            Localizacao localizacao = agendamentoService.buscarLocalizacaoDoAgendamento(agendamentoId);
+            return (localizacao != null) ? localizacao.getNome() : "Não definido";
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao obter nome da localização", e);
+            return "Erro ao carregar";
+        }
+    }
+
+    // Getter e Setter para o teste
+    public Long getAgendamentoIdTeste() {
+        return agendamentoIdTeste;
+    }
+
+    public void setAgendamentoIdTeste(Long agendamentoIdTeste) {
+        this.agendamentoIdTeste = agendamentoIdTeste;
     }
 }

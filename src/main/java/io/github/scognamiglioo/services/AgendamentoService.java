@@ -8,6 +8,7 @@ import jakarta.ejb.TransactionAttributeType;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -89,10 +90,32 @@ public class AgendamentoService implements AgendamentoServiceLocal {
             throw new IllegalArgumentException("Agendamento não encontrado");
         }
 
+        // Verifica se o cancelamento está sendo feito com pelo menos 24 horas de antecedência
+        LocalDate dataAgendamento = agendamento.getData();
+        LocalTime horaAgendamento = agendamento.getHora();
+
+        // Combina data e hora do agendamento
+        java.time.LocalDateTime dataHoraAgendamento = java.time.LocalDateTime.of(dataAgendamento, horaAgendamento);
+
+        // Obtém data/hora atual
+        java.time.LocalDateTime agora = java.time.LocalDateTime.now();
+
+        // Calcula diferença em horas
+        long horasRestantes = java.time.Duration.between(agora, dataHoraAgendamento).toHours();
+
+        // Valida se há pelo menos 24 horas de antecedência
+        if (horasRestantes < 24) {
+            throw new IllegalArgumentException(
+                    "Não é possível cancelar o agendamento com menos de 24 horas de antecedência. " +
+                            "Agendamento marcado para " + agendamento.getDataFormatada() + " às " + agendamento.getHoraFormatada() + "."
+            );
+        }
+
         agendamento.setStatus(StatusAgendamento.CANCELADO);
         em.merge(agendamento);
         em.flush();
-        LOGGER.log(Level.INFO, "Agendamento cancelado: {0}", agendamentoId);
+        LOGGER.log(Level.INFO, "Agendamento {0} cancelado com {1} horas de antecedência",
+                new Object[]{agendamentoId, horasRestantes});
     }
 
     @Override
@@ -221,14 +244,14 @@ public class AgendamentoService implements AgendamentoServiceLocal {
 
         // Verifica disponibilidade EXCLUINDO o próprio agendamento
         Long count = em.createQuery(
-            "SELECT COUNT(a) FROM Agendamento a WHERE a.data = :data AND a.hora = :hora " +
-            "AND a.funcionario.id = :funcionarioId AND a.id <> :agendamentoId AND a.status <> 'CANCELADO'",
-            Long.class)
-            .setParameter("data", agendamento.getData())
-            .setParameter("hora", agendamento.getHora())
-            .setParameter("funcionarioId", funcionarioId)
-            .setParameter("agendamentoId", agendamentoId)
-            .getSingleResult();
+                        "SELECT COUNT(a) FROM Agendamento a WHERE a.data = :data AND a.hora = :hora " +
+                                "AND a.funcionario.id = :funcionarioId AND a.id <> :agendamentoId AND a.status <> 'CANCELADO'",
+                        Long.class)
+                .setParameter("data", agendamento.getData())
+                .setParameter("hora", agendamento.getHora())
+                .setParameter("funcionarioId", funcionarioId)
+                .setParameter("agendamentoId", agendamentoId)
+                .getSingleResult();
 
         if (count > 0) {
             throw new IllegalArgumentException("Funcionário não disponível neste horário");
@@ -241,25 +264,6 @@ public class AgendamentoService implements AgendamentoServiceLocal {
                 new Object[]{funcionarioId, agendamentoId});
     }
 
-    @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public void atribuirGuiche(Long agendamentoId, Long guicheId) {
-        Agendamento agendamento = findAgendamentoById(agendamentoId);
-        if (agendamento == null) {
-            throw new IllegalArgumentException("Agendamento não encontrado");
-        }
-
-        Guiche guiche = em.find(Guiche.class, guicheId);
-        if (guiche == null) {
-            throw new IllegalArgumentException("Guichê não encontrado");
-        }
-
-        agendamento.setGuiche(guiche);
-        em.merge(agendamento);
-        em.flush();
-        LOGGER.log(Level.INFO, "Guichê {0} atribuído ao agendamento {1}",
-                new Object[]{guicheId, agendamentoId});
-    }
 
     @Override
     @TransactionAttribute(TransactionAttributeType.REQUIRED)
@@ -285,14 +289,12 @@ public class AgendamentoService implements AgendamentoServiceLocal {
             throw new IllegalArgumentException("ID do serviço é obrigatório");
         }
 
-        // Busca funcionários que prestam este serviço
-        // Primeira query: busca IDs dos funcionários (sem DISTINCT no fetch)
-        // Segunda query: carrega funcionários com FETCH para evitar LazyInitializationException
-
-        // Query em duas etapas para evitar problema DISTINCT + ORDER BY + FETCH no PostgreSQL
+        // Step 1: Buscar IDs dos funcionários que prestam o serviço
         TypedQuery<Long> idsQuery = em.createQuery(
-            "SELECT DISTINCT f.id FROM Funcionario f JOIN f.servicos s WHERE s.id = :servicoId AND f.ativo = true",
-            Long.class
+                "SELECT DISTINCT f.id FROM Funcionario f " +
+                        "JOIN f.funcionarioServicos fs " +
+                        "WHERE fs.servico.id = :servicoId AND f.ativo = true",
+                Long.class
         );
         idsQuery.setParameter("servicoId", servicoId);
         List<Long> ids = idsQuery.getResultList();
@@ -301,15 +303,20 @@ public class AgendamentoService implements AgendamentoServiceLocal {
             return new ArrayList<>();
         }
 
-        // Carrega funcionários completos com FETCH
+        // Step 2: Carrega funcionários completos com FETCH para evitar lazy loading
         TypedQuery<Funcionario> query = em.createQuery(
-            "SELECT f FROM Funcionario f LEFT JOIN FETCH f.cargo LEFT JOIN FETCH f.user WHERE f.id IN :ids ORDER BY f.user.nome",
-            Funcionario.class
+                "SELECT f FROM Funcionario f " +
+                        "LEFT JOIN FETCH f.cargo " +
+                        "LEFT JOIN FETCH f.user " +
+                        "WHERE f.id IN :ids " +
+                        "ORDER BY f.user.nome",
+                Funcionario.class
         );
         query.setParameter("ids", ids);
 
         return query.getResultList();
     }
+
 
     @Override
     public List<String> getHorariosDisponiveis() {
@@ -323,5 +330,96 @@ public class AgendamentoService implements AgendamentoServiceLocal {
         horarios.add("18:00");
 
         return horarios;
+    }
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public boolean funcionarioPrestServico(Long funcionarioId, Long servicoId) {
+        if (funcionarioId == null || servicoId == null) {
+            return false;
+        }
+
+        try {
+            // Query para verificar se existe relação entre funcionário e serviço
+            Long count = em.createQuery(
+                            "SELECT COUNT(fs) FROM FuncionarioServico fs " +
+                                    "WHERE fs.funcionario.id = :funcionarioId AND fs.servico.id = :servicoId",
+                            Long.class)
+                    .setParameter("funcionarioId", funcionarioId)
+                    .setParameter("servicoId", servicoId)
+                    .getSingleResult();
+
+            return count > 0;
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao verificar se funcionário presta serviço", e);
+            return false;
+        }
+    }
+
+    /**
+     * Busca a localização onde o funcionário presta o serviço do agendamento.
+     * Faz o JOIN: Agendamento -> FuncionarioServico -> Localizacao
+     *
+     * @param agendamentoId ID do agendamento
+     * @return Localizacao ou null se não encontrar
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public Localizacao buscarLocalizacaoDoAgendamento(Long agendamentoId) {
+        if (agendamentoId == null) {
+            LOGGER.log(Level.WARNING, "ID do agendamento não pode ser nulo");
+            return null;
+        }
+
+        try {
+            List<Localizacao> resultados = em.createNamedQuery("Agendamento.findLocalizacaoServicoPrestado", Localizacao.class)
+                .setParameter("agendamentoId", agendamentoId)
+                .getResultList();
+
+            if (resultados.isEmpty()) {
+                LOGGER.log(Level.WARNING, "Nenhuma localização encontrada para o agendamento: " + agendamentoId);
+                return null;
+            }
+
+            if (resultados.size() > 1) {
+                LOGGER.log(Level.WARNING,
+                    "Múltiplas localizações encontradas para o agendamento " + agendamentoId +
+                    ". Retornando a primeira.");
+            }
+
+            return resultados.get(0);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao buscar localização do agendamento: " + agendamentoId, e);
+            return null;
+        }
+    }
+
+    /**
+     * Busca a localização usando query dinâmica (alternativa à NamedQuery).
+     * Útil para entender como funciona o JOIN em JPQL.
+     *
+     * @param agendamentoId ID do agendamento
+     * @return Localizacao ou null se não encontrar
+     */
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public Localizacao buscarLocalizacaoComQueryDinamica(Long agendamentoId) {
+        if (agendamentoId == null) {
+            return null;
+        }
+
+        try {
+            String jpql = "SELECT fs.localizacao FROM Agendamento a " +
+                          "JOIN FuncionarioServico fs ON fs.funcionario.id = a.funcionario.id " +
+                          "AND fs.servico.id = a.servico.id " +
+                          "WHERE a.id = :agendamentoId";
+
+            List<Localizacao> resultados = em.createQuery(jpql, Localizacao.class)
+                .setParameter("agendamentoId", agendamentoId)
+                .getResultList();
+
+            return resultados.isEmpty() ? null : resultados.get(0);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao buscar localização com query dinâmica", e);
+            return null;
+        }
     }
 }

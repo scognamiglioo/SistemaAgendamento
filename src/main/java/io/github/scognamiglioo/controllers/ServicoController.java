@@ -290,9 +290,10 @@ public class ServicoController implements Serializable {
                 mensagemSucesso = "Serviço atualizado com sucesso!";
             } else {
                 Servico servicoCriado = createNewServico();
-                if (servicoCriado != null) {
-                    mensagemSucesso = "Serviço criado com sucesso!";
+                if (servicoCriado == null) {
+                    throw new IllegalStateException("Falha ao criar serviço");
                 }
+                mensagemSucesso = "Serviço criado com sucesso!";
             }
             
             // Usa Flash Scope para passar mensagem flutuante para a próxima página

@@ -111,23 +111,26 @@ public class LoginController {
     }
 
     private void redirectBasedOnRole() throws IOException {
-    String contextPath = getExternalContext().getRequestContextPath();
+        String contextPath = getExternalContext().getRequestContextPath();
 
-    if (securityContext.isCallerInRole("admin")) {
-        
-        getExternalContext().redirect(contextPath + "/app/admin.xhtml");
-        return;
-    }
+        if (securityContext.isCallerInRole("admin")) {
+            getExternalContext().redirect(contextPath + "/app/admin.xhtml");
+            return;
+        }
 
-    if (securityContext.isCallerInRole("atendente")) {
-        
+        if (securityContext.isCallerInRole("recepcionista")) {
+            getExternalContext().redirect(contextPath + "/app/agendamento/gerenciar_agendamentos.xhtml");
+            return;
+        }
+
+        if (securityContext.isCallerInRole("atendente")) {
+            getExternalContext().redirect(contextPath + "/app/agendamento/gerenciar_agendamentos.xhtml");
+            return;
+        }
+
+        // Caso seja usuário comum
         getExternalContext().redirect(contextPath + "/app/index.xhtml");
-        return;
     }
-
-    // Caso seja usuário comum
-    getExternalContext().redirect(contextPath + "/app/index.xhtml");
-}
 
 
     private AuthenticationStatus processAuthentication() {

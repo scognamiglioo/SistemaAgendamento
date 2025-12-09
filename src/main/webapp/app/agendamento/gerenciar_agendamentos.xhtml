@@ -325,10 +325,19 @@
                 <p>Sistema completo de gestão de agendamentos</p>
             </div>
             <h:form>
-                <p:commandButton value="Voltar"
-                                 action="/app/admin?faces-redirect=true"
-                                 styleClass="ui-button-secondary"
-                                 icon="pi pi-arrow-left"/>
+                <h:panelGroup rendered="#{request.isUserInRole('admin')}">
+                    <p:commandButton value="Voltar"
+                                     action="/app/admin?faces-redirect=true"
+                                     styleClass="ui-button-secondary"
+                                     icon="pi pi-arrow-left"/>
+                </h:panelGroup>
+                
+                <h:panelGroup rendered="#{request.isUserInRole('atendente') or request.isUserInRole('recepcionista')}">
+                    <p:commandButton value="Sair"
+                                     action="#{gerenciarAgendamentosController.logout}"
+                                     styleClass="ui-button-secondary"
+                                     icon="pi pi-sign-out"/>
+                </h:panelGroup>
             </h:form>
         </div>
 

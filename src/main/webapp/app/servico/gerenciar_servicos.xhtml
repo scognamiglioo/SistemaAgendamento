@@ -25,6 +25,13 @@
                     }, 100);
                 }
             }
+            
+            // Exibe mensagem flutuante ao carregar a página (vinda de redirect)
+            document.addEventListener('DOMContentLoaded', function() {
+                if (window.FormSuccessMonitor) {
+                    window.FormSuccessMonitor.monitor();
+                }
+            });
             //]]>
         </script>
     </h:head>
@@ -48,7 +55,7 @@
             </div>
 
             <h:form id="servicosForm">
-                <!-- Campos hidden para capturar mensagens -->
+                <!-- Campos hidden para capturar mensagens (incluindo do Flash Scope) -->
                 <h:inputHidden id="hiddenLastMessage" value="#{servicoController.lastMessage}" />
                 <h:inputHidden id="hiddenMessageType" value="#{servicoController.messageType}" />
                 

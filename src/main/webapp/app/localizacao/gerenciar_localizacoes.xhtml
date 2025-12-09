@@ -23,6 +23,13 @@
                     }, 100);
                 }
             }
+            
+            // Exibe mensagem flutuante ao carregar a página (vinda de redirect)
+            document.addEventListener('DOMContentLoaded', function() {
+                if (window.FormSuccessMonitor) {
+                    window.FormSuccessMonitor.monitor();
+                }
+            });
             //]]>
         </script>
     </h:head>

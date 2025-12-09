@@ -16,14 +16,19 @@
         
         <script type="text/javascript">
         //<![CDATA[
+            // Função helper para monitorar mensagens após AJAX
+            function monitorarMensagens(data) {
+                if (data.status === 'success' && window.FormSuccessMonitor) {
+                    setTimeout(function() {
+                        window.FormSuccessMonitor.monitor();
+                    }, 100);
+                }
+            }
+            
             // Monitora eventos AJAX do JSF para exibir mensagens
             if (typeof jsf !== 'undefined') {
                 jsf.ajax.addOnEvent(function(data) {
-                    if (data.status === 'success' && window.FormSuccessMonitor) {
-                        setTimeout(function() {
-                            window.FormSuccessMonitor.monitor();
-                        }, 100);
-                    }
+                    monitorarMensagens(data);
                 });
             }
             
@@ -108,7 +113,9 @@
                             <h:commandButton value="Adicionar Associação"
                                              action="#{funcionarioServicoController.createAssociacao}"
                                              styleClass="btn btn-primary">
-                                <f:ajax execute="@form" render=":associacoesForm:associacoes-panel :associacoesForm:hiddenLastMessage :associacoesForm:hiddenMessageType" />
+                                <f:ajax execute="@form" 
+                                        render=":associacoesForm:associacoes-panel :associacoesForm:hiddenLastMessage :associacoesForm:hiddenMessageType" 
+                                        onevent="monitorarMensagens" />
                             </h:commandButton>
                         </div>
                     </div>

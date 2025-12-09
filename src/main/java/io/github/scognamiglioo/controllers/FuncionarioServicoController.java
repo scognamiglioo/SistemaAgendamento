@@ -71,6 +71,13 @@ public class FuncionarioServicoController implements Serializable {
     @PostConstruct
     public void init() {
         loadData();
+        
+        // Recupera mensagens do Flash Scope (vindas de redirect)
+        FacesContext context = FacesContext.getCurrentInstance();
+        if (context != null && context.getExternalContext().getFlash().containsKey("lastMessage")) {
+            lastMessage = (String) context.getExternalContext().getFlash().get("lastMessage");
+            messageType = (String) context.getExternalContext().getFlash().get("messageType");
+        }
     }
 
     // ========== CARREGAMENTO DE DADOS ==========
@@ -278,17 +285,14 @@ public class FuncionarioServicoController implements Serializable {
             
             lastMessage = "Associação excluída com sucesso!";
             messageType = "success";
-            addSuccessMessage(lastMessage);
             
         } catch (IllegalArgumentException ex) {
             lastMessage = ex.getMessage();
             messageType = "error";
-            addErrorMessage(lastMessage);
         } catch (Exception ex) {
             LOGGER.log(Level.SEVERE, "Erro ao excluir associação", ex);
             lastMessage = "Erro ao excluir associação";
             messageType = "error";
-            addErrorMessage(lastMessage);
         }
     }
 

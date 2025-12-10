@@ -1,0 +1,289 @@
+/* ============================
+   RESET & BASE
+   ============================ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background: linear-gradient(135deg, #2c3e50 0%, #1a1a1a 100%);
+    color: #212529;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ============================
+   HEADER & FOOTER
+   ============================ */
+header {
+    background: linear-gradient(135deg, #212529 0%, #000000 100%);
+    padding: 25px;
+    text-align: center;
+    color: white;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+header h1 {
+    font-size: 2em;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+footer {
+    background: linear-gradient(135deg, #212529 0%, #000000 100%);
+    color: white;
+    text-align: center;
+    padding: 20px;
+    box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+    margin-top: auto;
+}
+
+footer p {
+    margin: 0;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    letter-spacing: 0.5px;
+}
+
+/* ============================
+   LAYOUT CONTAINERS
+   ============================ */
+.login-container,
+.activation-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 40px 20px;
+}
+
+.login-card,
+.activation-card,
+.success-container,
+.error-container {
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    border: 2px solid #e1e5e9;
+    text-align: center;
+    animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-30px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================
+   HEADINGS & TEXT
+   ============================ */
+.login-card h2,
+.activation-card h1,
+.success-container h1,
+.error-container h1 {
+    color: #212529;
+    font-weight: 700;
+    margin-bottom: 25px;
+    border-bottom: 3px solid #212529;
+    padding-bottom: 15px;
+}
+
+.login-card h2 { font-size: 1.8em; }
+.activation-card h1 { font-size: 2em; }
+.success-container h1 { color: #28a745; }
+.error-container h1 { color: #dc3545; }
+
+p {
+    color: #495057;
+    font-size: 1.05em;
+    line-height: 1.6;
+    margin-bottom: 25px;
+}
+
+.success-container p {
+    color: #155724;
+    background: #d4edda;
+    border: 2px solid #c3e6cb;
+    border-radius: 10px;
+    padding: 15px;
+    font-weight: 500;
+}
+
+.error-container p,
+.error-container .alert {
+    color: #721c24;
+    background: #f8d7da;
+    border: 2px solid #f5c6cb;
+    border-radius: 10px;
+    padding: 15px;
+    font-weight: 500;
+}
+
+/* ============================
+   ICONS
+   ============================ */
+.success-icon,
+.error-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+}
+
+/* ============================
+   FORMS & INPUTS
+   ============================ */
+label {
+    display: block;
+    margin-bottom: 8px;
+    color: #495057;
+    font-weight: 600;
+    font-size: 0.95rem;
+    text-align: left;
+}
+
+input[type="text"],
+input[type="password"],
+input[type="hidden"] {
+    width: 100%;
+    padding: 12px 15px;
+    margin-bottom: 20px;
+    border: 2px solid #e1e5e9;
+    border-radius: 10px;
+    font-size: 1rem;
+    background: white;
+    color: #212529;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+input[type="text"]:focus,
+input[type="password"]:focus {
+    border-color: #212529;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(33, 37, 41, 0.1);
+}
+
+/* ============================
+   BUTTONS & LINKS
+   ============================ */
+.btn,
+button[type="submit"],
+input[type="submit"],
+.ui-button,
+a.button-link {
+    display: inline-block;
+    width: 100%;
+    padding: 14px 24px;
+    background: linear-gradient(135deg, #212529 0%, #000000 100%);
+    color: white;
+    border: 2px solid #212529;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.btn:hover,
+button[type="submit"]:hover,
+input[type="submit"]:hover,
+.ui-button:hover,
+a.button-link:hover {
+    background: white;
+    color: #212529;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+.back-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-link a {
+    color: #495057;
+    text-decoration: none;
+    font-weight: 500;
+    border-bottom: 2px solid transparent;
+    transition: all 0.3s ease;
+}
+
+.back-link a:hover {
+    color: #212529;
+    border-bottom-color: #212529;
+}
+
+/* Inline links (non-full-width) */
+a.inline-link {
+    display: inline-block;
+    padding: 14px 28px;
+    background: linear-gradient(135deg, #212529 0%, #000000 100%);
+    color: white;
+    text-decoration: none;
+    border-radius: 10px;
+    font-weight: 600;
+    border: 2px solid #212529;
+    transition: all 0.3s ease;
+}
+
+a.inline-link:hover {
+    background: white;
+    color: #212529;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* ============================
+   MESSAGES (PrimeFaces/JSF)
+   ============================ */
+.ui-messages {
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 10px;
+    border: 2px solid;
+    font-weight: 500;
+}
+
+.ui-messages-error {
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
+    color: #721c24;
+}
+
+.ui-messages-info {
+    background-color: #d1ecf1;
+    border-color: #bee5eb;
+    color: #0c5460;
+}
+
+.ui-messages-success {
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+}
+
+/* ============================
+   RESPONSIVE
+   ============================ */
+@media (max-width: 768px) {
+    header h1 { font-size: 1.5em; }
+    .login-card,
+    .activation-card,
+    .success-container,
+    .error-container { padding: 30px 20px; }
+    .login-card h2 { font-size: 1.5em; }
+    h1 { font-size: 1.6em; }
+    p { font-size: 1em; }
+    .btn,
+    button[type="submit"],
+    input[type="submit"],
+    .ui-button { padding: 12px 20px; }
+}

@@ -60,18 +60,9 @@
 
     </security-constraint>
 
-    <security-constraint>
-        <display-name>Admin Role</display-name>
-        <web-resource-collection>
-            <web-resource-name>All App Pages</web-resource-name>
-            <url-pattern>/app/*</url-pattern>
-            <url-pattern>/password/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>admin</role-name>
-        </auth-constraint>
-    </security-constraint>
+    <!-- ROTAS ESPECÍFICAS PRIMEIRO (mais específicas têm precedência) -->
 
+    <!-- Páginas de Usuário -->
     <security-constraint>
         <display-name>User Role</display-name>
         <web-resource-collection>
@@ -79,7 +70,6 @@
             <url-pattern>/app/index.xhtml</url-pattern>
             <url-pattern>/app/meus-agendamentos.xhtml</url-pattern>
             <url-pattern>/app/reagendar-agendamento.xhtml</url-pattern>
-            <url-pattern>/password/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
@@ -87,12 +77,12 @@
         </auth-constraint>
     </security-constraint>
 
+    <!-- Fila de Atendimentos e Gerenciamento de Agendamentos -->
     <security-constraint>
-        <display-name>Recepcionista and Atendente</display-name>
+        <display-name>Agendamento Management</display-name>
         <web-resource-collection>
             <web-resource-name>Agendamento Pages</web-resource-name>
             <url-pattern>/app/agendamento/*</url-pattern>
-            <url-pattern>/password/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
@@ -101,27 +91,51 @@
         </auth-constraint>
     </security-constraint>
 
-    <!-- FUNCIONÁRIO: área específica -->
+    <!-- Páginas Administrativas Gerais -->
     <security-constraint>
+        <display-name>Admin Role</display-name>
         <web-resource-collection>
-            <web-resource-name>Funcionario Area</web-resource-name>
-            <url-pattern>/funcionario/*</url-pattern>
-            <url-pattern>/password/*</url-pattern>
+            <web-resource-name>Admin Pages</web-resource-name>
+            <url-pattern>/app/admin.xhtml</url-pattern>
+            <url-pattern>/app/cadastrar_funcionario.xhtml</url-pattern>
+            <url-pattern>/app/associacoes_localizacao_funcionario_servico.xhtml</url-pattern>
+            <url-pattern>/app/user-list.xhtml</url-pattern>
+            <url-pattern>/app/edit-user.xhtml</url-pattern>
+            <url-pattern>/app/users.xhtml</url-pattern>
+            <url-pattern>/app/servico/*</url-pattern>
+            <url-pattern>/app/localizacao/*</url-pattern>
+            <url-pattern>/app/cargo/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!-- Demais páginas /app/* - Todas as roles autenticadas -->
+    <security-constraint>
+        <display-name>General App Pages</display-name>
+        <web-resource-collection>
+            <web-resource-name>All App Pages</web-resource-name>
+            <url-pattern>/app/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+            <role-name>user</role-name>
+            <role-name>recepcionista</role-name>
+            <role-name>atendente</role-name>
             <role-name>funcionario</role-name>
         </auth-constraint>
     </security-constraint>
 
-
-    <!-- Área Funcionários -->
+    <!-- Área de Funcionários -->
     <security-constraint>
+        <display-name>Funcionario Area</display-name>
         <web-resource-collection>
-            <web-resource-name>Funcionario Area</web-resource-name>
+            <web-resource-name>Funcionario Pages</web-resource-name>
             <url-pattern>/funcionario/*</url-pattern>
-            <url-pattern>/password/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
+            <role-name>admin</role-name>
             <role-name>funcionario</role-name>
 
         </auth-constraint>

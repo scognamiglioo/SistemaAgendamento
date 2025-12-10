@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Fila de Atendimentos</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .page-header h1 {
+            color: #2d3748;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-header p {
+            color: #718096;
+            font-size: 1.1em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        /* Stats Cards */
+        .stats-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+        }
+
+        .stat-icon.waiting {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+            color: white;
+        }
+
+        .stat-icon.attending {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .stat-content h3, .stat-number {
+            color: #2d3748;
+            font-size: 2.5em;
+            font-weight: 700;
+            margin-bottom: 5px;
+            display: block;
+        }
+
+        .stat-content p, .stat-label {
+            color: #718096;
+            font-size: 1em;
+            font-weight: 500;
+            display: block;
+        }
+
+        /* Main Content Grid */
+        .content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        @media (max-width: 1200px) {
+            .content-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Section Cards */
+        .section-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            animation: fadeInUp 0.6s ease;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .section-header {
+            padding: 25px 30px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .section-header.waiting {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+        }
+
+        .section-header.attending {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-title h2 {
+            color: #2d3748;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .section-badge {
+            background: white;
+            color: #2d3748;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1em;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Queue List */
+        .queue-list {
+            padding: 20px;
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .queue-list::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .queue-list::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .queue-list::-webkit-scrollbar-thumb {
+            background: #cbd5e0;
+            border-radius: 10px;
+        }
+
+        .queue-list::-webkit-scrollbar-thumb:hover {
+            background: #a0aec0;
+        }
+
+        .queue-item {
+            background: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .queue-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border-color: #cbd5e0;
+        }
+
+        .queue-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .patient-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .patient-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 700;
+            font-size: 1.3em;
+        }
+
+        .patient-details h3 {
+            color: #2d3748;
+            font-size: 1.3em;
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .patient-details p {
+            color: #718096;
+            font-size: 0.9em;
+        }
+
+        .time-badge {
+            background: #667eea;
+            color: white;
+            padding: 8px 16px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .queue-item-body {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .info-field {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-label {
+            color: #718096;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .info-value {
+            color: #2d3748;
+            font-size: 1em;
+            font-weight: 600;
+        }
+
+        .queue-item-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 0.95em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-refresh {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #718096;
+        }
+
+        .empty-state-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state h3 {
+            font-size: 1.5em;
+            margin-bottom: 10px;
+            color: #4a5568;
+        }
+
+        .empty-state p {
+            font-size: 1em;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .page-header h1 {
+                font-size: 2em;
+            }
+
+            .queue-item-body {
+                grid-template-columns: 1fr;
+            }
+
+            .queue-item-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <div>
+                <h1>🏥 Fila de Atendimentos</h1>
+                <p>Gerenciamento em tempo real dos atendimentos do dia</p>
+            </div>
+            <div class="header-actions">
+                <h:form>
+                    <p:commandButton value="🔄 Atualizar"
+                                   action="#{atendimentoController.carregarDados}"
+                                   update="@form mainContent"
+                                   styleClass="btn btn-refresh"
+                                   icon="pi pi-refresh"/>
+                    <p:commandButton value="← Voltar"
+                                   action="/app/admin.xhtml?faces-redirect=true"
+                                   styleClass="btn btn-primary"
+                                   immediate="true"/>
+                </h:form>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <h:panelGroup styleClass="stats-container" layout="block">
+            <h:panelGroup styleClass="stat-card" layout="block">
+                <h:panelGroup styleClass="stat-icon waiting" layout="block">
+                    ⏳
+                </h:panelGroup>
+                <h:panelGroup styleClass="stat-content" layout="block">
+                    <h:outputText value="#{atendimentoController.quantidadeFilaEspera}" styleClass="stat-number"/>
+                    <h:outputText value="Na Fila de Espera" styleClass="stat-label"/>
+                </h:panelGroup>
+            </h:panelGroup>
+
+            <h:panelGroup styleClass="stat-card" layout="block">
+                <h:panelGroup styleClass="stat-icon attending" layout="block">
+                    👨‍⚕️
+                </h:panelGroup>
+                <h:panelGroup styleClass="stat-content" layout="block">
+                    <h:outputText value="#{atendimentoController.quantidadeEmAtendimento}" styleClass="stat-number"/>
+                    <h:outputText value="Em Atendimento" styleClass="stat-label"/>
+                </h:panelGroup>
+            </h:panelGroup>
+        </h:panelGroup>
+
+        <!-- Main Content -->
+        <h:form id="mainContent">
+            <p:messages id="messages" showDetail="true" closable="true"/>
+
+            <p:outputPanel styleClass="content-grid" layout="block">
+                <!-- Fila de Espera -->
+                <p:outputPanel styleClass="section-card" layout="block">
+                    <p:outputPanel styleClass="section-header waiting" layout="block">
+                        <p:outputPanel styleClass="section-title" layout="block">
+                            <h2>⏳ Fila de Espera</h2>
+                            <h:outputText value="#{atendimentoController.quantidadeFilaEspera}" styleClass="section-badge"/>
+                        </p:outputPanel>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="queue-list" layout="block">
+                        <h:panelGroup rendered="#{empty atendimentoController.filaEspera}" layout="block">
+                            <p:outputPanel styleClass="empty-state" layout="block">
+                                <p:outputPanel styleClass="empty-state-icon" layout="block">😊</p:outputPanel>
+                                <h3>Nenhum paciente na fila</h3>
+                                <p>Não há agendamentos aguardando atendimento no momento</p>
+                            </p:outputPanel>
+                        </h:panelGroup>
+
+                        <ui:repeat value="#{atendimentoController.filaEspera}" var="agendamento" xmlns:ui="jakarta.faces.facelets">
+                            <div class="queue-item">
+                                <div class="queue-item-header">
+                                    <div class="patient-info">
+                                        <div class="patient-avatar">
+                                            #{agendamento.user.nome.substring(0, 1).toUpperCase()}
+                                        </div>
+                                        <div class="patient-details">
+                                            <h3>#{agendamento.user.nome}</h3>
+                                            <p>ID: #{agendamento.id}</p>
+                                        </div>
+                                    </div>
+                                    <div class="time-badge">
+                                        🕐 #{agendamento.horaFormatada}
+                                    </div>
+                                </div>
+
+                                <div class="queue-item-body">
+                                    <div class="info-field">
+                                        <span class="info-label">Serviço</span>
+                                        <span class="info-value">#{agendamento.servico.nome}</span>
+                                    </div>
+                                    <div class="info-field">
+                                        <span class="info-label">Profissional</span>
+                                        <span class="info-value">
+                                            <h:outputText value="#{agendamento.funcionario.nome}"
+                                                        rendered="#{agendamento.funcionario != null}"/>
+                                            <h:outputText value="Não atribuído"
+                                                        rendered="#{agendamento.funcionario == null}"
+                                                        style="color: #f59e0b;"/>
+                                        </span>
+                                    </div>
+                                    <div class="info-field">
+                                        <span class="info-label">Local</span>
+                                        <span class="info-value">#{atendimentoController.getLocalizacaoAtendimento(agendamento)}</span>
+                                    </div>
+                                    <div class="info-field">
+                                        <span class="info-label">Status</span>
+                                        <span class="info-value" style="color: #f59e0b;">#{agendamento.status.descricao}</span>
+                                    </div>
+                                </div>
+
+                                <div class="queue-item-actions">
+                                    <p:commandButton value="✓ Iniciar Atendimento"
+                                                   action="#{atendimentoController.iniciarAtendimento(agendamento)}"
+                                                   update="mainContent"
+                                                   styleClass="btn btn-success"
+                                                   rendered="#{agendamento.funcionario != null}">
+                                        <p:confirm header="Confirmação"
+                                                 message="Deseja iniciar o atendimento de #{agendamento.user.nome}?"
+                                                 icon="pi pi-exclamation-triangle"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </ui:repeat>
+                    </p:outputPanel>
+                </p:outputPanel>
+
+                <!-- Em Atendimento -->
+                <p:outputPanel styleClass="section-card" layout="block">
+                    <p:outputPanel styleClass="section-header attending" layout="block">
+                        <p:outputPanel styleClass="section-title" layout="block">
+                            <h2>👨‍⚕️ Em Atendimento</h2>
+                            <h:outputText value="#{atendimentoController.quantidadeEmAtendimento}" styleClass="section-badge"/>
+                        </p:outputPanel>
+                    </p:outputPanel>
+
+                    <p:outputPanel styleClass="queue-list" layout="block">
+                        <h:panelGroup rendered="#{empty atendimentoController.emAtendimento}" layout="block">
+                            <p:outputPanel styleClass="empty-state" layout="block">
+                                <p:outputPanel styleClass="empty-state-icon" layout="block">⌛</p:outputPanel>
+                                <h3>Nenhum atendimento em andamento</h3>
+                                <p>Não há pacientes sendo atendidos no momento</p>
+                            </p:outputPanel>
+                        </h:panelGroup>
+
+                        <ui:repeat value="#{atendimentoController.emAtendimento}" var="agendamento" xmlns:ui="jakarta.faces.facelets">
+                            <div class="queue-item" style="border-color: #10b981;">
+                                <div class="queue-item-header">
+                                    <div class="patient-info">
+                                        <div class="patient-avatar" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                            #{agendamento.user.nome.substring(0, 1).toUpperCase()}
+                                        </div>
+                                        <div class="patient-details">
+                                            <h3>#{agendamento.user.nome}</h3>
+                                            <p>ID: #{agendamento.id}</p>
+                                        </div>
+                                    </div>
+                                    <div class="time-badge" style="background: #10b981;">
+                                        🕐 #{agendamento.horaFormatada}
+                                    </div>
+                                </div>
+
+                                <div class="queue-item-body">
+                                    <div class="info-field">
+                                        <span class="info-label">Serviço</span>
+                                        <span class="info-value">#{agendamento.servico.nome}</span>
+                                    </div>
+                                    <div class="info-field">
+                                        <span class="info-label">Profissional</span>
+                                        <span class="info-value">#{agendamento.funcionario.nome}</span>
+                                    </div>
+                                    <div class="info-field">
+                                        <span class="info-label">Local</span>
+                                        <span class="info-value">#{atendimentoController.getLocalizacaoAtendimento(agendamento)}</span>
+                                    </div>
+                                    <div class="info-field">
+                                        <span class="info-label">Status</span>
+                                        <span class="info-value" style="color: #10b981;">#{agendamento.status.descricao}</span>
+                                    </div>
+                                </div>
+
+                                <div class="queue-item-actions">
+                                    <p:commandButton value="✓ Finalizar Atendimento"
+                                                   action="#{atendimentoController.finalizarAtendimento(agendamento)}"
+                                                   update="mainContent"
+                                                   styleClass="btn btn-success">
+                                        <p:confirm header="Confirmação"
+                                                 message="Deseja finalizar o atendimento de #{agendamento.user.nome}?"
+                                                 icon="pi pi-check-circle"/>
+                                    </p:commandButton>
+                                </div>
+                            </div>
+                        </ui:repeat>
+                    </p:outputPanel>
+                </p:outputPanel>
+            </p:outputPanel>
+
+            <p:confirmDialog global="true" showEffect="fade" hideEffect="fade" responsive="true" width="350">
+                <p:commandButton value="Sim" type="button" styleClass="ui-confirmdialog-yes" icon="pi pi-check"/>
+                <p:commandButton value="Não" type="button" styleClass="ui-confirmdialog-no" icon="pi pi-times"/>
+            </p:confirmDialog>
+        </h:form>
+    </div>
+
+    <script>
+        // Auto-refresh a cada 30 segundos
+        setInterval(function() {
+            if (typeof PrimeFaces !== 'undefined') {
+                PrimeFaces.ab({
+                    source: 'mainContent',
+                    update: 'mainContent',
+                    process: '@this'
+                });
+            }
+        }, 30000);
+    </script>
+</h:body>
+</html>
+

@@ -133,5 +133,26 @@ public interface AgendamentoServiceLocal {
      * @return Localizacao ou null se não encontrar
      */
     io.github.scognamiglioo.entities.Localizacao buscarLocalizacaoComQueryDinamica(Long agendamentoId);
+
+    /**
+     * Busca agendamentos confirmados para o dia atual ordenados por hora
+     * (fila de espera)
+     */
+    List<Agendamento> findAgendamentosFilaEspera();
+
+    /**
+     * Busca agendamentos em atendimento no momento atual
+     */
+    List<Agendamento> findAgendamentosEmAtendimento();
+
+    /**
+     * Inicia o atendimento de um agendamento (muda status para EM_ATENDIMENTO)
+     */
+    void iniciarAtendimento(Long agendamentoId);
+
+    /**
+     * Finaliza o atendimento de um agendamento (muda status para CONCLUIDO)
+     */
+    void finalizarAtendimento(Long agendamentoId);
 }
 

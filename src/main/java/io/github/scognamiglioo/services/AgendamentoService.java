@@ -422,4 +422,97 @@ public class AgendamentoService implements AgendamentoServiceLocal {
             return null;
         }
     }
+
+    @Override
+    public List<Agendamento> findAgendamentosFilaEspera() {
+        try {
+            LocalDate hoje = LocalDate.now();
+
+            // Busca agendamentos CONFIRMADOS ou AGENDADOS para hoje, ordenados por hora
+            String jpql = "SELECT a FROM Agendamento a " +
+                         "LEFT JOIN FETCH a.user " +
+                         "LEFT JOIN FETCH a.servico " +
+                         "LEFT JOIN FETCH a.funcionario " +
+                         "WHERE a.data = :data " +
+                         "AND (a.status = :statusConfirmado OR a.status = :statusAgendado) " +
+                         "ORDER BY a.hora ASC";
+
+            return em.createQuery(jpql, Agendamento.class)
+                    .setParameter("data", hoje)
+                    .setParameter("statusConfirmado", StatusAgendamento.CONFIRMADO)
+                    .setParameter("statusAgendado", StatusAgendamento.AGENDADO)
+                    .getResultList();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao buscar fila de espera", e);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public List<Agendamento> findAgendamentosEmAtendimento() {
+        try {
+            LocalDate hoje = LocalDate.now();
+
+            // Busca agendamentos EM_ATENDIMENTO para hoje
+            String jpql = "SELECT a FROM Agendamento a " +
+                         "LEFT JOIN FETCH a.user " +
+                         "LEFT JOIN FETCH a.servico " +
+                         "LEFT JOIN FETCH a.funcionario " +
+                         "WHERE a.data = :data " +
+                         "AND a.status = :status " +
+                         "ORDER BY a.hora ASC";
+
+            return em.createQuery(jpql, Agendamento.class)
+                    .setParameter("data", hoje)
+                    .setParameter("status", StatusAgendamento.EM_ATENDIMENTO)
+                    .getResultList();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao buscar agendamentos em atendimento", e);
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public void iniciarAtendimento(Long agendamentoId) {
+        Agendamento agendamento = findAgendamentoById(agendamentoId);
+        if (agendamento == null) {
+            throw new IllegalArgumentException("Agendamento não encontrado");
+        }
+
+        if (agendamento.getStatus() == StatusAgendamento.EM_ATENDIMENTO) {
+            throw new IllegalArgumentException("Agendamento já está em atendimento");
+        }
+
+        if (agendamento.getStatus() == StatusAgendamento.CONCLUIDO) {
+            throw new IllegalArgumentException("Agendamento já foi concluído");
+        }
+
+        if (agendamento.getStatus() == StatusAgendamento.CANCELADO) {
+            throw new IllegalArgumentException("Agendamento está cancelado");
+        }
+
+        agendamento.setStatus(StatusAgendamento.EM_ATENDIMENTO);
+        em.merge(agendamento);
+        em.flush();
+        LOGGER.log(Level.INFO, "Atendimento iniciado para o agendamento {0}", agendamentoId);
+    }
+
+    @Override
+    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    public void finalizarAtendimento(Long agendamentoId) {
+        Agendamento agendamento = findAgendamentoById(agendamentoId);
+        if (agendamento == null) {
+            throw new IllegalArgumentException("Agendamento não encontrado");
+        }
+
+        if (agendamento.getStatus() != StatusAgendamento.EM_ATENDIMENTO) {
+            throw new IllegalArgumentException("Agendamento não está em atendimento");
+        }
+
+        agendamento.setStatus(StatusAgendamento.CONCLUIDO);
+        em.merge(agendamento);
+        em.flush();
+        LOGGER.log(Level.INFO, "Atendimento finalizado para o agendamento {0}", agendamentoId);
+    }
 }

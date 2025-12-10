@@ -50,7 +50,7 @@ public class AgendamentoMailService implements AgendamentoMailServiceLocal {
                 mail.setFrom(new InternetAddress(email));
             }
 
-            mail.setSubject("✅ Confirmação de Agendamento");
+            mail.setSubject("Confirmação de Agendamento");
             mail.setRecipient(Message.RecipientType.TO, 
                 new InternetAddress(agendamento.getUser().getEmail()));
 
@@ -234,7 +234,7 @@ public class AgendamentoMailService implements AgendamentoMailServiceLocal {
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>✅ Agendamento Confirmado</h1>
+                        <h1>Agendamento Confirmado</h1>
                         <p>Seu agendamento foi confirmado com sucesso!</p>
                     </div>
                     

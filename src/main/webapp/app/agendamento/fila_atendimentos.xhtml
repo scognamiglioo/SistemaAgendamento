@@ -440,7 +440,7 @@
                 <h:form>
                     <p:commandButton value="🔄 Atualizar"
                                    action="#{atendimentoController.carregarDados}"
-                                   update="mainContent:statsPanel mainContent:contentGrid mainContent:messages"
+                                   update=":mainContent:statsPanel :mainContent:contentGrid :mainContent:messages"
                                    styleClass="btn btn-refresh"
                                    icon="pi pi-refresh"/>
                     <p:commandButton value="← Voltar"
@@ -541,7 +541,7 @@
                                 <div class="queue-item-actions">
                                     <p:commandButton value="✓ Iniciar Atendimento"
                                                    action="#{atendimentoController.iniciarAtendimento(agendamento)}"
-                                                   update="statsPanel contentGrid messages"
+                                                   update=":mainContent:statsPanel :mainContent:contentGrid :mainContent:messages"
                                                    styleClass="btn btn-success"
                                                    rendered="#{agendamento.funcionario != null}">
                                         <p:confirm header="Confirmação"
@@ -611,7 +611,7 @@
                                 <div class="queue-item-actions">
                                     <p:commandButton value="✓ Finalizar Atendimento"
                                                    action="#{atendimentoController.finalizarAtendimento(agendamento)}"
-                                                   update="statsPanel contentGrid messages"
+                                                   update=":mainContent:statsPanel :mainContent:contentGrid :mainContent:messages"
                                                    styleClass="btn btn-success">
                                         <p:confirm header="Confirmação"
                                                  message="Deseja finalizar o atendimento de #{agendamento.user.nome}?"

@@ -307,7 +307,24 @@ public class AgendamentoController implements Serializable {
      */
     public void cancelarAgendamento(Long agendamentoId) {
         try {
+            Agendamento agendamento = agendamentoService.findAgendamentoById(agendamentoId);
+            
+            if (agendamento == null) {
+                addErrorMessage("Agendamento não encontrado.");
+                return;
+            }
+            
             agendamentoService.cancelarAgendamento(agendamentoId);
+            
+            // Envia e-mail de cancelamento
+            try {
+                agendamentoMailService.sendCancelamentoAgendamento(agendamento);
+                LOGGER.log(Level.INFO, "E-mail de cancelamento enviado para: {0}", agendamento.getUser().getEmail());
+            } catch (Exception mailEx) {
+                LOGGER.log(Level.WARNING, "Agendamento cancelado mas falha no envio do e-mail", mailEx);
+                addWarnMessage("Agendamento cancelado, mas houve erro ao enviar o e-mail de notificação.");
+            }
+            
             addSuccessMessage("Agendamento cancelado com sucesso!");
             loadMeusAgendamentos();
         } catch (Exception ex) {

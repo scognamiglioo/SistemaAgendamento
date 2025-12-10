@@ -1,6 +1,7 @@
 package io.github.scognamiglioo.controllers;
 
 import io.github.scognamiglioo.entities.*;
+import io.github.scognamiglioo.services.AgendamentoMailServiceLocal;
 import io.github.scognamiglioo.services.AgendamentoServiceLocal;
 import io.github.scognamiglioo.services.DataServiceLocal;
 import jakarta.annotation.PostConstruct;
@@ -36,6 +37,9 @@ public class ReagendamentoController implements Serializable {
 
     @EJB
     private DataServiceLocal dataService;
+
+    @EJB
+    private AgendamentoMailServiceLocal agendamentoMailService;
 
     // Agendamento original que será reagendado
     private Agendamento agendamentoOriginal;
@@ -304,13 +308,21 @@ public class ReagendamentoController implements Serializable {
                 observacoesCompletas += "\n" + novasObservacoes.trim();
             }
 
-            // Mantém as observações originais se houver
             if (agendamentoOriginal.getObservacoes() != null && !agendamentoOriginal.getObservacoes().trim().isEmpty()) {
                 observacoesCompletas += "\nObservações originais: " + agendamentoOriginal.getObservacoes();
             }
 
             novoAgendamento.setObservacoes(observacoesCompletas);
             agendamentoService.updateAgendamento(novoAgendamento);
+
+            // Envia e-mail de reagendamento
+            try {
+                agendamentoMailService.sendReagendamento(agendamentoOriginal, novoAgendamento);
+                LOGGER.log(Level.INFO, "E-mail de reagendamento enviado para: {0}", user.getEmail());
+            } catch (Exception mailEx) {
+                LOGGER.log(Level.WARNING, "Reagendamento realizado mas falha no envio do e-mail", mailEx);
+                addWarnMessage("Reagendamento realizado, mas houve erro ao enviar o e-mail de confirmação.");
+            }
 
             LOGGER.log(Level.INFO, "Reagendamento realizado com sucesso. Agendamento original: {0}, Novo agendamento: {1}",
                     new Object[]{agendamentoOriginal.getId(), novoAgendamento.getId()});

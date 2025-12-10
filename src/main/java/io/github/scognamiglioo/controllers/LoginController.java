@@ -124,7 +124,7 @@ public class LoginController {
         }
 
         if (securityContext.isCallerInRole("atendente")) {
-            getExternalContext().redirect(contextPath + "/app/agendamento/gerenciar_agendamentos.xhtml");
+            getExternalContext().redirect(contextPath + "/app/agendamento/index.xhtml");
             return;
         }
 

@@ -515,4 +515,33 @@ public class AgendamentoService implements AgendamentoServiceLocal {
         em.flush();
         LOGGER.log(Level.INFO, "Atendimento finalizado para o agendamento {0}", agendamentoId);
     }
+
+    
+    @Override
+    public List<Agendamento> searchByCpfOrProtocoloOrName(String termo) {
+        if (termo == null || termo.trim().isEmpty()) {
+            return new ArrayList<>();
+        }
+
+        String likeTerm = "%" + termo.trim() + "%";
+        LocalDate hoje = LocalDate.now();
+
+        try {
+            return em.createQuery(
+                    "SELECT a FROM Agendamento a " +
+                    "LEFT JOIN FETCH a.user u " +
+                    "LEFT JOIN FETCH a.servico s " +
+                    "LEFT JOIN FETCH a.funcionario f " +
+                    "WHERE a.data = :hoje " +
+                    "AND (u.cpf LIKE :termo OR u.nome LIKE :termo OR a.protocolo LIKE :termo) " +
+                    "ORDER BY a.hora ASC", Agendamento.class)
+                    .setParameter("hoje", hoje)
+                    .setParameter("termo", likeTerm)
+                    .getResultList();
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Erro ao buscar agendamentos pelo termo: " + termo, e);
+            return new ArrayList<>();
+        }
+    }
+
 }

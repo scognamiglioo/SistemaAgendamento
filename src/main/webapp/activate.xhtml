@@ -1,54 +1,174 @@
 <!DOCTYPE html>
-<html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://xmlns.jcp.org/jsf/html"
-      xmlns:p="primefaces"
-      xmlns:f="jakarta.faces.core">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:h="http://xmlns.jcp.org/jsf/html" xmlns:p="primefaces"
+    xmlns:f="jakarta.faces.core">
 <h:head>
     <title>Ativação de Conta</title>
-    <h:outputStylesheet name="css/admin.css"/>
-     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&amp;display=swap" rel="stylesheet"/>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: #000000;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+
+        .activation-container {
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .activation-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+            border: 2px solid #e1e5e9;
+            text-align: center;
+            animation: slideDown 0.5s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        h1 {
+            color: #212529;
+            font-size: 2em;
+            margin-bottom: 25px;
+            font-weight: 700;
+            border-bottom: 3px solid #212529;
+            padding-bottom: 15px;
+        }
+
+        .ui-messages {
+            margin-bottom: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            border: 2px solid;
+            font-weight: 500;
+        }
+
+        .ui-messages-error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+
+        .ui-messages-info {
+            background-color: #d1ecf1;
+            border-color: #bee5eb;
+            color: #0c5460;
+        }
+
+        .ui-messages-success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+
+        p {
+            color: #495057;
+            font-size: 1.05em;
+            margin-bottom: 25px;
+            line-height: 1.6;
+        }
+
+        p.success-message {
+            color: #155724;
+            font-weight: 600;
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 15px;
+        }
+
+        button,
+        input[type="submit"],
+        .ui-button {
+            padding: 14px 28px !important;
+            background: linear-gradient(135deg, #212529 0%, #000000 100%) !important;
+            color: white !important;
+            border: 2px solid #212529 !important;
+            border-radius: 10px !important;
+            font-size: 1rem !important;
+            font-weight: 600 !important;
+            cursor: pointer !important;
+            transition: all 0.3s ease !important;
+            font-family: inherit !important;
+        }
+
+        button:hover,
+        input[type="submit"]:hover,
+        .ui-button:hover {
+            background: white !important;
+            color: #212529 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        @media (max-width: 768px) {
+            .activation-card {
+                padding: 30px 20px;
+            }
+
+            h1 {
+                font-size: 1.6em;
+            }
+
+            p {
+                font-size: 1em;
+            }
+        }
+    </style>
 </h:head>
 
 <h:body>
-    
     <f:metadata>
         <f:viewParam name="token" value="#{activationController.token}" />
         <f:viewAction action="#{activationController.checkToken}" />
     </f:metadata>
-    
+
     <div class="activation-container">
-    <div class="activation-card">
+        <div class="activation-card">
+            <h1>🔐 Ativação de Conta</h1>
 
-        <h1>Ativação de Conta</h1>
+            <h:form>
+                <h:messages globalOnly="true" styleClass="ui-messages" />
 
-        <h:form>
+                <h:panelGroup rendered="#{activationController.activationAllowed}">
+                    <p>Clique no botão abaixo para ativar sua conta e começar a usar o sistema.</p>
 
-            <!-- Exibe mensagens -->
-            <h:messages globalOnly="true" styleClass="ui-messages" />
+                    <h:commandButton value="✅ Ativar Conta" action="#{activationController.activate}" />
+                </h:panelGroup>
 
-            <!-- Se ativação ainda não foi feita -->
-            <h:panelGroup rendered="#{activationController.activationAllowed}">
-                <p>Clique no botão abaixo para ativar sua conta.</p>
+                <h:panelGroup rendered="#{not activationController.activationAllowed}">
+                    <p class="success-message">
+                        Conta ativada com sucesso! Agora você já pode fazer login.
+                    </p>
 
-                <h:commandButton value="Ativar Conta"
-                                 action="#{activationController.activate}" />
-            </h:panelGroup>
-
-            
-            <h:panelGroup rendered="#{not activationController.activationAllowed}">
-                <p style="color: green; font-weight: bold;">Conta ativada com sucesso! Agora você já pode fazer login.</p>
-
-                <p:commandButton 
-                        value="Ir para o login" 
-                        action="/login?faces-redirect=true"
-                        immediate="true"/>
-            </h:panelGroup>
-
-        </h:form>
-
+                    <p:commandButton value="Ir para o Login →" action="/login?faces-redirect=true" immediate="true" />
+                </h:panelGroup>
+            </h:form>
+        </div>
     </div>
-</div>
-
-
 </h:body>
+
 </html>

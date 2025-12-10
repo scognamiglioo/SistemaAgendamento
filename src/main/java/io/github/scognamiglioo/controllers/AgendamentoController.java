@@ -2,6 +2,7 @@ package io.github.scognamiglioo.controllers;
 
 import io.github.scognamiglioo.entities.*;
 import io.github.scognamiglioo.entities.Localizacao;
+import io.github.scognamiglioo.services.AgendamentoMailServiceLocal;
 import io.github.scognamiglioo.services.AgendamentoServiceLocal;
 import io.github.scognamiglioo.services.DataServiceLocal;
 import io.github.scognamiglioo.services.ServicoServiceLocal;
@@ -43,6 +44,9 @@ public class AgendamentoController implements Serializable {
 
     @EJB
     private DataServiceLocal dataService;
+
+    @EJB
+    private AgendamentoMailServiceLocal agendamentoMailService;
 
     // Seleções do usuário (fluxo do agendamento)
     private Long servicoSelecionadoId;
@@ -203,7 +207,7 @@ public class AgendamentoController implements Serializable {
     }
 
     /**
-     * Salva o novo agendamento
+     * Salva o novo agendamento e envia e-mail de confirmação
      */
     public String salvarAgendamento() {
         try {
@@ -271,7 +275,16 @@ public class AgendamentoController implements Serializable {
                 agendamentoService.updateAgendamento(novoAgendamento);
             }
 
-            addSuccessMessage("Agendamento realizado com sucesso! Funcionário: " + funcionario.getNome());
+            // Envia e-mail de confirmação
+            try {
+                agendamentoMailService.sendConfirmacaoAgendamento(novoAgendamento);
+                LOGGER.log(Level.INFO, "E-mail de confirmação enviado para: {0}", user.getEmail());
+            } catch (Exception mailEx) {
+                LOGGER.log(Level.WARNING, "Agendamento criado mas falha no envio do e-mail", mailEx);
+                addWarnMessage("Agendamento realizado, mas houve erro ao enviar o e-mail de confirmação.");
+            }
+
+            addSuccessMessage("Agendamento realizado com sucesso! Enviamos um e-mail de confirmação para " + user.getEmail());
 
             // Limpa o formulário e recarrega a lista
             resetForm();

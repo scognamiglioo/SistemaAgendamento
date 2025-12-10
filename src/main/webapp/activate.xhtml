@@ -148,7 +148,7 @@
 
     <div class="activation-container">
         <div class="activation-card">
-            <h1>🔐 Ativação de Conta</h1>
+            <h1>Ativação de Conta</h1>
 
             <h:form>
                 <h:messages globalOnly="true" styleClass="ui-messages" />
@@ -156,7 +156,7 @@
                 <h:panelGroup rendered="#{activationController.activationAllowed}">
                     <p>Clique no botão abaixo para ativar sua conta e começar a usar o sistema.</p>
 
-                    <h:commandButton value="✅ Ativar Conta" action="#{activationController.activate}" />
+                    <h:commandButton value="Ativar Conta" action="#{activationController.activate}" />
                 </h:panelGroup>
 
                 <h:panelGroup rendered="#{not activationController.activationAllowed}">

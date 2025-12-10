@@ -440,7 +440,7 @@
                 <h:form>
                     <p:commandButton value="🔄 Atualizar"
                                    action="#{atendimentoController.carregarDados}"
-                                   update="@form mainContent"
+                                   update="mainContent:statsPanel mainContent:contentGrid mainContent:messages"
                                    styleClass="btn btn-refresh"
                                    icon="pi pi-refresh"/>
                     <p:commandButton value="← Voltar"
@@ -451,34 +451,33 @@
             </div>
         </div>
 
-        <!-- Stats -->
-        <h:panelGroup styleClass="stats-container" layout="block">
-            <h:panelGroup styleClass="stat-card" layout="block">
-                <h:panelGroup styleClass="stat-icon waiting" layout="block">
-                    ⏳
-                </h:panelGroup>
-                <h:panelGroup styleClass="stat-content" layout="block">
-                    <h:outputText value="#{atendimentoController.quantidadeFilaEspera}" styleClass="stat-number"/>
-                    <h:outputText value="Na Fila de Espera" styleClass="stat-label"/>
-                </h:panelGroup>
-            </h:panelGroup>
-
-            <h:panelGroup styleClass="stat-card" layout="block">
-                <h:panelGroup styleClass="stat-icon attending" layout="block">
-                    👨‍⚕️
-                </h:panelGroup>
-                <h:panelGroup styleClass="stat-content" layout="block">
-                    <h:outputText value="#{atendimentoController.quantidadeEmAtendimento}" styleClass="stat-number"/>
-                    <h:outputText value="Em Atendimento" styleClass="stat-label"/>
-                </h:panelGroup>
-            </h:panelGroup>
-        </h:panelGroup>
-
         <!-- Main Content -->
         <h:form id="mainContent">
+            <!-- Stats -->
+            <h:panelGroup id="statsPanel" styleClass="stats-container" layout="block">
+                <h:panelGroup styleClass="stat-card" layout="block">
+                    <h:panelGroup styleClass="stat-icon waiting" layout="block">
+                        ⏳
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="stat-content" layout="block">
+                        <h:outputText value="#{atendimentoController.quantidadeFilaEspera}" styleClass="stat-number"/>
+                        <h:outputText value="Na Fila de Espera" styleClass="stat-label"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+
+                <h:panelGroup styleClass="stat-card" layout="block">
+                    <h:panelGroup styleClass="stat-icon attending" layout="block">
+                        👨‍⚕️
+                    </h:panelGroup>
+                    <h:panelGroup styleClass="stat-content" layout="block">
+                        <h:outputText value="#{atendimentoController.quantidadeEmAtendimento}" styleClass="stat-number"/>
+                        <h:outputText value="Em Atendimento" styleClass="stat-label"/>
+                    </h:panelGroup>
+                </h:panelGroup>
+            </h:panelGroup>
             <p:messages id="messages" showDetail="true" closable="true"/>
 
-            <p:outputPanel styleClass="content-grid" layout="block">
+            <p:outputPanel id="contentGrid" styleClass="content-grid" layout="block">
                 <!-- Fila de Espera -->
                 <p:outputPanel styleClass="section-card" layout="block">
                     <p:outputPanel styleClass="section-header waiting" layout="block">
@@ -542,7 +541,7 @@
                                 <div class="queue-item-actions">
                                     <p:commandButton value="✓ Iniciar Atendimento"
                                                    action="#{atendimentoController.iniciarAtendimento(agendamento)}"
-                                                   update="mainContent"
+                                                   update="statsPanel contentGrid messages"
                                                    styleClass="btn btn-success"
                                                    rendered="#{agendamento.funcionario != null}">
                                         <p:confirm header="Confirmação"
@@ -612,7 +611,7 @@
                                 <div class="queue-item-actions">
                                     <p:commandButton value="✓ Finalizar Atendimento"
                                                    action="#{atendimentoController.finalizarAtendimento(agendamento)}"
-                                                   update="mainContent"
+                                                   update="statsPanel contentGrid messages"
                                                    styleClass="btn btn-success">
                                         <p:confirm header="Confirmação"
                                                  message="Deseja finalizar o atendimento de #{agendamento.user.nome}?"
@@ -638,7 +637,7 @@
             if (typeof PrimeFaces !== 'undefined') {
                 PrimeFaces.ab({
                     source: 'mainContent',
-                    update: 'mainContent',
+                    update: 'mainContent:statsPanel mainContent:contentGrid mainContent:messages',
                     process: '@this'
                 });
             }

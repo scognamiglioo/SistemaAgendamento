@@ -436,17 +436,34 @@
                 <h1>🏥 Fila de Atendimentos</h1>
                 <p>Gerenciamento em tempo real dos atendimentos do dia</p>
             </div>
+
+            <!-- Data e Hora Atual -->
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-width: 280px; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); padding: 20px 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);">
+                <div style="font-size: 0.9em; font-weight: 600; color: #718096; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
+                    📅 Data
+                </div>
+                <div style="font-size: 1.8em; font-weight: 700; color: #2d3748; margin-bottom: 15px;">
+                    <span id="currentDate">--/--/----</span>
+                </div>
+                <div style="font-size: 0.9em; font-weight: 600; color: #718096; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px;">
+                    🕐 Hora
+                </div>
+                <div style="font-size: 2.2em; font-weight: 700; color: #667eea; font-variant-numeric: tabular-nums;">
+                    <span id="currentTime">--:--:--</span>
+                </div>
+            </div>
+
             <div class="header-actions">
                 <h:form>
                     <p:commandButton value="🔄 Atualizar"
-                                   action="#{atendimentoController.carregarDados}"
-                                   update=":mainContent:statsPanel :mainContent:contentGrid :mainContent:messages"
-                                   styleClass="btn btn-refresh"
-                                   icon="pi pi-refresh"/>
+                                     action="#{atendimentoController.carregarDados}"
+                                     update=":mainContent"
+                                     styleClass="btn btn-refresh"
+                                     icon="pi pi-refresh"/>
                     <p:commandButton value="← Voltar"
-                                   action="/app/admin.xhtml?faces-redirect=true"
-                                   styleClass="btn btn-primary"
-                                   immediate="true"/>
+                                     action="/app/admin.xhtml?faces-redirect=true"
+                                     styleClass="btn btn-primary"
+                                     immediate="true"/>
                 </h:form>
             </div>
         </div>
@@ -470,7 +487,8 @@
                         👨‍⚕️
                     </h:panelGroup>
                     <h:panelGroup styleClass="stat-content" layout="block">
-                        <h:outputText value="#{atendimentoController.quantidadeEmAtendimento}" styleClass="stat-number"/>
+                        <h:outputText value="#{atendimentoController.quantidadeEmAtendimento}"
+                                      styleClass="stat-number"/>
                         <h:outputText value="Em Atendimento" styleClass="stat-label"/>
                     </h:panelGroup>
                 </h:panelGroup>
@@ -483,7 +501,8 @@
                     <p:outputPanel styleClass="section-header waiting" layout="block">
                         <p:outputPanel styleClass="section-title" layout="block">
                             <h2>⏳ Fila de Espera</h2>
-                            <h:outputText value="#{atendimentoController.quantidadeFilaEspera}" styleClass="section-badge"/>
+                            <h:outputText value="#{atendimentoController.quantidadeFilaEspera}"
+                                          styleClass="section-badge"/>
                         </p:outputPanel>
                     </p:outputPanel>
 
@@ -496,7 +515,8 @@
                             </p:outputPanel>
                         </h:panelGroup>
 
-                        <ui:repeat value="#{atendimentoController.filaEspera}" var="agendamento" xmlns:ui="jakarta.faces.facelets">
+                        <ui:repeat value="#{atendimentoController.filaEspera}" var="agendamento"
+                                   xmlns:ui="jakarta.faces.facelets">
                             <div class="queue-item">
                                 <div class="queue-item-header">
                                     <div class="patient-info">
@@ -522,10 +542,10 @@
                                         <span class="info-label">Profissional</span>
                                         <span class="info-value">
                                             <h:outputText value="#{agendamento.funcionario.nome}"
-                                                        rendered="#{agendamento.funcionario != null}"/>
+                                                          rendered="#{agendamento.funcionario != null}"/>
                                             <h:outputText value="Não atribuído"
-                                                        rendered="#{agendamento.funcionario == null}"
-                                                        style="color: #f59e0b;"/>
+                                                          rendered="#{agendamento.funcionario == null}"
+                                                          style="color: #f59e0b;"/>
                                         </span>
                                     </div>
                                     <div class="info-field">
@@ -534,19 +554,20 @@
                                     </div>
                                     <div class="info-field">
                                         <span class="info-label">Status</span>
-                                        <span class="info-value" style="color: #f59e0b;">#{agendamento.status.descricao}</span>
+                                        <span class="info-value"
+                                              style="color: #f59e0b;">#{agendamento.status.descricao}</span>
                                     </div>
                                 </div>
 
                                 <div class="queue-item-actions">
                                     <p:commandButton value="✓ Iniciar Atendimento"
-                                                   action="#{atendimentoController.iniciarAtendimento(agendamento)}"
-                                                   update=":mainContent:statsPanel :mainContent:contentGrid :mainContent:messages"
-                                                   styleClass="btn btn-success"
-                                                   rendered="#{agendamento.funcionario != null}">
+                                                     action="#{atendimentoController.iniciarAtendimento(agendamento)}"
+                                                     update=":mainContent"
+                                                     styleClass="btn btn-success"
+                                                     rendered="#{agendamento.funcionario != null}">
                                         <p:confirm header="Confirmação"
-                                                 message="Deseja iniciar o atendimento de #{agendamento.user.nome}?"
-                                                 icon="pi pi-exclamation-triangle"/>
+                                                   message="Deseja iniciar o atendimento de #{agendamento.user.nome}?"
+                                                   icon="pi pi-exclamation-triangle"/>
                                     </p:commandButton>
                                 </div>
                             </div>
@@ -559,7 +580,8 @@
                     <p:outputPanel styleClass="section-header attending" layout="block">
                         <p:outputPanel styleClass="section-title" layout="block">
                             <h2>👨‍⚕️ Em Atendimento</h2>
-                            <h:outputText value="#{atendimentoController.quantidadeEmAtendimento}" styleClass="section-badge"/>
+                            <h:outputText value="#{atendimentoController.quantidadeEmAtendimento}"
+                                          styleClass="section-badge"/>
                         </p:outputPanel>
                     </p:outputPanel>
 
@@ -572,11 +594,13 @@
                             </p:outputPanel>
                         </h:panelGroup>
 
-                        <ui:repeat value="#{atendimentoController.emAtendimento}" var="agendamento" xmlns:ui="jakarta.faces.facelets">
+                        <ui:repeat value="#{atendimentoController.emAtendimento}" var="agendamento"
+                                   xmlns:ui="jakarta.faces.facelets">
                             <div class="queue-item" style="border-color: #10b981;">
                                 <div class="queue-item-header">
                                     <div class="patient-info">
-                                        <div class="patient-avatar" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
+                                        <div class="patient-avatar"
+                                             style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
                                             #{agendamento.user.nome.substring(0, 1).toUpperCase()}
                                         </div>
                                         <div class="patient-details">
@@ -604,18 +628,19 @@
                                     </div>
                                     <div class="info-field">
                                         <span class="info-label">Status</span>
-                                        <span class="info-value" style="color: #10b981;">#{agendamento.status.descricao}</span>
+                                        <span class="info-value"
+                                              style="color: #10b981;">#{agendamento.status.descricao}</span>
                                     </div>
                                 </div>
 
                                 <div class="queue-item-actions">
                                     <p:commandButton value="✓ Finalizar Atendimento"
-                                                   action="#{atendimentoController.finalizarAtendimento(agendamento)}"
-                                                   update=":mainContent:statsPanel :mainContent:contentGrid :mainContent:messages"
-                                                   styleClass="btn btn-success">
+                                                     action="#{atendimentoController.finalizarAtendimento(agendamento)}"
+                                                     update=":mainContent"
+                                                     styleClass="btn btn-success">
                                         <p:confirm header="Confirmação"
-                                                 message="Deseja finalizar o atendimento de #{agendamento.user.nome}?"
-                                                 icon="pi pi-check-circle"/>
+                                                   message="Deseja finalizar o atendimento de #{agendamento.user.nome}?"
+                                                   icon="pi pi-check-circle"/>
                                     </p:commandButton>
                                 </div>
                             </div>
@@ -631,17 +656,51 @@
         </h:form>
     </div>
 
-    <script>
+    <script type="text/javascript">
+        //<![CDATA[
+        // Função para atualizar data e hora
+        function updateDateTime() {
+            var now = new Date();
+
+            // Formatar data (DD/MM/YYYY)
+            var day = String(now.getDate()).padStart(2, '0');
+            var month = String(now.getMonth() + 1).padStart(2, '0');
+            var year = now.getFullYear();
+            var dateString = day + '/' + month + '/' + year;
+
+            // Formatar hora (HH:MM:SS)
+            var hours = String(now.getHours()).padStart(2, '0');
+            var minutes = String(now.getMinutes()).padStart(2, '0');
+            var seconds = String(now.getSeconds()).padStart(2, '0');
+            var timeString = hours + ':' + minutes + ':' + seconds;
+
+            // Atualizar elementos
+            var dateElement = document.getElementById('currentDate');
+            var timeElement = document.getElementById('currentTime');
+
+            if (dateElement) dateElement.textContent = dateString;
+            if (timeElement) timeElement.textContent = timeString;
+        }
+
+        // Atualizar imediatamente e a cada segundo
+        updateDateTime();
+        setInterval(updateDateTime, 1000);
+
         // Auto-refresh a cada 30 segundos
-        setInterval(function() {
+        setInterval(function () {
             if (typeof PrimeFaces !== 'undefined') {
-                PrimeFaces.ab({
-                    source: 'mainContent',
-                    update: 'mainContent:statsPanel mainContent:contentGrid mainContent:messages',
-                    process: '@this'
-                });
+                try {
+                    PrimeFaces.ab({
+                        source: 'mainContent',
+                        update: ':mainContent',
+                        process: '@this'
+                    });
+                } catch (e) {
+                    console.debug('Auto-refresh skipped:', e);
+                }
             }
         }, 30000);
+        //]]>
     </script>
 </h:body>
 </html>

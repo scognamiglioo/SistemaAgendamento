@@ -24,19 +24,10 @@
         <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
 
+    <!-- Roles -->
     <security-role>
         <description>System administrator</description>
         <role-name>admin</role-name>
-    </security-role>
-
-    <security-role>
-        <description>Reception staff</description>
-        <role-name>recepcionista</role-name>
-    </security-role>
-
-    <security-role>
-        <description>Attendance staff</description>
-        <role-name>atendente</role-name>
     </security-role>
 
     <security-role>
@@ -45,112 +36,82 @@
     </security-role>
 
     <security-role>
-        <description>Common authenticated user</description>
-        <role-name>funcionario</role-name>
+        <description>atendente / prestador de serviço</description>
+        <role-name>atendente</role-name>
     </security-role>
 
-    <!-- PÁGINAS PÚBLICAS -->
+    <!-- Public pages and static resources (no authentication required) -->
     <security-constraint>
         <web-resource-collection>
-            <web-resource-name>Public Pages</web-resource-name>
+            <web-resource-name>Public Pages and Resources</web-resource-name>
             <url-pattern>/login.xhtml</url-pattern>
             <url-pattern>/activate.xhtml</url-pattern>
+            <url-pattern>/request_reset.xhtml</url-pattern>
+            <url-pattern>/reset_password.xhtml</url-pattern>
             <url-pattern>/app/newlogin.xhtml</url-pattern>
+            <url-pattern>/resources/*</url-pattern>
+            <url-pattern>/javax.faces.resource/*</url-pattern>
         </web-resource-collection>
-
+        <!-- no <auth-constraint> means public access -->
     </security-constraint>
 
-    <!-- ROTAS ESPECÍFICAS PRIMEIRO (mais específicas têm precedência) -->
-
-    <!-- Páginas de Usuário -->
+    <!-- Password management pages: require any authenticated role -->
     <security-constraint>
-        <display-name>User Role</display-name>
+        <display-name>Password Pages (authenticated)</display-name>
         <web-resource-collection>
-            <web-resource-name>User Pages</web-resource-name>
-            <url-pattern>/app/index.xhtml</url-pattern>
-            <url-pattern>/app/meus-agendamentos.xhtml</url-pattern>
-            <url-pattern>/app/reagendar-agendamento.xhtml</url-pattern>
+            <web-resource-name>Password Pages</web-resource-name>
+            <url-pattern>/password/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
             <role-name>user</role-name>
-        </auth-constraint>
-    </security-constraint>
-
-    <!-- Fila de Atendimentos e Gerenciamento de Agendamentos -->
-    <security-constraint>
-        <display-name>Agendamento Management</display-name>
-        <web-resource-collection>
-            <web-resource-name>Agendamento Pages</web-resource-name>
-            <url-pattern>/app/agendamento/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
-            <role-name>admin</role-name>
-            <role-name>recepcionista</role-name>
             <role-name>atendente</role-name>
         </auth-constraint>
     </security-constraint>
 
-    <!-- Páginas Administrativas Gerais -->
+    <!-- Admin-only area: keep administrative pages restricted to admin role -->
     <security-constraint>
-        <display-name>Admin Role</display-name>
+        <display-name>Admin Area</display-name>
         <web-resource-collection>
             <web-resource-name>Admin Pages</web-resource-name>
+            <url-pattern>/app/admin/*</url-pattern>
             <url-pattern>/app/admin.xhtml</url-pattern>
             <url-pattern>/app/cadastrar_funcionario.xhtml</url-pattern>
-            <url-pattern>/app/associacoes_localizacao_funcionario_servico.xhtml</url-pattern>
-            <url-pattern>/app/user-list.xhtml</url-pattern>
-            <url-pattern>/app/edit-user.xhtml</url-pattern>
-            <url-pattern>/app/users.xhtml</url-pattern>
-            <url-pattern>/app/servico/*</url-pattern>
-            <url-pattern>/app/localizacao/*</url-pattern>
+            <url-pattern>/app/edit_user.xhtml</url-pattern>
             <url-pattern>/app/cargo/*</url-pattern>
+            <url-pattern>/app/localizacao/*</url-pattern>
+            <url-pattern>/app/servico/*</url-pattern>
+            <url-pattern>/app/administracao.xhtml</url-pattern>
+            <!-- add other admin-only pages/patterns here if needed -->
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
         </auth-constraint>
     </security-constraint>
 
-    <!-- Demais páginas /app/* - Todas as roles autenticadas -->
+    <!-- atendente-specific pages: allow atendente and admin when needed -->
     <security-constraint>
-        <display-name>General App Pages</display-name>
+        <display-name>atendente Area</display-name>
         <web-resource-collection>
-            <web-resource-name>All App Pages</web-resource-name>
-            <url-pattern>/app/*</url-pattern>
+            <web-resource-name>atendente Pages</web-resource-name>
+            <url-pattern>/app/agendamento/disponibilidade.xhtml</url-pattern>
+            <url-pattern>/app/agendamento/fila_atendimentos.xhtml</url-pattern>
+            <url-pattern>/app/agendamento/gerenciar_agendamentos.xhtml</url-pattern>
+            <url-pattern>/atendente/*</url-pattern>
+            <!-- any other atendente-only endpoints go here -->
         </web-resource-collection>
         <auth-constraint>
-            <role-name>admin</role-name>
-            <role-name>user</role-name>
-            <role-name>recepcionista</role-name>
             <role-name>atendente</role-name>
-            <role-name>funcionario</role-name>
-        </auth-constraint>
-    </security-constraint>
-
-    <!-- Área de Funcionários -->
-    <security-constraint>
-        <display-name>Funcionario Area</display-name>
-        <web-resource-collection>
-            <web-resource-name>Funcionario Pages</web-resource-name>
-            <url-pattern>/funcionario/*</url-pattern>
-        </web-resource-collection>
-        <auth-constraint>
             <role-name>admin</role-name>
-            <role-name>funcionario</role-name>
-
         </auth-constraint>
     </security-constraint>
 
     <session-config>
-        <session-timeout>
-            30
-        </session-timeout>
+        <session-timeout>30</session-timeout>
     </session-config>
 
     <welcome-file-list>
-
         <welcome-file>login.xhtml</welcome-file>
-
     </welcome-file-list>
 
     <error-page>

@@ -443,10 +443,18 @@
                                    update=":mainContent:statsPanel :mainContent:contentGrid :mainContent:messages"
                                    styleClass="btn btn-refresh"
                                    icon="pi pi-refresh"/>
-                    <p:commandButton value="← Voltar"
-                                   action="/app/admin.xhtml?faces-redirect=true"
-                                   styleClass="btn btn-primary"
-                                   immediate="true"/>
+                    <h:panelGroup rendered="#{request.isUserInRole('admin')}">
+                        <p:commandButton value="← Voltar"
+                                       action="/app/agendamento/gerenciar_agendamentos.xhtml?faces-redirect=true"
+                                       styleClass="btn btn-primary"
+                                       immediate="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{request.isUserInRole('atendente') or request.isUserInRole('recepcionista') or request.isUserInRole('funcionario')}">
+                        <p:commandButton value="← Voltar"
+                                       action="/app/agendamento/gerenciar_agendamentos.xhtml?faces-redirect=true"
+                                       styleClass="btn btn-primary"
+                                       immediate="true"/>
+                    </h:panelGroup>
                 </h:form>
             </div>
         </div>
@@ -645,4 +653,3 @@
     </script>
 </h:body>
 </html>
-

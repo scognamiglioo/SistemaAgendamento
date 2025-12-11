@@ -9,11 +9,12 @@
 }
 
 body {
-    background: linear-gradient(135deg, #2c3e50 0%, #1a1a1a 100%);
+    background: #ffffff;
     color: #212529;
     min-height: 100vh;
     display: flex;
     flex-direction: column;
+
 }
 
 /* ============================
@@ -74,6 +75,7 @@ footer p {
     border: 2px solid #e1e5e9;
     text-align: center;
     animation: slideDown 0.5s ease;
+    margin: 0 auto;
 }
 
 @keyframes slideDown {

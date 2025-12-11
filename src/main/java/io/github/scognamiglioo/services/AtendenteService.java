@@ -4,11 +4,8 @@
  */
 package io.github.scognamiglioo.services;
 
-import io.github.scognamiglioo.entities.Agendamento;
-import io.github.scognamiglioo.entities.Atendimento;
 import io.github.scognamiglioo.entities.Funcionario;
 import io.github.scognamiglioo.entities.StatusAtendente;
-import io.github.scognamiglioo.entities.StatusAtendimento;
 import jakarta.ejb.Stateless;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;

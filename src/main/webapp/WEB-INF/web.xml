@@ -7,100 +7,115 @@
         <param-name>jakarta.faces.PROJECT_STAGE</param-name>
         <param-value>Development</param-value>
     </context-param>
-    
+
     <context-param>
         <param-name>jakarta.faces.FACELETS_SKIP_COMMENTS</param-name>
         <param-value>true</param-value>
     </context-param>
-    
+
     <servlet>
         <servlet-name>Faces Servlet</servlet-name>
         <servlet-class>jakarta.faces.webapp.FacesServlet</servlet-class>
         <load-on-startup>1</load-on-startup>
     </servlet>
-    
+
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.xhtml</url-pattern>
     </servlet-mapping>
-    
+
+    <!-- Roles -->
     <security-role>
         <description>System administrator</description>
         <role-name>admin</role-name>
     </security-role>
-    
+
     <security-role>
         <description>Common authenticated user</description>
         <role-name>user</role-name>
     </security-role>
-    
+
     <security-role>
-        <description>Common authenticated user</description>
+        <description>Funcionario / prestador de serviço</description>
         <role-name>funcionario</role-name>
     </security-role>
-    
-    <!-- PÁGINAS PÚBLICAS -->
+
+    <!-- Public pages (no authentication required) -->
     <security-constraint>
         <web-resource-collection>
             <web-resource-name>Public Pages</web-resource-name>
             <url-pattern>/login.xhtml</url-pattern>
             <url-pattern>/activate.xhtml</url-pattern>
-            <url-pattern>/app/newlogin.xhtml</url-pattern> 
+            <url-pattern>/app/newlogin.xhtml</url-pattern>
         </web-resource-collection>
-        
+        <!-- no <auth-constraint> means public access -->
     </security-constraint>
-    
+
+    <!-- Password management pages: require any authenticated role -->
     <security-constraint>
-        <display-name>Admin Role</display-name>
+        <display-name>Password Pages (authenticated)</display-name>
         <web-resource-collection>
-            <web-resource-name>All App Pages</web-resource-name>
-            <url-pattern>/app/*</url-pattern>
+            <web-resource-name>Password Pages</web-resource-name>
             <url-pattern>/password/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>admin</role-name>
+            <role-name>user</role-name>
+            <role-name>funcionario</role-name>
+        </auth-constraint>
+    </security-constraint>
+
+    <!-- Admin-only area: keep administrative pages restricted to admin role -->
+    <security-constraint>
+        <display-name>Admin Area</display-name>
+        <web-resource-collection>
+            <web-resource-name>Admin Pages</web-resource-name>
+            <url-pattern>/app/*</url-pattern>
+
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
         </auth-constraint>
     </security-constraint>
-    
+
+    <!-- App pages for normal authenticated users (and admin). This covers the main app area.
+         If there are pages under /app/ that should be limited to specific roles (e.g. funcionario),
+         add a separate constraint below with a narrower pattern. -->
     <security-constraint>
-        <display-name>User Role</display-name>
+        <display-name>User Area</display-name>
         <web-resource-collection>
             <web-resource-name>User Pages</web-resource-name>
-            <url-pattern>/app/index.xhtml</url-pattern>
-            <url-pattern>/app/meus-agendamentos.xhtml</url-pattern>
-            <url-pattern>/password/*</url-pattern>
+            <url-pattern>/app/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
             <role-name>user</role-name>
         </auth-constraint>
     </security-constraint>
-    
-    <!-- Área Funcionários -->
+
+    <!-- Funcionario-specific pages: allow funcionario and admin when needed -->
     <security-constraint>
+        <display-name>Funcionario Area</display-name>
         <web-resource-collection>
-            <web-resource-name>Funcionario Area</web-resource-name>
+            <web-resource-name>Funcionario Pages</web-resource-name>
             <url-pattern>/funcionario/*</url-pattern>
-            <url-pattern>/password/*</url-pattern>
+            <url-pattern>/app/agendamento/*</url-pattern>
+            <!-- any other funcionario-only endpoints go here -->
         </web-resource-collection>
         <auth-constraint>
             <role-name>funcionario</role-name>
-            
+            <role-name>admin</role-name>
         </auth-constraint>
     </security-constraint>
-    
+
     <session-config>
-        <session-timeout>
-            30
-        </session-timeout>
+        <session-timeout>30</session-timeout>
     </session-config>
-    
+
     <welcome-file-list>
-        
         <welcome-file>login.xhtml</welcome-file>
-        
     </welcome-file-list>
-    
+
     <error-page>
         <error-code>403</error-code>
         <location>/WEB-INF/templates/forbidden.xhtml</location>

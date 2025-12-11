@@ -84,7 +84,7 @@ public class AtendenteController implements Serializable {
             situacaoAtual = nova;
 
             FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage("Situação atualizada para: " + nova));
+                new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Situação atualizada para: " + nova));
 
             if (nova != Situacao.PAUSA) motivoPausa = null;
 

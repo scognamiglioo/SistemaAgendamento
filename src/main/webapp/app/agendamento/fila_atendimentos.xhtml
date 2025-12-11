@@ -456,14 +456,22 @@
             <div class="header-actions">
                 <h:form>
                     <p:commandButton value="🔄 Atualizar"
-                                     action="#{atendimentoController.carregarDados}"
-                                     update=":mainContent"
-                                     styleClass="btn btn-refresh"
-                                     icon="pi pi-refresh"/>
-                    <p:commandButton value="← Voltar"
-                                     action="/app/admin.xhtml?faces-redirect=true"
-                                     styleClass="btn btn-primary"
-                                     immediate="true"/>
+                                   action="#{atendimentoController.carregarDados}"
+                                   update=":mainContent:statsPanel :mainContent:contentGrid :mainContent:messages"
+                                   styleClass="btn btn-refresh"
+                                   icon="pi pi-refresh"/>
+                    <h:panelGroup rendered="#{request.isUserInRole('admin')}">
+                        <p:commandButton value="← Voltar"
+                                       action="/app/agendamento/gerenciar_agendamentos.xhtml?faces-redirect=true"
+                                       styleClass="btn btn-primary"
+                                       immediate="true"/>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{request.isUserInRole('atendente') or request.isUserInRole('recepcionista') or request.isUserInRole('funcionario')}">
+                        <p:commandButton value="← Voltar"
+                                       action="/app/agendamento/gerenciar_agendamentos.xhtml?faces-redirect=true"
+                                       styleClass="btn btn-primary"
+                                       immediate="true"/>
+                    </h:panelGroup>
                 </h:form>
             </div>
         </div>
@@ -487,8 +495,7 @@
                         👨‍⚕️
                     </h:panelGroup>
                     <h:panelGroup styleClass="stat-content" layout="block">
-                        <h:outputText value="#{atendimentoController.quantidadeEmAtendimento}"
-                                      styleClass="stat-number"/>
+                        <h:outputText value="#{atendimentoController.quantidadeEmAtendimento}" styleClass="stat-number"/>
                         <h:outputText value="Em Atendimento" styleClass="stat-label"/>
                     </h:panelGroup>
                 </h:panelGroup>
@@ -501,8 +508,7 @@
                     <p:outputPanel styleClass="section-header waiting" layout="block">
                         <p:outputPanel styleClass="section-title" layout="block">
                             <h2>⏳ Fila de Espera</h2>
-                            <h:outputText value="#{atendimentoController.quantidadeFilaEspera}"
-                                          styleClass="section-badge"/>
+                            <h:outputText value="#{atendimentoController.quantidadeFilaEspera}" styleClass="section-badge"/>
                         </p:outputPanel>
                     </p:outputPanel>
 
@@ -515,8 +521,7 @@
                             </p:outputPanel>
                         </h:panelGroup>
 
-                        <ui:repeat value="#{atendimentoController.filaEspera}" var="agendamento"
-                                   xmlns:ui="jakarta.faces.facelets">
+                        <ui:repeat value="#{atendimentoController.filaEspera}" var="agendamento" xmlns:ui="jakarta.faces.facelets">
                             <div class="queue-item">
                                 <div class="queue-item-header">
                                     <div class="patient-info">
@@ -542,10 +547,10 @@
                                         <span class="info-label">Profissional</span>
                                         <span class="info-value">
                                             <h:outputText value="#{agendamento.funcionario.nome}"
-                                                          rendered="#{agendamento.funcionario != null}"/>
+                                                        rendered="#{agendamento.funcionario != null}"/>
                                             <h:outputText value="Não atribuído"
-                                                          rendered="#{agendamento.funcionario == null}"
-                                                          style="color: #f59e0b;"/>
+                                                        rendered="#{agendamento.funcionario == null}"
+                                                        style="color: #f59e0b;"/>
                                         </span>
                                     </div>
                                     <div class="info-field">
@@ -704,4 +709,3 @@
     </script>
 </h:body>
 </html>
-

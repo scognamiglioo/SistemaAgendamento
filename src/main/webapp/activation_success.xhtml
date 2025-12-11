@@ -4,25 +4,23 @@
 
 <h:head>
     <title>Conta ativada</title>
-    <h:outputStylesheet name="css/admin.css"/>
+     <h:outputStylesheet library="css" name="auth-pages.css"/>
 </h:head>
 
 <h:body>
-    <div style="max-width: 500px; margin: 4rem auto; padding: 2rem;
-                border: 1px solid #ccc; border-radius: 8px;">
+    <div class="success-container">
+        <div class="success-icon">✅</div>
+        
+        <h1>Conta Ativada!</h1>
 
-        <h1>Conta ativada!</h1>
-
-        <p style="color: green; font-size: 18px;">
-            Sua conta foi ativada com sucesso. Agora você já pode fazer login.
+        <p>
+            Sua conta foi ativada com sucesso. Agora você já pode fazer login e aproveitar todos os recursos do sistema.
         </p>
 
         <h:form>
-            <h:commandButton value="Ir para login"
-                             action="/login?faces-redirect=true"
-                             style="padding: 10px 16px;" />
+            <h:commandButton value="Ir para Login →"
+                             action="/login?faces-redirect=true" />
         </h:form>
-
     </div>
 </h:body>
 

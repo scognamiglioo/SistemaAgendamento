@@ -32,8 +32,23 @@
 <h:body>
     <h:form id="formAtendente">
         <div class="page-header">
-            <h1><i class="pi pi-user" style="color:#667eea; font-size:1.3em;"></i>Disponibilidade do Atendente</h1>
-            <p>Gerencie seu status em tempo real</p>
+            <div>
+                <h1><i class="pi pi-user" style="color:#667eea; font-size:1.3em;"></i>Disponibilidade do Atendente</h1>
+                <p>Gerencie seu status em tempo real</p>
+            </div>
+            <h:panelGroup rendered="#{request.isUserInRole('admin')}">
+                <p:commandButton value="Voltar"
+                                 action="/app/admin.xhtml?faces-redirect=true"
+                                 styleClass="ui-button-secondary"
+                                 icon="pi pi-arrow-left"/>
+            </h:panelGroup>
+            
+            <h:panelGroup rendered="#{request.isUserInRole('atendente') or request.isUserInRole('recepcionista') or request.isUserInRole('funcionario')}">
+                <p:commandButton value="Voltar"
+                                 action="/app/agendamento/gerenciar_agendamentos.xhtml?faces-redirect=true"
+                                 styleClass="ui-button-secondary"
+                                 icon="pi pi-arrow-left"/>
+            </h:panelGroup>
         </div>
 
         <p:messages id="messages" closable="true" showDetail="true"/>

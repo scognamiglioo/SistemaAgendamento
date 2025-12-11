@@ -32,7 +32,7 @@
             background: white;
             padding: 30px;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
@@ -55,7 +55,7 @@
         .main-card {
             background: white;
             border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
             overflow: hidden;
         }
 
@@ -158,7 +158,7 @@
         .ui-dialog {
             border-radius: 15px !important;
             overflow: hidden !important;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3) !important;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3) !important;
             max-height: 90vh !important;
         }
 
@@ -186,7 +186,7 @@
             padding: 20px;
             border-radius: 10px;
             border-left: 4px solid #667eea;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
         }
 
         .dialog-field label {
@@ -224,7 +224,7 @@
 
         .ui-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
         }
 
         .btn-filtrar {
@@ -245,20 +245,31 @@
             background: white;
             padding: 20px;
             border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             border-left: 4px solid;
             transition: all 0.3s ease;
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
 
-        .stat-card.total { border-left-color: #667eea; }
-        .stat-card.hoje { border-left-color: #38ef7d; }
-        .stat-card.pendentes { border-left-color: #f5576c; }
-        .stat-card.concluidos { border-left-color: #00f2fe; }
+        .stat-card.total {
+            border-left-color: #667eea;
+        }
+
+        .stat-card.hoje {
+            border-left-color: #38ef7d;
+        }
+
+        .stat-card.pendentes {
+            border-left-color: #f5576c;
+        }
+
+        .stat-card.concluidos {
+            border-left-color: #00f2fe;
+        }
 
         .stat-card .stat-number {
             font-size: 2em;
@@ -314,10 +325,19 @@
                 <p>Sistema completo de gestão de agendamentos</p>
             </div>
             <h:form>
-                <p:commandButton value="Voltar"
-                                 action="/app/admin?faces-redirect=true"
-                                 styleClass="ui-button-secondary"
-                                 icon="pi pi-arrow-left"/>
+                <h:panelGroup rendered="#{request.isUserInRole('admin')}">
+                    <p:commandButton value="Voltar"
+                                     action="/app/admin?faces-redirect=true"
+                                     styleClass="ui-button-secondary"
+                                     icon="pi pi-arrow-left"/>
+                </h:panelGroup>
+                
+                <h:panelGroup rendered="#{request.isUserInRole('atendente') or request.isUserInRole('recepcionista')}">
+                    <p:commandButton value="Sair"
+                                     action="#{gerenciarAgendamentosController.logout}"
+                                     styleClass="ui-button-secondary"
+                                     icon="pi pi-sign-out"/>
+                </h:panelGroup>
             </h:form>
         </div>
 
@@ -352,15 +372,15 @@
                         <div class="filter-field">
                             <label><i class="pi pi-hashtag"></i> ID do Agendamento</label>
                             <p:inputText value="#{gerenciarAgendamentosController.filtroId}"
-                                        placeholder="Ex: 1"
-                                        style="width: 100%;"/>
+                                         placeholder="Ex: 1"
+                                         style="width: 100%;"/>
                         </div>
 
                         <div class="filter-field">
                             <label><i class="pi pi-user"></i> Nome do Paciente</label>
                             <p:inputText value="#{gerenciarAgendamentosController.filtroUsuario}"
-                                        placeholder="Digite o nome do paciente..."
-                                        style="width: 100%;"/>
+                                         placeholder="Digite o nome do paciente..."
+                                         style="width: 100%;"/>
                         </div>
 
                         <div class="filter-field">
@@ -448,9 +468,10 @@
                         <h:outputText value="#{agendamento.nomeFuncionario}"/>
                     </p:column>
 
-                    <p:column headerText="Local" style="width: 120px;">
-                        <i class="pi pi-building" style="color: #00f2fe; margin-right: 8px;"></i>
-                        <h:outputText value="#{agendamento.nomeGuiche}"/>
+                    <p:column headerText="Local do Atendimento" style="width: 180px;">
+                        <i class="pi pi-map-marker" style="color: #00f2fe; margin-right: 8px;"></i>
+                        <h:outputText value="#{gerenciarAgendamentosController.getNomeLocalizacao(agendamento.id)}"
+                                      style="font-weight: 500; color: #2196F3;"/>
                     </p:column>
 
                     <p:column headerText="Status" style="width: 160px; text-align: center;">
@@ -479,7 +500,8 @@
                                 <i class="pi pi-times-circle"></i> #{agendamento.status.descricao}
                             </span>
                         </h:panelGroup>
-                        <h:panelGroup rendered="#{agendamento.status.name() == 'NAO_COMPARECEU' or agendamento.status.name() == 'AUSENTE'}">
+                        <h:panelGroup
+                                rendered="#{agendamento.status.name() == 'NAO_COMPARECEU' or agendamento.status.name() == 'AUSENTE'}">
                             <span class="status-badge status-nao-compareceu">
                                 <i class="pi pi-ban"></i> Ausente
                             </span>
@@ -533,7 +555,8 @@
                         <div class="dialog-field">
                             <label><i class="pi pi-user icon"></i> Paciente</label>
                             <div class="value">
-                                <h:outputText value="#{gerenciarAgendamentosController.agendamentoSelecionado.nomeUsuario}"/>
+                                <h:outputText
+                                        value="#{gerenciarAgendamentosController.agendamentoSelecionado.nomeUsuario}"/>
                             </div>
                         </div>
 
@@ -541,7 +564,8 @@
                         <div class="dialog-field">
                             <label><i class="pi pi-briefcase icon"></i> Serviço</label>
                             <div class="value">
-                                <h:outputText value="#{gerenciarAgendamentosController.agendamentoSelecionado.nomeServico}"/>
+                                <h:outputText
+                                        value="#{gerenciarAgendamentosController.agendamentoSelecionado.nomeServico}"/>
                             </div>
                         </div>
 
@@ -550,13 +574,15 @@
                             <div class="dialog-field">
                                 <label><i class="pi pi-calendar icon"></i> Data</label>
                                 <div class="value">
-                                    <h:outputText value="#{gerenciarAgendamentosController.agendamentoSelecionado.dataFormatada}"/>
+                                    <h:outputText
+                                            value="#{gerenciarAgendamentosController.agendamentoSelecionado.dataFormatada}"/>
                                 </div>
                             </div>
                             <div class="dialog-field">
                                 <label><i class="pi pi-clock icon"></i> Horário</label>
                                 <div class="value">
-                                    <h:outputText value="#{gerenciarAgendamentosController.agendamentoSelecionado.horaFormatada}"/>
+                                    <h:outputText
+                                            value="#{gerenciarAgendamentosController.agendamentoSelecionado.horaFormatada}"/>
                                 </div>
                             </div>
                         </div>
@@ -574,17 +600,6 @@
                             </p:selectOneMenu>
                         </div>
 
-                        <div class="dialog-field">
-                            <label><i class="pi pi-building icon"></i> Local de Atendimento</label>
-                            <p:selectOneMenu value="#{gerenciarAgendamentosController.guicheSelecionadoId}"
-                                             style="width: 100%;">
-                                <f:selectItem itemLabel="Selecione o guichê..." itemValue="#{null}"/>
-                                <f:selectItems value="#{gerenciarAgendamentosController.guichesDisponiveis}"
-                                               var="guiche"
-                                               itemLabel="#{guiche.nome}"
-                                               itemValue="#{guiche.id}"/>
-                            </p:selectOneMenu>
-                        </div>
 
                         <div class="dialog-field">
                             <label><i class="pi pi-info-circle icon"></i> Status do Atendimento</label>
@@ -601,10 +616,11 @@
 
                         <div class="dialog-field">
                             <label><i class="pi pi-comment icon"></i> Observações</label>
-                            <p:inputTextarea value="#{gerenciarAgendamentosController.agendamentoSelecionado.observacoes}"
-                                             rows="4"
-                                             placeholder="Adicione observações sobre o atendimento..."
-                                             style="width: 100%;"/>
+                            <p:inputTextarea
+                                    value="#{gerenciarAgendamentosController.agendamentoSelecionado.observacoes}"
+                                    rows="4"
+                                    placeholder="Adicione observações sobre o atendimento..."
+                                    style="width: 100%;"/>
                         </div>
                     </div>
                 </h:panelGroup>

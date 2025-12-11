@@ -2,7 +2,6 @@ package io.github.scognamiglioo.services;
 
 import io.github.scognamiglioo.entities.Cargo;
 import io.github.scognamiglioo.entities.Funcionario;
-import io.github.scognamiglioo.entities.Guiche;
 import io.github.scognamiglioo.entities.Role;
 import io.github.scognamiglioo.entities.User;
 import jakarta.ejb.LocalBean;
@@ -21,12 +20,7 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.security.enterprise.identitystore.Pbkdf2PasswordHash;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.UUID;
-import io.github.scognamiglioo.entities.Servico;
-
-import java.util.List;
 
 @Stateless
 @LocalBean
@@ -358,19 +352,9 @@ public class DataService
 
     // ----------------------------------FUNCIONARIO CADASTRO--------------------------------------------
     @Override
-    public List<Guiche> listGuiches() {
-        return em.createQuery("SELECT g FROM Guiche g ORDER BY g.nome", Guiche.class).getResultList();
-    }
-
-    @Override
-    public Guiche findGuicheById(Long id) {
-        return em.find(Guiche.class, id);
-    }
-
-    @Override
     public Funcionario createFuncionario(String nome, String cpf, String email, String telefone,
             String username, String password, Role role,
-            Long guicheId, Long cargoId, boolean ativo,
+            Long cargoId, boolean ativo,
             List<Long> servicosIds) {
 
         if (cpf == null || cpf.isBlank()) {
@@ -398,30 +382,18 @@ public class DataService
         user.setActive(true);
         em.persist(user);
 
-        Guiche guiche = (guicheId != null) ? findGuicheById(guicheId) : null;
         Cargo cargo = (cargoId != null) ? em.find(Cargo.class, cargoId) : null;
 
-        List<Servico> servicos = new ArrayList<>();
-        if (servicosIds != null && !servicosIds.isEmpty()) {
-            servicos = em.createQuery("SELECT s FROM Servico s WHERE s.id IN :ids", Servico.class)
-                    .setParameter("ids", servicosIds)
-                    .getResultList();
-        }
-
         Funcionario funcionario = new Funcionario(
-                user, role, guiche, cargo, ativo
+                user, role, cargo, ativo
         );
 
-        funcionario.setServicos(servicos);
-
         em.persist(funcionario);
+        em.flush(); // Garante que o ID seja gerado
 
-        // garantir associação bidirecional
-        for (Servico s : servicos) {
-            if (!s.getFuncionarios().contains(funcionario)) {
-                s.getFuncionarios().add(funcionario);
-            }
-        }
+        // Nota: As associações FuncionarioServico devem ser criadas separadamente
+        // através do gerenciamento de associações, pois requerem Localização.
+        // servicosIds aqui será ignorado - use o sistema de gerenciamento de associações.
 
         return funcionario;
     }
@@ -451,15 +423,6 @@ public class DataService
     @Override
     public List<Funcionario> listEmployees() {
         return em.createNamedQuery("Funcionario.all", Funcionario.class).getResultList();
-
-    }
-
-    @Override
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
-    public Guiche createGuiche(String nome) {
-        Guiche g = new Guiche(nome);
-        em.persist(g);
-        return g;
     }
 
     // ----------------------------------UPDATE FUNCIONARIO E USERS--------------------------------------------

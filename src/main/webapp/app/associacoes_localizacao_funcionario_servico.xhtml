@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:ui="jakarta.faces.facelets"
+      xmlns:p="primefaces">
+
+    <h:head>
+        <title>Gerenciar Associações Funcionário-Serviço-Localização</title>
+        <h:outputStylesheet library="css" name="admin.css"/>
+        <h:outputStylesheet library="css" name="localizacoes.css"/>
+        
+        <!-- Scripts -->
+        <h:outputScript name="js/floating-messages.js" />
+        <h:outputScript name="js/form-success-monitor.js" />
+        
+        <script type="text/javascript">
+        //<![CDATA[
+            // Função helper para monitorar mensagens após AJAX
+            function monitorarMensagens(data) {
+                if (data.status === 'success' && window.FormSuccessMonitor) {
+                    setTimeout(function() {
+                        window.FormSuccessMonitor.monitor();
+                    }, 100);
+                }
+            }
+            
+            // Monitora eventos AJAX do JSF para exibir mensagens
+            if (typeof jsf !== 'undefined') {
+                jsf.ajax.addOnEvent(function(data) {
+                    monitorarMensagens(data);
+                });
+            }
+            
+            // Monitora ao carregar a página
+            document.addEventListener('DOMContentLoaded', function() {
+                if (window.FormSuccessMonitor) {
+                    window.FormSuccessMonitor.monitor();
+                }
+            });
+        //]]>
+        </script>
+    </h:head>
+
+    <h:body>
+        <div class="localizacoes-container">
+            <!-- Header -->
+            <div class="localizacoes-header">
+                <h1>Associações Funcionário-Serviço-Localização</h1>
+                <div class="localizacoes-actions">
+                    <h:form id="navForm">
+                        <h:commandButton value="Voltar às Localizações" 
+                                         action="/app/localizacao/gerenciar_localizacoes.xhtml?faces-redirect=true"
+                                         styleClass="btn btn-secondary"
+                                         immediate="true" />
+                        <h:commandButton value="Voltar ao Painel" 
+                                         action="/app/admin.xhtml?faces-redirect=true"
+                                         styleClass="btn btn-secondary"
+                                         immediate="true" />
+                    </h:form>
+                </div>
+            </div>
+
+            <h:form id="associacoesForm">
+                <!-- Campos hidden para capturar mensagens -->
+                <h:inputHidden id="hiddenLastMessage" value="#{funcionarioServicoController.lastMessage}" />
+                <h:inputHidden id="hiddenMessageType" value="#{funcionarioServicoController.messageType}" />
+
+                <!-- Nova Associação -->
+                <div class="localizacoes-filters">
+                    <h3>Nova Associação</h3>
+                    <div class="filter-row">
+                        <div class="filter-group">
+                            <h:outputLabel value="Funcionário:" />
+                            <p:selectOneMenu value="#{funcionarioServicoController.selectedFuncionarioId}" 
+                                             styleClass="form-control"
+                                             required="true">
+                                <f:selectItem itemLabel="Selecione o funcionário" itemValue="" />
+                                <f:selectItems value="#{funcionarioServicoController.funcionarios}" 
+                                              var="func" 
+                                              itemLabel="#{func.nome}" 
+                                              itemValue="#{func.id}" />
+                            </p:selectOneMenu>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <h:outputLabel value="Serviço:" />
+                            <p:selectOneMenu value="#{funcionarioServicoController.selectedServicoId}" 
+                                             styleClass="form-control"
+                                             required="true">
+                                <f:selectItem itemLabel="Selecione o serviço" itemValue="" />
+                                <f:selectItems value="#{funcionarioServicoController.servicos}" 
+                                              var="serv" 
+                                              itemLabel="#{serv.nome}" 
+                                              itemValue="#{serv.id}" />
+                            </p:selectOneMenu>
+                        </div>
+                        
+                        <div class="filter-group">
+                            <h:outputLabel value="Localização:" />
+                            <p:selectOneMenu value="#{funcionarioServicoController.selectedLocalizacaoId}" 
+                                             styleClass="form-control"
+                                             required="true">
+                                <f:selectItem itemLabel="Selecione a localização" itemValue="" />
+                                <f:selectItems value="#{funcionarioServicoController.localizacoes}" 
+                                              var="loc" 
+                                              itemLabel="#{loc.nome}" 
+                                              itemValue="#{loc.id}" />
+                            </p:selectOneMenu>
+                        </div>
+                        
+                        <div class="filter-actions">
+                            <h:commandButton value="Adicionar Associação"
+                                             action="#{funcionarioServicoController.createAssociacao}"
+                                             styleClass="btn btn-primary">
+                                <f:ajax execute="@form" 
+                                        render=":associacoesForm:associacoes-panel :associacoesForm:hiddenLastMessage :associacoesForm:hiddenMessageType" 
+                                        onevent="monitorarMensagens" />
+                            </h:commandButton>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lista de Associações -->
+                <h:panelGroup id="associacoes-panel">
+                    <ui:include src="localizacao/fragments/lista_associacoes.xhtml" />
+                </h:panelGroup>
+
+            </h:form>
+        </div>
+
+        <!-- Container para mensagens flutuantes -->
+        <div id="floating-message-container"></div>
+    </h:body>
+</html>

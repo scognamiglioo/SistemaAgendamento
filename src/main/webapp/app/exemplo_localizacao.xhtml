@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Exemplo - Exibir Localização do Agendamento</title>
+</h:head>
+
+<h:body>
+    <h:form id="formExemplo">
+        <p:messages id="messages" showDetail="true" closable="true" />
+
+        <div style="padding: 20px;">
+            <h2>Exemplos de Uso: Buscar Localização do Agendamento</h2>
+
+            <!-- EXEMPLO 1: Tabela com coluna de localização -->
+            <h3>Exemplo 1: Lista de Agendamentos com Localização</h3>
+            <p:dataTable id="tabelaAgendamentos"
+                         value="#{agendamentoController.agendamentosFiltrados}"
+                         var="agendamento"
+                         paginator="true"
+                         rows="10"
+                         emptyMessage="Nenhum agendamento encontrado">
+
+                <p:column headerText="ID" sortBy="#{agendamento.id}">
+                    <h:outputText value="#{agendamento.id}" />
+                </p:column>
+
+                <p:column headerText="Paciente" sortBy="#{agendamento.user.nome}">
+                    <h:outputText value="#{agendamento.user.nome}" />
+                </p:column>
+
+                <p:column headerText="Serviço" sortBy="#{agendamento.servico.nome}">
+                    <h:outputText value="#{agendamento.servico.nome}" />
+                </p:column>
+
+                <p:column headerText="Funcionário" sortBy="#{agendamento.funcionario.user.nome}">
+                    <h:outputText value="#{agendamento.funcionario.user.nome}"
+                                  rendered="#{agendamento.funcionario != null}" />
+                    <h:outputText value="Não atribuído"
+                                  style="color: #999;"
+                                  rendered="#{agendamento.funcionario == null}" />
+                </p:column>
+
+                <!-- COLUNA COM LOCALIZAÇÃO - USANDO O MÉTODO DO CONTROLLER -->
+                <p:column headerText="Local do Atendimento">
+                    <h:outputText value="#{agendamentoController.getNomeLocalizacao(agendamento.id)}"
+                                  style="font-weight: bold; color: #2196F3;" />
+                </p:column>
+
+                <p:column headerText="Data/Hora">
+                    <h:outputText value="#{agendamento.dataFormatada}" />
+                    <br/>
+                    <h:outputText value="#{agendamento.horaFormatada}" />
+                </p:column>
+
+                <p:column headerText="Status">
+                    <h:outputText value="#{agendamento.status}" />
+                </p:column>
+
+                <p:column headerText="Ações">
+                    <!-- Botão para exibir mensagem com a localização -->
+                    <p:commandButton value="Ver Local"
+                                     icon="pi pi-map-marker"
+                                     action="#{agendamentoController.exibirLocalizacaoDoAgendamento(agendamento.id)}"
+                                     update="messages"
+                                     styleClass="ui-button-info"
+                                     style="margin-right: 5px;" />
+                </p:column>
+            </p:dataTable>
+
+            <p:divider />
+
+            <!-- EXEMPLO 2: Card individual com detalhes -->
+            <h3>Exemplo 2: Card de Detalhes do Agendamento</h3>
+            <p:panel header="Informações do Agendamento" style="margin-top: 20px;">
+                <h:panelGrid columns="2" cellpadding="10" style="width: 100%;">
+                    <h:outputText value="ID do Agendamento:" style="font-weight: bold;" />
+                    <h:outputText value="#{agendamentoController.agendamentoSelecionado.id}" />
+
+                    <h:outputText value="Paciente:" style="font-weight: bold;" />
+                    <h:outputText value="#{agendamentoController.agendamentoSelecionado.user.nome}" />
+
+                    <h:outputText value="Serviço:" style="font-weight: bold;" />
+                    <h:outputText value="#{agendamentoController.agendamentoSelecionado.servico.nome}" />
+
+                    <h:outputText value="Funcionário:" style="font-weight: bold;" />
+                    <h:outputText value="#{agendamentoController.agendamentoSelecionado.funcionario.user.nome}" />
+
+                    <!-- LOCALIZAÇÃO USANDO O JOIN -->
+                    <h:outputText value="Local do Atendimento:"
+                                  style="font-weight: bold; color: #2196F3;" />
+                    <h:outputText value="#{agendamentoController.getNomeLocalizacao(agendamentoController.agendamentoSelecionado.id)}"
+                                  style="font-size: 1.2em; color: #2196F3;" />
+
+                    <h:outputText value="Data:" style="font-weight: bold;" />
+                    <h:outputText value="#{agendamentoController.agendamentoSelecionado.dataFormatada}" />
+
+                    <h:outputText value="Horário:" style="font-weight: bold;" />
+                    <h:outputText value="#{agendamentoController.agendamentoSelecionado.horaFormatada}" />
+
+                    <h:outputText value="Status:" style="font-weight: bold;" />
+                    <h:outputText value="#{agendamentoController.agendamentoSelecionado.status}" />
+                </h:panelGrid>
+            </p:panel>
+
+            <p:divider />
+
+            <!-- EXEMPLO 3: Teste rápido -->
+            <h3>Exemplo 3: Teste Rápido - Digite um ID</h3>
+            <p:panel header="Testar Busca de Localização" style="margin-top: 20px;">
+                <h:panelGrid columns="3" cellpadding="10">
+                    <h:outputText value="ID do Agendamento:" />
+                    <p:inputText id="idTeste"
+                                 value="#{agendamentoController.agendamentoIdTeste}"
+                                 placeholder="Ex: 1" />
+                    <p:commandButton value="Buscar Localização"
+                                     icon="pi pi-search"
+                                     action="#{agendamentoController.exibirLocalizacaoDoAgendamento(agendamentoController.agendamentoIdTeste)}"
+                                     update="messages"
+                                     styleClass="ui-button-success" />
+                </h:panelGrid>
+            </p:panel>
+
+            <p:divider />
+
+            <!-- EXEMPLO 4: Grid/Card Layout -->
+            <h3>Exemplo 4: Layout de Cards</h3>
+            <p:dataView value="#{agendamentoController.agendamentosFiltrados}"
+                        var="agendamento"
+                        layout="grid"
+                        gridIcon="pi pi-th-large"
+                        listIcon="pi pi-bars">
+
+                <p:dataViewGridItem>
+                    <div class="card" style="padding: 20px; margin: 10px; border: 1px solid #ddd; border-radius: 8px;">
+                        <h4>#{agendamento.servico.nome}</h4>
+                        <p><strong>Paciente:</strong> #{agendamento.user.nome}</p>
+                        <p><strong>Funcionário:</strong> #{agendamento.funcionario.user.nome}</p>
+
+                        <!-- LOCALIZAÇÃO EM DESTAQUE -->
+                        <div style="background: #e3f2fd; padding: 10px; border-radius: 5px; margin: 10px 0;">
+                            <i class="pi pi-map-marker" style="color: #2196F3;"></i>
+                            <strong style="color: #2196F3;">Local:</strong>
+                            <span style="font-size: 1.1em; color: #1976D2;">
+                                #{agendamentoController.getNomeLocalizacao(agendamento.id)}
+                            </span>
+                        </div>
+
+                        <p><strong>Data:</strong> #{agendamento.dataFormatada} às #{agendamento.horaFormatada}</p>
+                        <p><strong>Status:</strong>
+                            <span class="badge badge-#{agendamento.status}">#{agendamento.status}</span>
+                        </p>
+
+                        <p:commandButton value="Ver Detalhes"
+                                         icon="pi pi-eye"
+                                         action="#{agendamentoController.selecionarAgendamento(agendamento)}"
+                                         styleClass="ui-button-outlined" />
+                    </div>
+                </p:dataViewGridItem>
+            </p:dataView>
+
+            <p:divider />
+
+            <!-- Informações técnicas -->
+            <p:panel header="ℹ️ Informações Técnicas" toggleable="true" collapsed="true" style="margin-top: 20px;">
+                <h4>Como funciona?</h4>
+                <ul>
+                    <li>O método <code>getNomeLocalizacao(agendamentoId)</code> faz um JOIN entre as tabelas:
+                        <ul>
+                            <li><strong>Agendamento</strong> (tem funcionário + serviço)</li>
+                            <li><strong>FuncionarioServico</strong> (relaciona funcionário + serviço + localização)</li>
+                            <li><strong>Localizacao</strong> (tem o nome do local)</li>
+                        </ul>
+                    </li>
+                    <li>A query JPQL executada é:
+                        <pre>SELECT fs.localizacao FROM Agendamento a
+JOIN FuncionarioServico fs
+  ON fs.funcionario.id = a.funcionario.id
+  AND fs.servico.id = a.servico.id
+WHERE a.id = :agendamentoId</pre>
+                    </li>
+                    <li>O resultado é o nome da localização onde o funcionário presta aquele serviço específico.</li>
+                </ul>
+
+                <h4>Arquivos modificados:</h4>
+                <ul>
+                    <li><code>AgendamentoService.java</code> - Método <code>buscarLocalizacaoDoAgendamento()</code></li>
+                    <li><code>AgendamentoController.java</code> - Métodos <code>exibirLocalizacaoDoAgendamento()</code> e <code>getNomeLocalizacao()</code></li>
+                    <li><code>Agendamento.java</code> - NamedQuery <code>Agendamento.findLocalizacaoServicoPrestado</code></li>
+                </ul>
+
+                <h4>Para mais informações:</h4>
+                <p>Consulte os arquivos:</p>
+                <ul>
+                    <li><code>RESUMO_JOINS.md</code> - Resumo rápido</li>
+                    <li><code>GUIA_JOINS_JAKARTA.md</code> - Guia completo e detalhado</li>
+                </ul>
+            </p:panel>
+        </div>
+    </h:form>
+</h:body>
+</html>
+

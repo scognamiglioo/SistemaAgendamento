@@ -1,59 +1,194 @@
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:h="jakarta.faces.html">
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui">
 
 <h:head>
-    <title>Painel do Administrador</title>
+    <title>Painel Administrativo</title>
     <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <h:outputStylesheet library="css" name="admin.css"/>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap"/>
 </h:head>
 
 <h:body>
-    <div class="admin-container">
-        <div class="admin-card">
-            <h1>Painel do Administrador</h1>
-            
-
-            <div class="button-group">
-
-                <h:form>
-                    <p:commandButton value="Gerenciar Agendamentos"
-                                     action="/app/agendamento/gerenciar_agendamentos?faces-redirect=true"
-                                     styleClass="admin-button"/>
-
-                    <p:commandButton value="Atendimentos"
-                                     action="/funcionario/atendimentos?faces-redirect=true"
-                                     styleClass="admin-button"/>
-
-                    
-                    <p:commandButton value="Gerenciar Funcionário"
-                                     action="/app/cadastrar_funcionario?faces-redirect=true"
-                                     styleClass="admin-button"/>
-                    
-                    <p:commandButton value="Gerenciar Serviços"
-                                     action="/app/servico/gerenciar_servicos?faces-redirect=true"
-                                     styleClass="admin-button"/>
-                    
-                    <p:commandButton value="Gerenciar Cargos"
-                                     action="/app/cargo/gerenciar_cargos?faces-redirect=true"
-                                     styleClass="admin-button"/>
-                    
-                    <p:commandButton value="Editar Perfil"
-                                     action="/app/user-list?faces-redirect=true"
-                                     styleClass="admin-button"/>
-                    
-                    <p:commandButton value="Sair" 
+    <div class="admin-wrapper">
+        <!-- Header -->
+        <header class="admin-header">
+            <div class="header-content">
+                <div class="brand-section">
+                    <i class="pi pi-briefcase brand-icon"></i>
+                    <h1 class="brand-title">Sistema de Agendamento</h1>
+                </div>
+                <div class="user-section">
+                    <span class="welcome-text">Bem-vindo, Administrador</span>
+                    <h:form>
+                        <p:commandButton value="Sair"
+                                         icon="pi pi-sign-out"
                                          action="#{userSessionController.logout}"
-                                         style="background: #dc3545; border: none; color: white;"
-                                         ajax="false"
-                                         styleClass="admin-button"/>
-                   
-                </h:form>
-
+                                         styleClass="btn-logout"
+                                         ajax="false"/>
+                    </h:form>
+                </div>
             </div>
-        </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="admin-content">
+            <div class="content-wrapper">
+                <!-- Page Title -->
+                <div class="page-header">
+                    <h2 class="page-title">Painel de Controle</h2>
+                    <p class="page-subtitle">Gerencie todo o sistema a partir daqui</p>
+                </div>
+
+                <!-- Quick Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card stat-primary">
+                        <div class="stat-icon">
+                            <i class="pi pi-calendar"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-title">Agendamentos</h3>
+                            <p class="stat-description">Gerencie todos os agendamentos</p>
+                        </div>
+                        <h:form>
+                            <p:commandButton value="Acessar"
+                                             icon="pi pi-arrow-right"
+                                             action="/app/agendamento/gerenciar_agendamentos?faces-redirect=true"
+                                             styleClass="btn-card"/>
+                        </h:form>
+                    </div>
+
+                    <div class="stat-card stat-success">
+                        <div class="stat-icon">
+                            <i class="pi pi-users"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-title">Fila de Atendimentos</h3>
+                            <p class="stat-description">Acompanhe atendimentos em tempo real</p>
+                        </div>
+                        <h:form>
+                            <p:commandButton value="Acessar"
+                                             icon="pi pi-arrow-right"
+                                             action="/app/agendamento/fila_atendimentos?faces-redirect=true"
+                                             styleClass="btn-card"/>
+                        </h:form>
+                    </div>
+
+                    <div class="stat-card stat-info">
+                        <div class="stat-icon">
+                            <i class="pi pi-user"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-title">Funcionários</h3>
+                            <p class="stat-description">Cadastro e gestão de profissionais</p>
+                        </div>
+                        <h:form>
+                            <p:commandButton value="Acessar"
+                                             icon="pi pi-arrow-right"
+                                             action="/app/cadastrar_funcionario?faces-redirect=true"
+                                             styleClass="btn-card"/>
+                        </h:form>
+                    </div>
+
+                    <div class="stat-card stat-warning">
+                        <div class="stat-icon">
+                            <i class="pi pi-briefcase"></i>
+                        </div>
+                        <div class="stat-content">
+                            <h3 class="stat-title">Serviços</h3>
+                            <p class="stat-description">Gerencie os serviços oferecidos</p>
+                        </div>
+                        <h:form>
+                            <p:commandButton value="Acessar"
+                                             icon="pi pi-arrow-right"
+                                             action="/app/servico/gerenciar_servicos?faces-redirect=true"
+                                             styleClass="btn-card"/>
+                        </h:form>
+                    </div>
+                </div>
+
+                <!-- Management Section -->
+                <div class="management-section">
+                    <h3 class="section-title">Gestão do Sistema</h3>
+
+                    <div class="management-grid">
+                        <div class="management-card">
+                            <div class="mgmt-icon">
+                                <i class="pi pi-map-marker"></i>
+                            </div>
+                            <div class="mgmt-content">
+                                <h4>Localizações</h4>
+                                <p>Configure locais de atendimento</p>
+                            </div>
+                            <h:form>
+                                <p:commandButton value="Gerenciar"
+                                                 action="/app/localizacao/gerenciar_localizacoes?faces-redirect=true"
+                                                 styleClass="btn-mgmt"
+                                                 icon="pi pi-chevron-right"/>
+                            </h:form>
+                        </div>
+
+                        <div class="management-card">
+                            <div class="mgmt-icon">
+                                <i class="pi pi-sitemap"></i>
+                            </div>
+                            <div class="mgmt-content">
+                                <h4>Associações</h4>
+                                <p>Vincule funcionários, serviços e locais</p>
+                            </div>
+                            <h:form>
+                                <p:commandButton value="Gerenciar"
+                                                 action="/app/associacoes_localizacao_funcionario_servico?faces-redirect=true"
+                                                 styleClass="btn-mgmt"
+                                                 icon="pi pi-chevron-right"/>
+                            </h:form>
+                        </div>
+
+                        <div class="management-card">
+                            <div class="mgmt-icon">
+                                <i class="pi pi-id-card"></i>
+                            </div>
+                            <div class="mgmt-content">
+                                <h4>Cargos</h4>
+                                <p>Gerencie cargos e hierarquias</p>
+                            </div>
+                            <h:form>
+                                <p:commandButton value="Gerenciar"
+                                                 action="/app/cargo/gerenciar_cargos?faces-redirect=true"
+                                                 styleClass="btn-mgmt"
+                                                 icon="pi pi-chevron-right"/>
+                            </h:form>
+                        </div>
+
+                        <div class="management-card">
+                            <div class="mgmt-icon">
+                                <i class="pi pi-user-edit"></i>
+                            </div>
+                            <div class="mgmt-content">
+                                <h4>Usuários</h4>
+                                <p>Edite perfis e permissões</p>
+                            </div>
+                            <h:form>
+                                <p:commandButton value="Gerenciar"
+                                                 action="/app/user-list?faces-redirect=true"
+                                                 styleClass="btn-mgmt"
+                                                 icon="pi pi-chevron-right"/>
+                            </h:form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="admin-footer">
+            <div class="footer-content">
+                <p>© 2025 Sistema de Agendamento - Todos os direitos reservados</p>
+            </div>
+        </footer>
     </div>
 </h:body>
 

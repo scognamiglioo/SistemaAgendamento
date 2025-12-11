@@ -4,11 +4,13 @@
                 xmlns:f="http://xmlns.jcp.org/jsf/core"
                 xmlns:p="primefaces">
 
+    <!-- Campos hidden para capturar mensagens -->
+    <h:inputHidden id="hiddenLastMessage" value="#{servicoController.lastMessage}" />
+    <h:inputHidden id="hiddenMessageType" value="#{servicoController.messageType}" />
+
     <div class="servico-form">
         <div class="form-section">
             <h3>Dados do Serviço</h3>
-
-            <h:messages showDetail="true" showSummary="true" styleClass="error-message"/>
 
             <div class="form-group">
                 <h:outputLabel for="nome" value="Nome do Serviço:" styleClass="form-label required" />
@@ -44,55 +46,10 @@
                 <h:message for="valor" styleClass="error-message" />
             </div>
 
-
-            <!-- Seleção de Funcionários -->
-            <div class="form-group">
-                <h:outputLabel value="Funcionários Associados:" styleClass="form-label" />
-                <h:panelGroup rendered="#{empty servicoController.todosFuncionarios}">
-                    <div class="no-funcionarios">
-                        <p>Nenhum funcionário cadastrado. 
-                            <a href="/app/cadastrar_funcionario.xhtml">Clique aqui para cadastrar funcionários</a>
-                        </p>
-                    </div>
-                </h:panelGroup>
-
-                <h:panelGroup rendered="#{not empty servicoController.todosFuncionarios}">
-                    <div class="funcionarios-selection">
-                        <small class="form-help">Selecione os funcionários que podem realizar este serviço:</small>
-                        <div class="funcionarios-list-form">
-                            <h:selectManyCheckbox value="#{servicoController.selectedFuncionarioIds}" 
-                                                  layout="pageDirection" 
-                                                  styleClass="funcionarios-checkboxes">
-                                <f:selectItems value="#{servicoController.todosFuncionarios}" 
-                                               var="funcionario" 
-                                               itemValue="#{funcionario.id}" 
-                                               itemLabel="#{funcionario.nome} - #{funcionario.email}" />
-                            </h:selectManyCheckbox>
-                        </div>
-
-                        <h:panelGroup rendered="#{servicoController.editMode and not empty servicoController.funcionariosDoServico}">
-                            <div class="funcionarios-atuais">
-                                <h6>Funcionários atualmente associados:</h6>
-                                <ul class="funcionarios-simple-list">
-                                    <ui:repeat value="#{servicoController.funcionariosDoServico}" var="funcionario">
-                                        <li>
-                                            <strong>#{funcionario.nome}</strong><br/>
-                                            <small>#{funcionario.email}</small>
-                                        </li>
-                                    </ui:repeat>
-                                </ul>
-                            </div>
-                        </h:panelGroup>
-                    </div>
-                </h:panelGroup>
-            </div>
-
             <div class="form-actions">
                 <h:commandButton value="#{servicoController.saveButtonText}" 
                                  action="#{servicoController.saveAndReturn}"
-                                 styleClass="btn btn-primary">
-                    <f:ajax execute="@form" render="@form" />
-                </h:commandButton>
+                                 styleClass="btn btn-primary" />
 
                 <h:commandButton value="Cancelar" 
                                  action="#{servicoController.navigateToList}"
@@ -103,7 +60,7 @@
                                  action="#{servicoController.save}"
                                  styleClass="btn btn-outline-primary"
                                  rendered="#{!servicoController.editMode}">
-                    <f:ajax execute="@form" render="@form" />
+                    <f:ajax execute="@form" render="@form" onevent="monitorarMensagens" />
                 </h:commandButton>
             </div>
         </div>

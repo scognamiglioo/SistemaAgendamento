@@ -884,3 +884,98 @@ div[id*="funcionarios-content"][style*="display: none"] {
     max-height: 200px;
     overflow-y: auto;
 }
+
+/* Estilos para mensagens flutuantes */
+.floating-message {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 9999;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: white;
+    max-width: 400px;
+    word-wrap: break-word;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    animation: slideInRight 0.3s ease-out;
+}
+
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.floating-message.success {
+    background: #28a745;
+    border-left: 4px solid #1e7e34;
+}
+
+.floating-message.error {
+    background: #dc3545;
+    border-left: 4px solid #b02a37;
+}
+
+.floating-message.warning {
+    background: #ffc107;
+    color: #212529;
+    border-left: 4px solid #d39e00;
+}
+
+.floating-message.info {
+    background: #17a2b8;
+    border-left: 4px solid #138496;
+}
+
+/* Mensagens JSF (h:messages) */
+.messages {
+    margin: 20px 0;
+    padding: 0;
+    list-style: none;
+}
+
+.messages li {
+    padding: 12px 20px;
+    margin-bottom: 10px;
+    border-radius: 4px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.message-info {
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    color: #155724;
+}
+
+.message-error {
+    background-color: #f8d7da;
+    border: 1px solid #f5c6cb;
+    color: #721c24;
+}
+
+.message-warn {
+    background-color: #fff3cd;
+    border: 1px solid #ffeaa7;
+    color: #856404;
+}

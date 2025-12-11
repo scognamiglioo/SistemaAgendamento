@@ -13,36 +13,47 @@
 
 <h:body>
     <h:form id="formFuncionario">
-        
-
         <h:panelGroup layout="block" styleClass="container">
             <h1>Cadastrar Novo Funcionário</h1>
 
-            <!-- Dados Pessoais -->
+            <!-- Mensagens de Erro -->
+            <h:messages id="messages" globalOnly="false" layout="table" styleClass="error-messages"
+                        errorClass="error-message" infoClass="info-message" />
+
             <fieldset>
                 <legend>Dados Pessoais</legend>
 
                 <h:panelGroup layout="block" styleClass="form-group">
                     <h:outputLabel for="nome" value="Nome:" styleClass="required" />
                     <h:inputText id="nome" value="#{employeeController.employee.nome}" required="true" 
-                                 requiredMessage="Nome é obrigatório" />
+                                 requiredMessage="Nome é obrigatório"
+                                 validatorMessage="Nome deve ter entre 3 e 100 caracteres">
+                        <f:validateLength minimum="3" maximum="100" />
+                    </h:inputText>
                 </h:panelGroup>
 
                 <h:panelGroup layout="block" styleClass="form-group">
                     <h:outputLabel for="cpf" value="CPF:" styleClass="required" />
                     <h:inputText id="cpf" value="#{employeeController.employee.cpf}" required="true"
-                                 requiredMessage="CPF é obrigatório" />
+                                 requiredMessage="CPF é obrigatório"
+                                 validatorMessage="CPF deve conter 11 dígitos">
+                        <f:validateRegex pattern="\d{11}" />
+                    </h:inputText>
                 </h:panelGroup>
 
                 <h:panelGroup layout="block" styleClass="form-group">
                     <h:outputLabel for="email" value="Email:" styleClass="required" />
                     <h:inputText id="email" value="#{employeeController.employee.email}" required="true"
-                                 requiredMessage="Email é obrigatório" type="email" />
+                                 requiredMessage="Email é obrigatório" type="email"
+                                 validatorMessage="Email inválido" />
                 </h:panelGroup>
 
                 <h:panelGroup layout="block" styleClass="form-group">
                     <h:outputLabel for="telefone" value="Telefone:" />
-                    <h:inputText id="telefone" value="#{employeeController.employee.telefone}" />
+                    <h:inputText id="telefone" value="#{employeeController.employee.telefone}"
+                                 validatorMessage="Telefone deve conter 10 ou 11 dígitos">
+                        <f:validateRegex pattern="(\d{10}|\d{11})?" />
+                    </h:inputText>
                 </h:panelGroup>
             </fieldset>
 
@@ -53,13 +64,19 @@
                 <h:panelGroup layout="block" styleClass="form-group">
                     <h:outputLabel for="username" value="Username:" styleClass="required" />
                     <h:inputText id="username" value="#{employeeController.employee.username}" required="true"
-                                 requiredMessage="Username é obrigatório" />
+                                 requiredMessage="Username é obrigatório"
+                                 validatorMessage="Username deve ter entre 4 e 50 caracteres">
+                        <f:validateLength minimum="4" maximum="50" />
+                    </h:inputText>
                 </h:panelGroup>
 
                 <h:panelGroup layout="block" styleClass="form-group">
                     <h:outputLabel for="password" value="Senha:" styleClass="required" />
                     <h:inputSecret id="password" value="#{employeeController.employee.password}" required="true"
-                                   requiredMessage="Senha é obrigatória" />
+                                   requiredMessage="Senha é obrigatória"
+                                   validatorMessage="Senha deve ter entre 6 e 50 caracteres">
+                        <f:validateLength minimum="6" maximum="50" />
+                    </h:inputSecret>
                 </h:panelGroup>
 
                 <h:panelGroup layout="block" styleClass="form-group">
@@ -85,8 +102,6 @@
                                        itemLabel="#{cargo.nome}" itemValue="#{cargo.id}" />
                     </h:selectOneMenu>
                 </h:panelGroup>
-
-                
 
                 <h:panelGroup layout="block" styleClass="form-group-checkbox">
                     <h:selectBooleanCheckbox id="ativo" value="#{employeeController.employee.ativo}" />

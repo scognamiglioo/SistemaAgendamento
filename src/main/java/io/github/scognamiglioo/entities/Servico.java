@@ -13,7 +13,7 @@ import jakarta.validation.constraints.*;
     @NamedQuery(name = "Servico.findByNome", query = "SELECT s FROM Servico s WHERE s.nome = :nome"),
     @NamedQuery(name = "Servico.findByNomePartial", query = "SELECT s FROM Servico s WHERE LOWER(s.nome) LIKE LOWER(:nome) ORDER BY s.nome"),
     @NamedQuery(name = "Servico.countByNome", query = "SELECT COUNT(s) FROM Servico s WHERE s.nome = :nome"),
-    @NamedQuery(name = "Servico.findFuncionariosByServico", query = "SELECT f FROM Funcionario f JOIN f.servicos s WHERE s.id = :servicoId ORDER BY f.user.nome")
+    @NamedQuery(name = "Servico.findFuncionariosByServico", query = "SELECT fs.funcionario FROM FuncionarioServico fs WHERE fs.servico.id = :servicoId ORDER BY fs.funcionario.user.nome")
 })
 public class Servico implements Serializable {
 
@@ -30,8 +30,9 @@ public class Servico implements Serializable {
     @Column(nullable = false)
     private Float valor;
 
-    @ManyToMany(mappedBy = "servicos", fetch = FetchType.LAZY)
-    private List<Funcionario> funcionarios = new ArrayList<>();
+    // Relacionamento OneToMany com a entidade associativa FuncionarioServico
+    @OneToMany(mappedBy = "servico", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<FuncionarioServico> funcionarioServicos = new ArrayList<>();
 
     public Servico() {}
 
@@ -64,31 +65,42 @@ public class Servico implements Serializable {
         this.valor = valor;
     }
 
+    public List<FuncionarioServico> getFuncionarioServicos() {
+        return funcionarioServicos;
+    }
+
+    public void setFuncionarioServicos(List<FuncionarioServico> funcionarioServicos) {
+        this.funcionarioServicos = funcionarioServicos;
+    }
+
+    // Métodos de conveniência para trabalhar com funcionários
     public List<Funcionario> getFuncionarios() {
+        List<Funcionario> funcionarios = new ArrayList<>();
+        if (funcionarioServicos != null) {
+            for (FuncionarioServico fs : funcionarioServicos) {
+                if (!funcionarios.contains(fs.getFuncionario())) {
+                    funcionarios.add(fs.getFuncionario());
+                }
+            }
+        }
         return funcionarios;
     }
 
-    public void setFuncionarios(List<Funcionario> funcionarios) {
-        this.funcionarios = funcionarios;
+    // Métodos para gerenciar associações funcionário-serviço-localização
+    public void addFuncionarioLocalizacao(Funcionario funcionario, Localizacao localizacao) {
+        FuncionarioServico fs = new FuncionarioServico(funcionario, this, localizacao);
+        funcionarioServicos.add(fs);
     }
 
-    // Métodos utilitários para gerenciar relacionamento
-    public void addFuncionario(Funcionario funcionario) {
-        if (!funcionarios.contains(funcionario)) {
-            funcionarios.add(funcionario);
-            if (!funcionario.getServicos().contains(this)) {
-                funcionario.getServicos().add(this);
-            }
-        }
+    public void removeFuncionarioLocalizacao(Funcionario funcionario, Localizacao localizacao) {
+        funcionarioServicos.removeIf(fs -> 
+            fs.getFuncionario().equals(funcionario) && fs.getLocalizacao().equals(localizacao));
     }
 
-    public void removeFuncionario(Funcionario funcionario) {
-        if (funcionarios.contains(funcionario)) {
-            funcionarios.remove(funcionario);
-            if (funcionario.getServicos().contains(this)) {
-                funcionario.getServicos().remove(this);
-            }
-        }
+    public boolean hasFuncionarioInLocalizacao(Funcionario funcionario, Localizacao localizacao) {
+        return funcionarioServicos.stream()
+            .anyMatch(fs -> fs.getFuncionario().equals(funcionario) && 
+                           fs.getLocalizacao().equals(localizacao));
     }
 
     @Override

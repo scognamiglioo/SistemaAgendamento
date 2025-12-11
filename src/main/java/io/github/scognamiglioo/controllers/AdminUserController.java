@@ -163,4 +163,28 @@ public class AdminUserController implements Serializable {
          // redireciona de volta para a lista
          return "/app/user-list.xhtml?faces-redirect=true";
      }
+
+      
+    public String deactivate() {
+        if ("user".equals(editType) && selectedUser != null) {
+            selectedUser.setActive(false);
+            selectedUser.setEmail("deleted_" + selectedUser.getId() + "@deleted.com");
+            dataService.updateUser(selectedUser);
+        } else if ("funcionario".equals(editType) && selectedFuncionario != null) {
+            selectedFuncionario.setAtivo(false);
+            selectedFuncionario.setEmail("deleted_" + selectedFuncionario.getId() + "@deleted.com");
+            // também desativa o user associado
+            if (selectedFuncionario.getUser() != null) {
+                selectedFuncionario.getUser().setActive(false);
+                selectedFuncionario.getUser().setEmail("deleted_" + selectedFuncionario.getUser().getId() + "@deleted.com");
+                dataService.updateUser(selectedFuncionario.getUser());
+            }
+            dataService.updateFuncionario(selectedFuncionario);
+        }
+        
+        loadAll();
+        return "/app/user-list.xhtml?faces-redirect=true";
+    }
 }
+
+

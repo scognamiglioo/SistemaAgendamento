@@ -1,471 +1,537 @@
 <?xml version='1.0' encoding='UTF-8' ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html
-    lang="pt-BR"
-    xmlns="http://www.w3.org/1999/xhtml"
-    xmlns:h="http://xmlns.jcp.org/jsf/html"
-    xmlns:f="http://xmlns.jcp.org/jsf/core"
-    xmlns:p="http://primefaces.org/ui">
+        lang="pt-BR"
+        xmlns="http://www.w3.org/1999/xhtml"
+        xmlns:h="http://xmlns.jcp.org/jsf/html"
+        xmlns:f="http://xmlns.jcp.org/jsf/core"
+        xmlns:p="http://primefaces.org/ui">
 
-    <h:head>
-        <title>Meus Agendamentos - Sistema de Agendamento</title>
-        <meta content=""/>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-        <style type="">
-            * {
-                margin: 0;
-                padding: 0;
-                box-sizing: border-box;
+<h:head>
+    <title>Meus Agendamentos - Sistema de Agendamento</title>
+    <meta content=""/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style type="">
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding-bottom: 40px;
+        }
+
+        /* Header moderno */
+        .app-header {
+            background: rgba(255, 255, 255, 0.95);
+            box-shadow: 0 2px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .app-header h1 {
+            color: #667eea;
+            font-size: 1.8em;
+            font-weight: 700;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #f8f9fa;
+            padding: 8px 16px;
+            border-radius: 20px;
+            color: #495057;
+            font-weight: 500;
+        }
+
+        /* Container principal */
+        .main-container {
+            max-width: 1400px;
+            margin: 30px auto;
+            padding: 0 20px;
+        }
+
+        /* Card principal */
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
             }
-
-            body {
-                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                min-height: 100vh;
-                padding-bottom: 40px;
+            to {
+                opacity: 1;
+                transform: translateY(0);
             }
+        }
 
-            /* Header moderno */
+        .page-title {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .page-title h2 {
+            color: #2d3748;
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        /* Filtros de pesquisa */
+        .search-filters {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 25px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .filter-field label {
+            display: block;
+            color: #495057;
+            font-weight: 600;
+            font-size: 0.9em;
+            margin-bottom: 8px;
+        }
+
+        /* Badges */
+        .code-badge {
+            background: #e9ecef;
+            color: #495057;
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Tabela estilizada */
+        .ui-datatable thead th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            padding: 15px !important;
+            font-weight: 600 !important;
+            text-transform: uppercase;
+            font-size: 0.85em !important;
+        }
+
+        .ui-datatable tbody td {
+            padding: 15px !important;
+            border-bottom: 1px solid #e9ecef !important;
+        }
+
+        .ui-datatable tbody tr:hover {
+            background: #f8f9fa !important;
+        }
+
+        /* Botões */
+        .ui-button {
+            border-radius: 8px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .ui-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2) !important;
+        }
+
+        /* Dialog */
+        .ui-dialog .ui-dialog-titlebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+        }
+
+        /* Mensagens de Feedback */
+        .ui-messages {
+            margin-bottom: 20px !important;
+            border-radius: 8px !important;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        .ui-messages-info {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+            border: none !important;
+            color: white !important;
+        }
+
+        .ui-messages-error {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%) !important;
+            border: none !important;
+            color: white !important;
+        }
+
+        .ui-messages-warn {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%) !important;
+            border: none !important;
+            color: white !important;
+        }
+
+        .ui-messages .ui-messages-icon,
+        .ui-messages .ui-messages-close {
+            color: white !important;
+        }
+
+        /* Responsivo */
+        @media (max-width: 768px) {
             .app-header {
-                background: rgba(255, 255, 255, 0.95);
-                box-shadow: 0 2px 20px rgba(0,0,0,0.1);
-                padding: 20px 40px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                position: sticky;
-                top: 0;
-                z-index: 1000;
-                backdrop-filter: blur(10px);
-            }
-
-            .app-header h1 {
-                color: #667eea;
-                font-size: 1.8em;
-                font-weight: 700;
-            }
-
-            .header-actions {
-                display: flex;
-                align-items: center;
+                flex-direction: column;
                 gap: 15px;
             }
 
-            .user-info {
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                background: #f8f9fa;
-                padding: 8px 16px;
-                border-radius: 20px;
-                color: #495057;
-                font-weight: 500;
-            }
-
-            /* Container principal */
-            .main-container {
-                max-width: 1400px;
-                margin: 30px auto;
-                padding: 0 20px;
-            }
-
-            /* Card principal */
-            .main-card {
-                background: white;
-                border-radius: 15px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-                padding: 30px;
-                animation: fadeIn 0.5s ease-out;
-            }
-
-            @keyframes fadeIn {
-                from {
-                    opacity: 0;
-                    transform: translateY(20px);
-                }
-                to {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-            }
-
-            .page-title {
-                display: flex;
-                align-items: center;
-                gap: 15px;
-                margin-bottom: 30px;
-                padding-bottom: 20px;
-                border-bottom: 2px solid #e9ecef;
-            }
-
-            .page-title h2 {
-                color: #2d3748;
-                font-size: 2em;
-                font-weight: 700;
-            }
-
-            /* Filtros de pesquisa */
             .search-filters {
-                background: #f8f9fa;
-                padding: 25px;
-                border-radius: 10px;
-                margin-bottom: 25px;
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-                gap: 15px;
+                grid-template-columns: 1fr;
             }
+        }
+    </style>
+</h:head>
 
-            .filter-field label {
-                display: block;
-                color: #495057;
-                font-weight: 600;
-                font-size: 0.9em;
-                margin-bottom: 8px;
-            }
+<h:body>
+    <!-- Header -->
+    <div class="app-header">
+        <h1>
+            <i class="pi pi-calendar"></i>
+            Sistema de Agendamento
+        </h1>
+        <div class="header-actions">
+            <p:button value="Novo Agendamento"
+                      icon="pi pi-plus"
+                      styleClass="ui-button-success"
+                      href="index.xhtml"/>
 
-            /* Badges */
-            .code-badge {
-                background: #e9ecef;
-                color: #495057;
-                padding: 4px 12px;
-                border-radius: 6px;
-                font-family: 'Courier New', monospace;
-                font-size: 0.9em;
-                font-weight: 600;
-            }
-
-            .status-badge {
-                display: inline-flex;
-                align-items: center;
-                gap: 6px;
-                padding: 6px 14px;
-                border-radius: 20px;
-                font-size: 0.85em;
-                font-weight: 600;
-                text-transform: uppercase;
-                letter-spacing: 0.5px;
-            }
-
-            /* Tabela estilizada */
-            .ui-datatable thead th {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-                color: white !important;
-                padding: 15px !important;
-                font-weight: 600 !important;
-                text-transform: uppercase;
-                font-size: 0.85em !important;
-            }
-
-            .ui-datatable tbody td {
-                padding: 15px !important;
-                border-bottom: 1px solid #e9ecef !important;
-            }
-
-            .ui-datatable tbody tr:hover {
-                background: #f8f9fa !important;
-            }
-
-            /* Botões */
-            .ui-button {
-                border-radius: 8px !important;
-                font-weight: 600 !important;
-                transition: all 0.3s ease !important;
-            }
-
-            .ui-button:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 5px 15px rgba(0,0,0,0.2) !important;
-            }
-
-            /* Dialog */
-            .ui-dialog .ui-dialog-titlebar {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
-                color: white !important;
-            }
-
-            /* Responsivo */
-            @media (max-width: 768px) {
-                .app-header {
-                    flex-direction: column;
-                    gap: 15px;
-                }
-
-                .search-filters {
-                    grid-template-columns: 1fr;
-                }
-            }
-        </style>
-    </h:head>
-
-    <h:body>
-        <!-- Header -->
-        <div class="app-header">
-            <h1>
-                <i class="pi pi-calendar"></i>
-                Sistema de Agendamento
-            </h1>
-            <div class="header-actions">
-                <p:button value="Novo Agendamento"
-                          icon="pi pi-plus"
-                          styleClass="ui-button-success"
-                          href="index.xhtml"/>
-
-                <div class="user-info">
-                    <i class="pi pi-user"></i>
-                    <span>#{facesContext.externalContext.remoteUser}</span>
-                </div>
-
-                <h:form>
-                    <p:commandButton value="Sair"
-                                     action="#{userSessionController.logout}"
-                                     icon="pi pi-sign-out"
-                                     styleClass="ui-button-danger ui-button-sm"
-                                     ajax="false"/>
-                </h:form>
+            <div class="user-info">
+                <i class="pi pi-user"></i>
+                <span>#{facesContext.externalContext.remoteUser}</span>
             </div>
+
+            <h:form>
+                <p:commandButton value="Sair"
+                                 action="#{userSessionController.logout}"
+                                 icon="pi pi-sign-out"
+                                 styleClass="ui-button-danger ui-button-sm"
+                                 ajax="false"/>
+            </h:form>
         </div>
+    </div>
 
-        <!-- Container Principal -->
-        <div class="main-container">
-            <div class="main-card">
+    <!-- Container Principal -->
+    <div class="main-container">
+        <div class="main-card">
 
-                <!-- Título da Página -->
-                <div class="page-title">
-                    <i class="pi pi-list" style="font-size: 2em; color: #667eea;"></i>
-                    <h2>Meus Agendamentos</h2>
-                </div>
+            <!-- Título da Página -->
+            <div class="page-title">
+                <i class="pi pi-list" style="font-size: 2em; color: #667eea;"></i>
+                <h2>Meus Agendamentos</h2>
+            </div>
 
-                <h:form id="formMeusAgendamentos">
+            <h:form id="formMeusAgendamentos">
 
-                    <!-- Filtros de Pesquisa -->
-                    <div class="search-filters">
-                        <div class="filter-field">
-                            <label><i class="pi pi-hashtag"></i> Código do Agendamento</label>
-                            <p:inputText id="filtroCodigo"
-                                         value="#{agendamentoController.filtroCodigo}"
-                                         placeholder="Ex: 123"
-                                         style="width: 100%;"/>
-                        </div>
+                <!-- Mensagens de Feedback -->
+                <p:messages id="messages" showDetail="true" closable="true" escape="false">
+                    <p:autoUpdate/>
+                </p:messages>
 
-                        <div class="filter-field">
-                            <label><i class="pi pi-calendar"></i> Data do Agendamento</label>
-                            <p:calendar id="filtroData"
-                                        value="#{agendamentoController.filtroData}"
-                                        pattern="dd/MM/yyyy"
-                                        locale="pt"
-                                        showButtonPanel="true"
-                                        placeholder="Selecione a data"
-                                        style="width: 100%;"/>
-                        </div>
-
-                        <div class="filter-field">
-                            <label><i class="pi pi-filter"></i> Status</label>
-                            <p:selectOneMenu id="filtroStatus"
-                                             value="#{agendamentoController.filtroStatus}"
-                                             style="width: 100%;">
-                                <f:selectItem itemLabel="Todos" itemValue=""/>
-                                <f:selectItem itemLabel="Agendado" itemValue="AGENDADO"/>
-                                <f:selectItem itemLabel="Confirmado" itemValue="CONFIRMADO"/>
-                                <f:selectItem itemLabel="Em Atendimento" itemValue="EM_ATENDIMENTO"/>
-                                <f:selectItem itemLabel="Concluído" itemValue="CONCLUIDO"/>
-                                <f:selectItem itemLabel="Cancelado" itemValue="CANCELADO"/>
-                            </p:selectOneMenu>
-                        </div>
-
-                        <div class="filter-field" style="display: flex; gap: 10px; align-items: flex-end;">
-                            <p:commandButton value="Pesquisar"
-                                             action="#{agendamentoController.aplicarFiltros}"
-                                             update="tabelaAgendamentos"
-                                             icon="pi pi-search"
-                                             styleClass="ui-button-info"
-                                             style="flex: 1;"/>
-                            <p:commandButton value="Limpar"
-                                             action="#{agendamentoController.limparFiltros}"
-                                             update="@form"
-                                             icon="pi pi-times"
-                                             styleClass="ui-button-secondary"/>
-                        </div>
+                <!-- Filtros de Pesquisa -->
+                <div class="search-filters">
+                    <div class="filter-field">
+                        <label><i class="pi pi-hashtag"></i> Código do Agendamento</label>
+                        <p:inputText id="filtroCodigo"
+                                     value="#{agendamentoController.filtroCodigo}"
+                                     placeholder="Ex: 123"
+                                     style="width: 100%;"/>
                     </div>
 
-                    <!-- Tabela de Agendamentos -->
-                    <p:dataTable id="tabelaAgendamentos"
-                                 value="#{agendamentoController.agendamentosFiltrados}"
-                                 var="ag"
-                                 paginator="true"
-                                 rows="15"
-                                 rowsPerPageTemplate="10,15,20,25"
-                                 paginatorPosition="bottom"
-                                 emptyMessage="Nenhum agendamento encontrado"
-                                 styleClass="p-datatable-striped">
+                    <div class="filter-field">
+                        <label><i class="pi pi-calendar"></i> Data do Agendamento</label>
+                        <p:calendar id="filtroData"
+                                    value="#{agendamentoController.filtroData}"
+                                    pattern="dd/MM/yyyy"
+                                    locale="pt"
+                                    showButtonPanel="true"
+                                    placeholder="Selecione a data"
+                                    style="width: 100%;"/>
+                    </div>
 
-                        <p:column headerText="Código" style="width: 80px; text-align: center;">
-                            <span class="code-badge">##{ag.id}</span>
-                        </p:column>
+                    <div class="filter-field">
+                        <label><i class="pi pi-filter"></i> Status</label>
+                        <p:selectOneMenu id="filtroStatus"
+                                         value="#{agendamentoController.filtroStatus}"
+                                         style="width: 100%;">
+                            <f:selectItem itemLabel="Todos" itemValue=""/>
+                            <f:selectItem itemLabel="Agendado" itemValue="AGENDADO"/>
+                            <f:selectItem itemLabel="Confirmado" itemValue="CONFIRMADO"/>
+                            <f:selectItem itemLabel="Em Atendimento" itemValue="EM_ATENDIMENTO"/>
+                            <f:selectItem itemLabel="Concluído" itemValue="CONCLUIDO"/>
+                            <f:selectItem itemLabel="Cancelado" itemValue="CANCELADO"/>
+                        </p:selectOneMenu>
+                    </div>
 
-                        <p:column headerText="Data/Hora" style="width: 150px;" sortBy="#{ag.data}">
-                            <div style="display: flex; flex-direction: column; gap: 4px;">
+                    <div class="filter-field" style="display: flex; gap: 10px; align-items: flex-end;">
+                        <p:commandButton value="Pesquisar"
+                                         action="#{agendamentoController.aplicarFiltros}"
+                                         update="tabelaAgendamentos"
+                                         icon="pi pi-search"
+                                         styleClass="ui-button-info"
+                                         style="flex: 1;"/>
+                        <p:commandButton value="Limpar"
+                                         action="#{agendamentoController.limparFiltros}"
+                                         update="@form"
+                                         icon="pi pi-times"
+                                         styleClass="ui-button-secondary"/>
+                    </div>
+                </div>
+
+                <!-- Tabela de Agendamentos -->
+                <p:dataTable id="tabelaAgendamentos"
+                             value="#{agendamentoController.agendamentosFiltrados}"
+                             var="ag"
+                             paginator="true"
+                             rows="15"
+                             rowsPerPageTemplate="10,15,20,25"
+                             paginatorPosition="bottom"
+                             emptyMessage="Nenhum agendamento encontrado"
+                             styleClass="p-datatable-striped">
+
+                    <p:column headerText="Código" style="width: 80px; text-align: center;">
+                        <span class="code-badge">##{ag.id}</span>
+                    </p:column>
+
+                    <p:column headerText="Data/Hora" style="width: 150px;" sortBy="#{ag.data}">
+                        <div style="display: flex; flex-direction: column; gap: 4px;">
                                 <span style="font-weight: 600; color: #2d3748;">
                                     <i class="pi pi-calendar" style="color: #667eea; font-size: 0.9em;"></i>
                                     #{ag.dataFormatada}
                                 </span>
-                                <span style="color: #6c757d; font-size: 0.9em;">
+                            <span style="color: #6c757d; font-size: 0.9em;">
                                     <i class="pi pi-clock" style="color: #f5576c; font-size: 0.9em;"></i>
-                                    #{ag.horaFormatada}
+                                #{ag.horaFormatada}
                                 </span>
-                            </div>
-                        </p:column>
+                        </div>
+                    </p:column>
 
-                        <p:column headerText="Serviço">
-                            <i class="pi pi-briefcase" style="color: #667eea; margin-right: 8px;"></i>
-                            <h:outputText value="#{ag.nomeServico}" style="font-weight: 500;"/>
-                        </p:column>
+                    <p:column headerText="Serviço">
+                        <i class="pi pi-briefcase" style="color: #667eea; margin-right: 8px;"></i>
+                        <h:outputText value="#{ag.nomeServico}" style="font-weight: 500;"/>
+                    </p:column>
 
-                        <p:column headerText="Profissional" style="width: 200px;">
-                            <i class="pi pi-user" style="color: #2196F3; margin-right: 8px;"></i>
-                            <h:outputText value="#{ag.nomeFuncionario}"/>
-                        </p:column>
+                    <p:column headerText="Profissional" style="width: 200px;">
+                        <i class="pi pi-user" style="color: #2196F3; margin-right: 8px;"></i>
+                        <h:outputText value="#{ag.nomeFuncionario}"/>
+                    </p:column>
 
-                        <p:column headerText="Local" style="width: 120px;">
-                            <i class="pi pi-building" style="color: #FF9800; margin-right: 8px;"></i>
-                            <h:outputText value="#{ag.nomeGuiche}"/>
-                        </p:column>
+                    <p:column headerText="Local do Atendimento" style="width: 180px;">
+                        <i class="pi pi-map-marker" style="color: #FF9800; margin-right: 8px;"></i>
+                        <h:outputText value="#{agendamentoController.getNomeLocalizacao(ag.id)}"
+                                      style="font-weight: 500; color: #2196F3;"/>
+                    </p:column>
 
-                        <p:column headerText="Status" style="width: 160px; text-align: center;" sortBy="#{ag.status}">
-                            <h:panelGroup rendered="#{ag.status.name() == 'AGENDADO'}">
-                                <span class="status-badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <p:column headerText="Status" style="width: 160px; text-align: center;" sortBy="#{ag.status}">
+                        <h:panelGroup rendered="#{ag.status.name() == 'AGENDADO'}">
+                                <span class="status-badge"
+                                      style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
                                     <i class="pi pi-calendar-plus"></i> Agendado
                                 </span>
-                            </h:panelGroup>
-                            <h:panelGroup rendered="#{ag.status.name() == 'CONFIRMADO'}">
-                                <span class="status-badge" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{ag.status.name() == 'CONFIRMADO'}">
+                                <span class="status-badge"
+                                      style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white;">
                                     <i class="pi pi-check"></i> Confirmado
                                 </span>
-                            </h:panelGroup>
-                            <h:panelGroup rendered="#{ag.status.name() == 'EM_ATENDIMENTO'}">
-                                <span class="status-badge" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{ag.status.name() == 'EM_ATENDIMENTO'}">
+                                <span class="status-badge"
+                                      style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
                                     <i class="pi pi-clock"></i> Em Atendimento
                                 </span>
-                            </h:panelGroup>
-                            <h:panelGroup rendered="#{ag.status.name() == 'CONCLUIDO'}">
-                                <span class="status-badge" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{ag.status.name() == 'CONCLUIDO'}">
+                                <span class="status-badge"
+                                      style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
                                     <i class="pi pi-check-circle"></i> Concluído
                                 </span>
-                            </h:panelGroup>
-                            <h:panelGroup rendered="#{ag.status.name() == 'CANCELADO'}">
-                                <span class="status-badge" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+                        </h:panelGroup>
+                        <h:panelGroup rendered="#{ag.status.name() == 'CANCELADO'}">
+                                <span class="status-badge"
+                                      style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
                                     <i class="pi pi-times-circle"></i> Cancelado
                                 </span>
-                            </h:panelGroup>
-                        </p:column>
+                        </h:panelGroup>
+                    </p:column>
 
-                        <p:column headerText="Ações" style="width: 150px; text-align: center;">
-                            <div style="display: flex; gap: 5px; justify-content: center;">
-                                <p:commandButton icon="pi pi-eye"
-                                                 title="Ver Detalhes"
-                                                 styleClass="ui-button-info ui-button-rounded ui-button-sm"
-                                                 update=":formDetalhes"
-                                                 oncomplete="PF('dialogDetalhes').show();">
-                                    <f:setPropertyActionListener value="#{ag}"
-                                                                 target="#{agendamentoController.agendamentoSelecionado}"/>
-                                </p:commandButton>
+                    <p:column headerText="Ações" style="width: 200px; text-align: center;">
+                        <div style="display: flex; gap: 5px; justify-content: center; flex-wrap: wrap;">
+                            <p:commandButton icon="pi pi-eye"
+                                             title="Ver Detalhes"
+                                             styleClass="ui-button-info ui-button-rounded ui-button-sm"
+                                             update=":formDetalhes"
+                                             oncomplete="PF('dialogDetalhes').show();">
+                                <f:setPropertyActionListener value="#{ag}"
+                                                             target="#{agendamentoController.agendamentoSelecionado}"/>
+                            </p:commandButton>
 
-                                <p:commandButton icon="pi pi-trash"
-                                                 title="Cancelar"
-                                                 action="#{agendamentoController.cancelarAgendamento(ag.id)}"
-                                                 update="tabelaAgendamentos"
-                                                 styleClass="ui-button-danger ui-button-rounded ui-button-sm"
-                                                 rendered="#{ag.status.name() != 'CANCELADO' and ag.status.name() != 'CONCLUIDO'}"
-                                                 onclick="return confirm('Deseja realmente cancelar este agendamento?');"/>
-                            </div>
-                        </p:column>
-                    </p:dataTable>
-                </h:form>
-            </div>
+                            <p:button icon="pi pi-refresh"
+                                      title="Reagendar"
+                                      styleClass="ui-button-warning ui-button-rounded ui-button-sm"
+                                      rendered="#{ag.status.name() != 'CANCELADO' and ag.status.name() != 'CONCLUIDO'}"
+                                      outcome="reagendar-agendamento">
+                                <f:param name="id" value="#{ag.id}"/>
+                            </p:button>
+
+                            <p:commandButton icon="pi pi-trash"
+                                             title="Cancelar"
+                                             action="#{agendamentoController.cancelarAgendamento(ag.id)}"
+                                             update="tabelaAgendamentos"
+                                             styleClass="ui-button-danger ui-button-rounded ui-button-sm"
+                                             rendered="#{ag.status.name() != 'CANCELADO' and ag.status.name() != 'CONCLUIDO'}"
+                                             onclick="return confirm('Deseja realmente cancelar este agendamento?');"/>
+                        </div>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
         </div>
+    </div>
 
-        <!-- Dialog Detalhes -->
-        <h:form id="formDetalhes">
-            <p:dialog header="Detalhes do Agendamento"
-                      widgetVar="dialogDetalhes"
-                      modal="true"
-                      width="650"
-                      responsive="true">
+    <!-- Dialog Detalhes -->
+    <h:form id="formDetalhes">
+        <p:dialog header="Detalhes do Agendamento"
+                  widgetVar="dialogDetalhes"
+                  modal="true"
+                  width="650"
+                  responsive="true">
 
-                <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado != null}">
+            <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado != null}">
 
-                    <div style="text-align: center; margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
-                        <div style="margin-bottom: 15px;">
+                <div style="text-align: center; margin-bottom: 25px; padding: 20px; background: #f8f9fa; border-radius: 10px;">
+                    <div style="margin-bottom: 15px;">
                             <span class="code-badge" style="font-size: 1.2em; padding: 8px 20px;">
                                 ##{agendamentoController.agendamentoSelecionado.id}
                             </span>
-                        </div>
-
-                        <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'AGENDADO'}">
-                            <span class="status-badge" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 1.1em; padding: 10px 20px;">
-                                <i class="pi pi-calendar-plus"></i> AGENDADO
-                            </span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'CONFIRMADO'}">
-                            <span class="status-badge" style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; font-size: 1.1em; padding: 10px 20px;">
-                                <i class="pi pi-check"></i> CONFIRMADO
-                            </span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'CONCLUIDO'}">
-                            <span class="status-badge" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; font-size: 1.1em; padding: 10px 20px;">
-                                <i class="pi pi-check-circle"></i> CONCLUÍDO
-                            </span>
-                        </h:panelGroup>
-                        <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'CANCELADO'}">
-                            <span class="status-badge" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; font-size: 1.1em; padding: 10px 20px;">
-                                <i class="pi pi-times-circle"></i> CANCELADO
-                            </span>
-                        </h:panelGroup>
                     </div>
 
-                    <p:panelGrid columns="2" columnClasses="ui-grid-col-4,ui-grid-col-8" layout="grid"
-                                 styleClass="ui-panelgrid-blank" style="width: 100%;">
-
-                        <h:outputText value="Data:" style="font-weight: 600;"/>
-                        <h:outputText value="#{agendamentoController.agendamentoSelecionado.dataFormatada}" style="font-size: 1.1em;"/>
-
-                        <h:outputText value="Hora:" style="font-weight: 600;"/>
-                        <h:outputText value="#{agendamentoController.agendamentoSelecionado.horaFormatada}" style="font-size: 1.1em;"/>
-
-                        <h:outputText value="Serviço:" style="font-weight: 600;"/>
-                        <h:outputText value="#{agendamentoController.agendamentoSelecionado.nomeServico}" style="font-size: 1.1em;"/>
-
-                        <h:outputText value="Profissional:" style="font-weight: 600;"/>
-                        <h:outputText value="#{agendamentoController.agendamentoSelecionado.nomeFuncionario}" style="font-size: 1.1em;"/>
-
-                        <h:outputText value="Local:" style="font-weight: 600;"/>
-                        <h:outputText value="#{agendamentoController.agendamentoSelecionado.nomeGuiche}" style="font-size: 1.1em;"/>
-                    </p:panelGrid>
-
-                    <h:panelGroup rendered="#{agendamentoController.agendamentoSelecionado.observacoes != null and agendamentoController.agendamentoSelecionado.observacoes != ''}">
-                        <hr style="margin: 20px 0; border: none; border-top: 1px solid #e9ecef;"/>
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea;">
-                            <h:outputText value="Observações:" style="font-weight: 600; display: block; margin-bottom: 10px; color: #6c757d;"/>
-                            <h:outputText value="#{agendamentoController.agendamentoSelecionado.observacoes}" style="line-height: 1.6;"/>
-                        </div>
+                    <h:panelGroup
+                            rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'AGENDADO'}">
+                            <span class="status-badge"
+                                  style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; font-size: 1.1em; padding: 10px 20px;">
+                                <i class="pi pi-calendar-plus"></i> AGENDADO
+                            </span>
                     </h:panelGroup>
+                    <h:panelGroup
+                            rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'CONFIRMADO'}">
+                            <span class="status-badge"
+                                  style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; font-size: 1.1em; padding: 10px 20px;">
+                                <i class="pi pi-check"></i> CONFIRMADO
+                            </span>
+                    </h:panelGroup>
+                    <h:panelGroup
+                            rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'CONCLUIDO'}">
+                            <span class="status-badge"
+                                  style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white; font-size: 1.1em; padding: 10px 20px;">
+                                <i class="pi pi-check-circle"></i> CONCLUÍDO
+                            </span>
+                    </h:panelGroup>
+                    <h:panelGroup
+                            rendered="#{agendamentoController.agendamentoSelecionado.status.name() == 'CANCELADO'}">
+                            <span class="status-badge"
+                                  style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white; font-size: 1.1em; padding: 10px 20px;">
+                                <i class="pi pi-times-circle"></i> CANCELADO
+                            </span>
+                    </h:panelGroup>
+                </div>
+
+                <p:panelGrid columns="2" columnClasses="ui-grid-col-4,ui-grid-col-8" layout="grid"
+                             styleClass="ui-panelgrid-blank" style="width: 100%;">
+
+                    <h:outputText value="Data:" style="font-weight: 600;"/>
+                    <h:outputText value="#{agendamentoController.agendamentoSelecionado.dataFormatada}"
+                                  style="font-size: 1.1em;"/>
+
+                    <h:outputText value="Hora:" style="font-weight: 600;"/>
+                    <h:outputText value="#{agendamentoController.agendamentoSelecionado.horaFormatada}"
+                                  style="font-size: 1.1em;"/>
+
+                    <h:outputText value="Serviço:" style="font-weight: 600;"/>
+                    <h:outputText value="#{agendamentoController.agendamentoSelecionado.nomeServico}"
+                                  style="font-size: 1.1em;"/>
+
+                    <h:outputText value="Profissional:" style="font-weight: 600;"/>
+                    <h:outputText value="#{agendamentoController.agendamentoSelecionado.nomeFuncionario}"
+                                  style="font-size: 1.1em;"/>
+
+                    <h:outputText value="Local do Atendimento:" style="font-weight: 600;"/>
+                    <h:outputText value="#{agendamentoController.getNomeLocalizacao(agendamentoController.agendamentoSelecionado.id)}"
+                                  style="font-size: 1.1em; color: #2196F3; font-weight: 500;"/>
+                </p:panelGrid>
+
+                <h:panelGroup
+                        rendered="#{agendamentoController.agendamentoSelecionado.observacoes != null and agendamentoController.agendamentoSelecionado.observacoes != ''}">
+                    <hr style="margin: 20px 0; border: none; border-top: 1px solid #e9ecef;"/>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; border-left: 4px solid #667eea;">
+                        <h:outputText value="Observações:"
+                                      style="font-weight: 600; display: block; margin-bottom: 10px; color: #6c757d;"/>
+                        <h:outputText value="#{agendamentoController.agendamentoSelecionado.observacoes}"
+                                      style="line-height: 1.6;"/>
+                    </div>
                 </h:panelGroup>
+            </h:panelGroup>
 
-                <f:facet name="footer">
-                    <p:commandButton value="Fechar"
-                                     icon="pi pi-times"
-                                     onclick="PF('dialogDetalhes').hide();"
-                                     type="button"
-                                     styleClass="ui-button-secondary"/>
-                </f:facet>
-            </p:dialog>
-        </h:form>
+            <f:facet name="footer">
+                <p:commandButton value="Fechar"
+                                 icon="pi pi-times"
+                                 onclick="PF('dialogDetalhes').hide();"
+                                 type="button"
+                                 styleClass="ui-button-secondary"/>
+            </f:facet>
+        </p:dialog>
+    </h:form>
 
-        <!-- Footer -->
-        <div style="text-align: center; color: white; padding: 20px; margin-top: 40px;">
-            <p style="font-size: 0.9em; opacity: 0.8;">
-                © 2025 Sistema de Agendamento
-            </p>
-        </div>
-    </h:body>
+    <!-- Footer -->
+    <div style="text-align: center; color: white; padding: 20px; margin-top: 40px;">
+        <p style="font-size: 0.9em; opacity: 0.8;">
+            © 2025 Sistema de Agendamento
+        </p>
+    </div>
+</h:body>
 </html>
 

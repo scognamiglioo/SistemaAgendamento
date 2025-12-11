@@ -35,14 +35,15 @@
         <h:outputLabel for="username" value="Username:" />
         <h:inputText id="username" value="#{adminUserBean.editUsername}" required="true" />
 
-        <h:outputLabel for="ativo" value="Ativo:" />
-        <h:selectBooleanCheckbox id="ativo" value="#{adminUserBean.editAtivo}" />
+        
 
     </h:panelGrid>
 
     <br/>
 
     <h:commandButton value="Salvar" action="#{adminUserBean.save}" styleClass="btn btn-primary"/>
+    <h:commandButton value="Desativar" action="#{adminUserBean.deactivate}" styleClass="btn btn-warning" 
+                     onclick="return confirm('Tem certeza que deseja desativar este usuário?');"/>
     <h:commandButton value="Cancelar" action="/app/user-list.xhtml?faces-redirect=true" immediate="true" />
 
 </h:form>

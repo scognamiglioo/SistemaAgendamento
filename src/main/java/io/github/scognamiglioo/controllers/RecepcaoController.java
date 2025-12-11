@@ -5,16 +5,8 @@
 package io.github.scognamiglioo.controllers;
 
 import io.github.scognamiglioo.entities.Agendamento;
-import io.github.scognamiglioo.entities.Atendimento;
-import io.github.scognamiglioo.entities.AtendimentoFila;
-import io.github.scognamiglioo.entities.Funcionario;
-import io.github.scognamiglioo.entities.Servico;
 import io.github.scognamiglioo.entities.StatusAgendamento;
-import io.github.scognamiglioo.entities.User;
-import io.github.scognamiglioo.services.AgendamentoService;
 import io.github.scognamiglioo.services.AgendamentoServiceLocal;
-import io.github.scognamiglioo.services.FilaServiceLocal;
-import io.github.scognamiglioo.services.RecepcaoServiceLocal;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
 import jakarta.faces.application.FacesMessage;
@@ -22,15 +14,8 @@ import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 import java.io.Serializable;
-import java.time.Instant;
-import java.time.LocalDate;
-import java.time.LocalTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -43,28 +28,22 @@ public class RecepcaoController implements Serializable {
     @EJB
     private AgendamentoServiceLocal agendamentoService;
 
-    // === Campos de check-in ===
+    // === Check-in ===
     private String termoBusca; // CPF, nome ou protocolo
     private List<Agendamento> resultadosBusca;
     private Agendamento agendamentoSelecionado;
 
-    // === Campos de walk-in ===
-    private String walkNome;
+    // === Walk-in (apenas confirma presença) ===
     private String walkCpf;
-    private Servico walkServico;
-    private Funcionario walkFuncionario;
-    private LocalDate walkData;
-    private LocalTime walkHora;
 
     @PostConstruct
     public void init() {
         resultadosBusca = new ArrayList<>();
-        walkData = LocalDate.now();
     }
 
-    // ---------------------------------------------------------------------
-    // CHECK-IN: busca agendamento existente e confirma
-    // ---------------------------------------------------------------------
+    // -----------------------------
+    // CHECK-IN: busca agendamento existente de hoje
+    // -----------------------------
     public void buscarAgendamento() {
         if (termoBusca == null || termoBusca.isBlank()) {
             addWarnMessage("Informe CPF, protocolo ou nome.");
@@ -74,10 +53,6 @@ public class RecepcaoController implements Serializable {
         }
 
         resultadosBusca = agendamentoService.searchByCpfOrProtocoloOrName(termoBusca.trim());
-        if (resultadosBusca == null) resultadosBusca = new ArrayList<>();
-
-        // Filtra apenas agendamentos de hoje
-        resultadosBusca.removeIf(a -> a.getData() == null || !a.getData().isEqual(LocalDate.now()));
 
         if (resultadosBusca.isEmpty()) {
             addWarnMessage("Nenhum agendamento encontrado para hoje com esse termo.");
@@ -85,64 +60,54 @@ public class RecepcaoController implements Serializable {
             return;
         }
 
-        // Seleciona o primeiro por padrão
         agendamentoSelecionado = resultadosBusca.get(0);
+
         addSuccessMessage("Agendamento encontrado: selecione na lista ou confirme o primeiro resultado.");
     }
 
+
+    // -----------------------------
+    // CONFIRMAR CHECK-IN (somente para agendamentos de hoje)
+    // -----------------------------
     public void confirmarCheckin() {
         if (agendamentoSelecionado == null) {
-            addWarnMessage("Nenhum agendamento selecionado para check-in.");
+            addWarnMessage("Nenhum agendamento selecionado.");
             return;
         }
 
-        agendamentoService.alterarStatus(agendamentoSelecionado.getId(), StatusAgendamento.CONFIRMADO);
-        addSuccessMessage("Check-in confirmado.");
-        
-        // Limpa seleção
-        agendamentoSelecionado = null;
-        resultadosBusca = new ArrayList<>();
-        termoBusca = null;
+        // Apenas valida, sem mudar status
+        addSuccessMessage("Agendamento válido para: " +
+                agendamentoSelecionado.getUser().getNome());
+
+        // Não altera status e não salva nada no banco
     }
 
-    // ---------------------------------------------------------------------
-    // WALK-IN: cria agendamento para cliente sem reserva
-    // ---------------------------------------------------------------------
+    // -----------------------------
+    // WALK-IN: confirma presença de agendamento existente de hoje
+    // -----------------------------
     public void registrarWalkin() {
-        if (walkNome == null || walkNome.isBlank() || walkCpf == null || walkCpf.isBlank() || walkServico == null) {
-            addWarnMessage("Preencha todos os dados do walk-in: nome, CPF e serviço.");
+        if (walkCpf == null || walkCpf.isBlank()) {
+            addWarnMessage("Informe o CPF do cliente para confirmar presença.");
             return;
         }
 
-        try {
-            // Cria User fictício para walk-in
-            User user = new User();
-            user.setNome(walkNome);
-            user.setCpf(walkCpf);
-
-            // Se não escolher funcionário, será null (qualquer disponível)
-            Agendamento novo = agendamentoService.createAgendamento(user, walkServico, walkFuncionario, walkData, walkHora);
-
-            // Após criar, já confirma check-in automaticamente
-            agendamentoService.alterarStatus(novo.getId(), StatusAgendamento.CONFIRMADO);
-            addSuccessMessage("Walk-in registrado e check-in confirmado para " + walkNome);
-
-            // Limpa campos do walk-in
-            walkNome = null;
-            walkCpf = null;
-            walkServico = null;
-            walkFuncionario = null;
-            walkData = LocalDate.now();
-            walkHora = LocalTime.now();
-
-        } catch (Exception ex) {
-            addErrorMessage("Erro ao registrar walk-in: " + ex.getMessage());
+        List<Agendamento> agendamentos = agendamentoService.searchByCpfOrProtocoloOrName(walkCpf.trim());
+        if (agendamentos.isEmpty()) {
+            addWarnMessage("Nenhum agendamento encontrado para hoje com esse CPF.");
+            return;
         }
+
+        Agendamento agendamento = agendamentos.get(0);
+        agendamentoService.alterarStatus(agendamento.getId(), StatusAgendamento.CONFIRMADO);
+        addSuccessMessage("Presença confirmada para " + agendamento.getUser().getNome());
+
+        walkCpf = null;
     }
 
-    // ---------------------------
+
+    // -----------------------------
     // Mensagens utilitárias
-    // ---------------------------
+    // -----------------------------
     private void addErrorMessage(String msg) {
         FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR, "Erro", msg));
@@ -158,9 +123,9 @@ public class RecepcaoController implements Serializable {
                 new FacesMessage(FacesMessage.SEVERITY_WARN, "Atenção", msg));
     }
 
-    // ---------------------------
+    // -----------------------------
     // Getters / Setters
-    // ---------------------------
+    // -----------------------------
     public String getTermoBusca() { return termoBusca; }
     public void setTermoBusca(String termoBusca) { this.termoBusca = termoBusca; }
 
@@ -168,16 +133,6 @@ public class RecepcaoController implements Serializable {
     public Agendamento getAgendamentoSelecionado() { return agendamentoSelecionado; }
     public void setAgendamentoSelecionado(Agendamento agendamentoSelecionado) { this.agendamentoSelecionado = agendamentoSelecionado; }
 
-    public String getWalkNome() { return walkNome; }
-    public void setWalkNome(String walkNome) { this.walkNome = walkNome; }
     public String getWalkCpf() { return walkCpf; }
     public void setWalkCpf(String walkCpf) { this.walkCpf = walkCpf; }
-    public Servico getWalkServico() { return walkServico; }
-    public void setWalkServico(Servico walkServico) { this.walkServico = walkServico; }
-    public Funcionario getWalkFuncionario() { return walkFuncionario; }
-    public void setWalkFuncionario(Funcionario walkFuncionario) { this.walkFuncionario = walkFuncionario; }
-    public LocalDate getWalkData() { return walkData; }
-    public void setWalkData(LocalDate walkData) { this.walkData = walkData; }
-    public LocalTime getWalkHora() { return walkHora; }
-    public void setWalkHora(LocalTime walkHora) { this.walkHora = walkHora; }
 }

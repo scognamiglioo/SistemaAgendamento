@@ -519,29 +519,19 @@ public class AgendamentoService implements AgendamentoServiceLocal {
     
     @Override
     public List<Agendamento> searchByCpfOrProtocoloOrName(String termo) {
-        if (termo == null || termo.trim().isEmpty()) {
-            return new ArrayList<>();
-        }
+        if (termo == null || termo.isBlank()) return new ArrayList<>();
 
-        String likeTerm = "%" + termo.trim() + "%";
-        LocalDate hoje = LocalDate.now();
+        List<Agendamento> resultados = em.createQuery(
+            "SELECT a FROM Agendamento a " +
+            "WHERE (a.user.cpf = :cpf OR LOWER(a.user.nome) LIKE :nome OR CAST(a.id AS string) = :id) " +
+            "AND a.data = :hoje", Agendamento.class)
+            .setParameter("cpf", termo)
+            .setParameter("nome", "%" + termo.toLowerCase() + "%")
+            .setParameter("id", termo)
+            .setParameter("hoje", LocalDate.now())
+            .getResultList();
 
-        try {
-            return em.createQuery(
-                    "SELECT a FROM Agendamento a " +
-                    "LEFT JOIN FETCH a.user u " +
-                    "LEFT JOIN FETCH a.servico s " +
-                    "LEFT JOIN FETCH a.funcionario f " +
-                    "WHERE a.data = :hoje " +
-                    "AND (u.cpf LIKE :termo OR u.nome LIKE :termo OR a.protocolo LIKE :termo) " +
-                    "ORDER BY a.hora ASC", Agendamento.class)
-                    .setParameter("hoje", hoje)
-                    .setParameter("termo", likeTerm)
-                    .getResultList();
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Erro ao buscar agendamentos pelo termo: " + termo, e);
-            return new ArrayList<>();
-        }
+        return resultados;
     }
 
 }

@@ -119,12 +119,12 @@ public class LoginController {
         }
 
         if (securityContext.isCallerInRole("recepcionista")) {
-            getExternalContext().redirect(contextPath + "/app/agendamento/gerenciar_agendamentos.xhtml");
+            getExternalContext().redirect(contextPath + "/app/recepcionista/index.xhtml");
             return;
         }
 
         if (securityContext.isCallerInRole("atendente")) {
-            getExternalContext().redirect(contextPath + "/app/agendamento/index.xhtml");
+            getExternalContext().redirect(contextPath + "/app/agendamento/gerenciar_agendamentos.xhtml");
             return;
         }
 

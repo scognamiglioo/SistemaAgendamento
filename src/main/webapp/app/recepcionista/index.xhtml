@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Recepção - Atendimento</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        * {margin:0; padding:0; box-sizing:border-box;}
+        body {font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height:100vh; padding:20px;}
+        .page-container {max-width:1400px; margin:0 auto;}
+        .page-header {background:white; padding:30px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.1); margin-bottom:25px; display:flex; justify-content:space-between; align-items:center;}
+        .page-header h1 {color:#2d3748; font-size:2em; font-weight:700;}
+        .page-header p {color:#718096; font-size:1em;}
+        .main-card {background:white; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.1); overflow:hidden; margin-bottom:25px;}
+        .filters-section {background:#f7fafc; padding:25px; border-bottom:2px solid #e2e8f0;}
+        .filters-grid {display:grid; grid-template-columns:repeat(auto-fit, minmax(250px,1fr)); gap:20px; margin-bottom:20px;}
+        .filter-field {display:flex; flex-direction:column; gap:8px;}
+        .filter-field label {color:#2d3748; font-weight:600; font-size:0.9em;}
+        .ui-button {border-radius:8px !important; padding:10px 20px !important; font-weight:600 !important; text-transform:uppercase; font-size:0.85em; letter-spacing:0.5px; transition:all 0.3s ease !important;}
+        .btn-filtrar {background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; border:none !important; color:white !important;}
+        .ui-datatable {border:none !important;}
+        .ui-datatable thead th {background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color:white !important; padding:15px !important; font-weight:600 !important; text-transform:uppercase; font-size:0.85em; letter-spacing:0.5px; border:none !important;}
+        .ui-datatable tbody td {padding:15px !important; border-bottom:1px solid #e2e8f0 !important; vertical-align:middle !important;}
+        .ui-datatable tbody tr:hover {background:#f7fafc !important;}
+        .status-badge {display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:0.85em; font-weight:600; text-transform:uppercase;}
+        .status-agendado {background: linear-gradient(135deg,#667eea 0%,#764ba2 100%); color:white;}
+        @media (max-width:768px){.filters-grid{grid-template-columns:1fr;} .page-header{flex-direction:column;gap:20px;text-align:center;}}
+    </style>
+</h:head>
+
+<h:body>
+<div class="page-container">
+
+    <!-- Header -->
+    <div class="page-header">
+        <div>
+            <h1><i class="pi pi-id-card" style="color:#667eea;"></i> Recepção - Atendimento</h1>
+            <p>Gerencie check-ins, walk-ins e status de funcionários</p>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center;">
+            <!-- Ver Disponibilidade -->
+            <h:form>
+                <p:commandButton value="Ver Disponibilidade"
+                                 action="/app/disponibilidade_funcionario?faces-redirect=true"
+                                 styleClass="btn-filtrar"
+                                 icon="pi pi-users"/>
+            </h:form>
+
+            <!-- Sair -->
+            <h:form>
+                <p:commandButton value="Sair"
+                                 action="#{loginController.logout}"
+                                 styleClass="ui-button-secondary"
+                                 icon="pi pi-sign-out"/>
+            </h:form>
+        </div>
+    </div>
+
+    <!-- Mensagens -->
+    <h:form id="messagesForm">
+        <p:messages id="msgs" autoUpdate="true" closable="true" showDetail="true" 
+                    showSummary="true" sticky="false" style="margin-bottom:20px;"/>
+    </h:form>
+
+    <!-- ================= Check-in ================= -->
+    <div class="main-card">
+        <h:form id="formCheckin">
+            <div class="filters-section">
+                <div class="filters-grid">
+                    <div class="filter-field">
+                        <label>Buscar Agendamento</label>
+                        <p:inputText value="#{recepcaoController.termoBusca}" placeholder="CPF, protocolo ou nome"/>
+                    </div>
+                    <div class="filter-field" style="align-self:flex-end;">
+                        <p:commandButton value="Buscar"
+                                         action="#{recepcaoController.buscarAgendamento}"
+                                         update="@form messagesForm"
+                                         styleClass="btn-filtrar"
+                                         icon="pi pi-search"/>
+                    </div>
+                </div>
+            </div>
+
+            <p:dataTable id="listaAgendamentos"
+                         value="#{recepcaoController.resultadosBusca}"
+                         var="a"
+                         selection="#{recepcaoController.agendamentoSelecionado}"
+                         rowKey="#{a.id}" selectionMode="single"
+                         emptyMessage="Nenhum agendamento encontrado">
+                <p:column headerText="Paciente">#{a.user.nome}</p:column>
+                <p:column headerText="Horário">#{a.hora}</p:column>
+                <p:column headerText="Status">
+                    <span class="status-badge status-agendado">#{a.status}</span>
+                </p:column>
+            </p:dataTable>
+
+            <div style="padding:20px; text-align:center;">
+                <p:commandButton value="Validar Check-in"
+                                 action="#{recepcaoController.confirmarCheckin}"
+                                 update="@form messagesForm"
+                                 styleClass="btn-filtrar"
+                                 disabled="#{empty recepcaoController.agendamentoSelecionado}"/>
+            </div>
+        </h:form>
+    </div>
+
+    <!-- ================= Walk-in ================= -->
+    <div class="main-card">
+        <h:form id="formWalkin" style="text-align:center;">
+            <div class="filters-section">
+                <label>Walk-in (Atendimento Sem Agendamento)</label>
+                <p:inputText value="#{recepcaoController.walkCpf}" placeholder="CPF do cliente"/>
+                <p:commandButton value="Registrar Walk-in"
+                                 action="#{recepcaoController.registrarWalkin}"
+                                 update="@form messagesForm"
+                                 styleClass="btn-filtrar"
+                                 icon="pi pi-user-plus"/>
+            </div>
+        </h:form>
+    </div>
+
+</div>
+</h:body>
+</html>

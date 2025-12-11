@@ -17,7 +17,10 @@
             O link de ativação não é válido ou a conta já foi ativada anteriormente.
         </p>
 
-        <a href="login.xhtml">← Voltar para Login</a>
+        <h:form>
+            <h:commandButton value="Ir para Login →"
+                             action="/login?faces-redirect=true" />
+        </h:form>
     </div>
 </h:body>
 

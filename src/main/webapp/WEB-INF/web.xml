@@ -39,6 +39,10 @@
         <description>atendente / prestador de serviço</description>
         <role-name>atendente</role-name>
     </security-role>
+    <security-role>
+        <description>recepcionista / recepção</description>
+        <role-name>recepcionista</role-name>
+    </security-role>
 
     <!-- Public pages and static resources (no authentication required) -->
     <security-constraint>
@@ -60,12 +64,14 @@
         <display-name>Password Pages (authenticated)</display-name>
         <web-resource-collection>
             <web-resource-name>Password Pages</web-resource-name>
-            <url-pattern>/password/*</url-pattern>
+            <url-pattern>/app/index.xhtml</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <role-name>admin</role-name>
             <role-name>user</role-name>
             <role-name>atendente</role-name>
+            <role-name>recepcionista</role-name>
+
         </auth-constraint>
     </security-constraint>
 
@@ -106,6 +112,21 @@
         </auth-constraint>
     </security-constraint>
 
+    <!-- Recepcionista-specific pages: allow recepcionista and admin -->
+    <security-constraint>
+        <display-name>Recepcionista Area</display-name>
+        <web-resource-collection>
+            <web-resource-name>Recepcionista Pages</web-resource-name>
+            <url-pattern>/app/agendamento/gerenciar_agendamentos.xhtml</url-pattern>
+            <url-pattern>/app/agendamento/*</url-pattern>
+            <url-pattern>/app/atendente/*</url-pattern>
+            <url-pattern>/app/recepcionista/*</url-pattern>
+        </web-resource-collection>
+        <auth-constraint>
+            <role-name>recepcionista</role-name>
+            <role-name>admin</role-name>
+        </auth-constraint>
+    </security-constraint>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>

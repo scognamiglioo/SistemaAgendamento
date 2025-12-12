@@ -4,6 +4,7 @@ import io.github.scognamiglioo.entities.Agendamento;
 import io.github.scognamiglioo.entities.Localizacao;
 import io.github.scognamiglioo.services.AgendamentoServiceLocal;
 import io.github.scognamiglioo.websocket.PainelChamadaService;
+import io.github.scognamiglioo.websocket.ChamadaWebSocketUtil;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
 import jakarta.faces.application.FacesMessage;
@@ -139,21 +140,43 @@ public class AtendimentoController implements Serializable {
      */
     private void notificarPainelPublico(Agendamento agendamento) {
         try {
-            if (agendamento == null || agendamento.getUser() == null) {
+            if (agendamento == null) {
                 return;
             }
 
-            String nomeUsuario = agendamento.getUser().getNome();
+            boolean isWalkin = Boolean.TRUE.equals(agendamento.getIsWalkin());
+            LOGGER.log(Level.INFO, "notificarPainelPublico: isWalkin={0}, agendamentoId={1}", 
+                new Object[]{isWalkin, agendamento.getId()});
+            
+            String nomeUsuario;
+
+            if (isWalkin) {
+                nomeUsuario = agendamento.getWalkinNome() != null ? agendamento.getWalkinNome() : "Walk-in";
+                LOGGER.log(Level.INFO, "Walk-in: nomeUsuario={0}", nomeUsuario);
+            } else {
+                if (agendamento.getUser() == null) {
+                    return;
+                }
+                nomeUsuario = agendamento.getUser().getNome();
+            }
+
             String localizacao = getLocalizacaoAtendimento(agendamento);
+            LOGGER.log(Level.INFO, "notificarPainelPublico: localizacao={0}", localizacao);
             int quantidadeFila = getQuantidadeFilaEspera();
 
-            PainelChamadaService.getInstance()
-                .enviarChamada(nomeUsuario, localizacao, quantidadeFila);
+            if (isWalkin) {
+                LOGGER.log(Level.INFO, "Enviando walk-in para painel: {0} -> {1}", 
+                    new Object[]{nomeUsuario, localizacao});
+                ChamadaWebSocketUtil.enviarChamadaWalkin(nomeUsuario, localizacao, quantidadeFila);
+            } else {
+                PainelChamadaService.getInstance()
+                    .enviarChamada(nomeUsuario, localizacao, quantidadeFila);
+            }
 
             LOGGER.log(Level.INFO, "Painel público notificado: " + nomeUsuario +
                 " -> " + localizacao + " (fila: " + quantidadeFila + ")");
         } catch (Exception e) {
-            LOGGER.log(Level.WARNING, "Erro ao notificar painel público: " + e.getMessage(), e);
+            LOGGER.log(Level.SEVERE, "Erro ao notificar painel público", e);
             // Não bloqueia o fluxo se falhar a notificação
         }
     }

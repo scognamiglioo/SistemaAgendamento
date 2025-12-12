@@ -3,6 +3,7 @@ package io.github.scognamiglioo.controllers;
 import io.github.scognamiglioo.entities.Agendamento;
 import io.github.scognamiglioo.entities.Localizacao;
 import io.github.scognamiglioo.services.AgendamentoServiceLocal;
+import io.github.scognamiglioo.websocket.PainelChamadaService;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
 import jakarta.faces.application.FacesMessage;
@@ -58,6 +59,8 @@ public class AtendimentoController implements Serializable {
     public void carregarFilaEspera() {
         try {
             filaEspera = agendamentoService.findAgendamentosFilaEspera();
+            PainelChamadaService.getInstance()
+                .atualizarQuantidadeNaFila(filaEspera.size());
             LOGGER.log(Level.INFO, "Carregados {0} agendamentos na fila de espera", filaEspera.size());
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erro ao carregar fila de espera", e);
@@ -93,6 +96,9 @@ public class AtendimentoController implements Serializable {
             agendamentoService.iniciarAtendimento(agendamento.getId());
             addSuccessMessage("Atendimento iniciado com sucesso!");
 
+            // Notificar painel público via WebSocket
+            notificarPainelPublico(agendamento);
+
             // Recarrega os dados
             carregarDados();
         } catch (IllegalArgumentException e) {
@@ -125,6 +131,30 @@ public class AtendimentoController implements Serializable {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erro ao finalizar atendimento", e);
             addErrorMessage("Erro ao finalizar atendimento: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Notifica o painel público sobre a chamada via WebSocket
+     */
+    private void notificarPainelPublico(Agendamento agendamento) {
+        try {
+            if (agendamento == null || agendamento.getUser() == null) {
+                return;
+            }
+
+            String nomeUsuario = agendamento.getUser().getNome();
+            String localizacao = getLocalizacaoAtendimento(agendamento);
+            int quantidadeFila = getQuantidadeFilaEspera();
+
+            PainelChamadaService.getInstance()
+                .enviarChamada(nomeUsuario, localizacao, quantidadeFila);
+
+            LOGGER.log(Level.INFO, "Painel público notificado: " + nomeUsuario +
+                " -> " + localizacao + " (fila: " + quantidadeFila + ")");
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Erro ao notificar painel público: " + e.getMessage(), e);
+            // Não bloqueia o fluxo se falhar a notificação
         }
     }
 

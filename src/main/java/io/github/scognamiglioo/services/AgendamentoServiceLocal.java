@@ -27,6 +27,11 @@ public interface AgendamentoServiceLocal {
     Agendamento createAgendamento(User user, Servico servico, Funcionario funcionario, LocalDate data, LocalTime hora);
 
     /**
+     * Cria um novo agendamento walk-in (atendimento presencial sem usuário registrado)
+     */
+    Agendamento createWalkinAgendamento(String nome, String cpf, String telefone, Servico servico, LocalDate data, LocalTime hora);
+
+    /**
      * Atualiza um agendamento existente
      */
     void updateAgendamento(Agendamento agendamento);

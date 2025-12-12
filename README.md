@@ -41,7 +41,7 @@ Aplicação web para gestão de agendamentos construída com Jakarta EE, JSF (Fa
    - Na raiz do projeto, execute `mvn clean package` para gerar o `.war`.
    - Faça o deploy do artefato gerado em `target/` no WildFly.
 5. **Acesso**
-   - Aplicação: `http://localhost:8080/SistemaAgendamento-1.0-SNAPSHOT/`
+   - Aplicação: `http://localhost:8080/secureapp/`
    - Console de administração: `http://localhost:9990`
 
 ## Segurança - Hash em Senhas (Elytron/JASPI)

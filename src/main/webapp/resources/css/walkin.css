@@ -1,0 +1,252 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Inter', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: #ffffff;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+/* Header */
+.page-header {
+    background: white;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    margin-bottom: 30px;
+    animation: slideDown 0.5s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.page-header h1 {
+    color: #2d3748;
+    font-size: 2.2em;
+    font-weight: 700;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.page-header p {
+    color: #718096;
+    font-size: 1.05em;
+}
+
+/* Main Card */
+.form-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    overflow: hidden;
+    animation: fadeInUp 0.6s ease;
+    margin-bottom: 30px;
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.form-header {
+    background: #000000;
+    padding: 25px 30px;
+    color: white;
+}
+
+.form-header h2 {
+    font-size: 1.5em;
+    font-weight: 700;
+    margin: 0;
+}
+
+.form-content {
+    padding: 40px 30px;
+}
+
+/* Form Grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+    margin-bottom: 25px;
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+.form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.form-group label {
+    color: #2d3748;
+    font-weight: 600;
+    font-size: 0.95em;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.required-mark {
+    color: #f56565;
+    font-weight: 700;
+}
+
+/* Primefaces Inputs */
+.ui-inputtext,
+.ui-select,
+.ui-dropdown {
+    border: 2px solid #e2e8f0 !important;
+    border-radius: 10px !important;
+    padding: 12px 15px !important;
+    font-size: 0.95em !important;
+    font-family: 'Inter', 'Segoe UI', sans-serif !important;
+    transition: all 0.3s ease !important;
+}
+
+.ui-inputtext:focus,
+.ui-select:focus,
+.ui-dropdown:focus {
+    border-color: #667eea !important;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+}
+
+.ui-dropdown {
+    width: 100%;
+}
+
+/* Messages */
+.messages-container {
+    margin-bottom: 25px;
+}
+
+.ui-messages {
+    margin: 0 !important;
+}
+
+/* Buttons */
+.buttons-group {
+    display: flex;
+    gap: 15px;
+    justify-content: flex-end;
+    margin-top: 30px;
+}
+
+@media (max-width: 768px) {
+    .buttons-group {
+        flex-direction: column;
+    }
+}
+
+.ui-button {
+    border-radius: 10px !important;
+    padding: 12px 30px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    font-size: 0.85em !important;
+    letter-spacing: 0.5px !important;
+    transition: all 0.3s ease !important;
+    min-width: 150px;
+}
+
+.btn-submit {
+    background: #000000 !important;
+    border: none !important;
+    color: white !important;
+}
+
+.btn-submit:hover {
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4) !important;
+    transform: translateY(-2px) !important;
+}
+
+.btn-cancel {
+    background: #e2e8f0 !important;
+    border: none !important;
+    color: #2d3748 !important;
+}
+
+.btn-cancel:hover {
+    background: #cbd5e0 !important;
+}
+
+/* Info Box */
+.info-box {
+    background: #edf2f7;
+    border-left: 4px solid #667eea;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    display: flex;
+    gap: 15px;
+    align-items: flex-start;
+}
+
+.info-box .icon {
+    color: #667eea;
+    font-size: 1.5em;
+    flex-shrink: 0;
+}
+
+.info-box .content {
+    color: #4a5568;
+    font-size: 0.95em;
+    line-height: 1.6;
+}
+
+.info-box .content strong {
+    color: #2d3748;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* Helper text */
+.helper-text {
+    color: #718096;
+    font-size: 0.85em;
+    margin-top: 5px;
+}
+
+/* Loading overlay */
+.ui-blockui {
+    background: rgba(0, 0, 0, 0.7) !important;
+}
+
+.ui-blockui-content {
+    background: white !important;
+    padding: 30px !important;
+    border-radius: 10px !important;
+}

@@ -5,7 +5,9 @@
 package io.github.scognamiglioo.services;
 
 import io.github.scognamiglioo.entities.StatusAtendente;
+import io.github.scognamiglioo.entities.StatusAtendenteAtual;
 import jakarta.ejb.Local;
+import java.util.List;
 
 /**
  *
@@ -13,10 +15,16 @@ import jakarta.ejb.Local;
  */
 @Local
 public interface AtendenteServiceLocal {
+    
     void alterarStatusAtendente(Long idAtendente, StatusAtendente novoStatus);
 
     Long buscarIdFuncionarioPorUsername(String username);
     
+    public StatusAtendente.Situacao buscarStatusAtual(Long idFuncionario);
+    
+    List<StatusAtendente> buscarHistorico(Long idFuncionario); 
+    
+    public List<StatusAtendenteAtual> buscarTodosStatusAtendentes();
 }
 
 

@@ -10,6 +10,7 @@ import io.github.scognamiglioo.entities.StatusAtendente.Situacao;
 import io.github.scognamiglioo.services.AtendenteServiceLocal;
 import jakarta.annotation.PostConstruct;
 import jakarta.faces.application.FacesMessage;
+import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.faces.view.ViewScoped;
@@ -17,8 +18,12 @@ import jakarta.inject.Inject;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.security.enterprise.SecurityContext;
+import java.io.IOException;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.List;
 
 /**
  *
@@ -33,71 +38,94 @@ public class AtendenteController implements Serializable {
     @Inject
     private AtendenteServiceLocal atendimentoService;
 
-    @Inject
-    private SecurityContext securityContext;
-
-    @PersistenceContext
-    private EntityManager em;
-
     private Long idFuncionario;
     private Funcionario atendente;
-
-    private Situacao situacaoAtual = Situacao.INDISPONIVEL;
+    private StatusAtendente.Situacao situacaoAtual = StatusAtendente.Situacao.INDISPONIVEL;
     private String motivoPausa;
+    private List<StatusAtendente> historico;
 
     @PostConstruct
     public void init() {
         try {
-            String username = securityContext.getCallerPrincipal().getName();
+            String username = FacesContext.getCurrentInstance()
+                                  .getExternalContext()
+                                  .getRemoteUser(); // ou SecurityContext se usar
+
             idFuncionario = atendimentoService.buscarIdFuncionarioPorUsername(username);
+            if (idFuncionario == null) throw new IllegalStateException("Funcionário não encontrado");
 
-            if (idFuncionario == null) {
-                throw new IllegalStateException("Funcionário não encontrado para login: " + username);
-            }
+            // Buscar funcionário
+            atendente = FacesContext.getCurrentInstance()
+                          .getApplication()
+                          .evaluateExpressionGet(FacesContext.getCurrentInstance(),
+                                  "#{em.find('io.github.scognamiglioo.entities.Funcionario'," + idFuncionario + ")}",
+                                  Funcionario.class);
 
-            atendente = em.find(Funcionario.class, idFuncionario);
+            // Buscar status atual do atendente
+            situacaoAtual = atendimentoService.buscarStatusAtual(idFuncionario);
 
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                 "Erro ao carregar dados do atendente: " + e.getMessage(), null));
+                        "Erro ao carregar dados do atendente: " + e.getMessage(), null));
         }
     }
 
-    public void ficarDisponivel() { alterarSituacao(Situacao.DISPONIVEL); }
-    public void ficarOcupado() { alterarSituacao(Situacao.OCUPADO); }
-    public void pausar() { alterarSituacao(Situacao.PAUSA); }
-    public void ficarIndisponivel() { alterarSituacao(Situacao.INDISPONIVEL); }
+    public void disponibilizar() { alterarSituacao(StatusAtendente.Situacao.DISPONIVEL); }
+    public void pausar() { alterarSituacao(StatusAtendente.Situacao.PAUSA); }
+    public void indisponibilizar() { alterarSituacao(StatusAtendente.Situacao.INDISPONIVEL); }
+    public void ficarOcupado() { alterarSituacao(StatusAtendente.Situacao.OCUPADO); }
 
-    public void disponibilizar() { ficarDisponivel(); }
-    public void indisponibilizar() { ficarIndisponivel(); }
-
-    private void alterarSituacao(Situacao nova) {
+    private void alterarSituacao(StatusAtendente.Situacao nova) {
         try {
             StatusAtendente status = new StatusAtendente();
-            status.setFuncionario(atendente);
             status.setSituacao(nova);
-            status.setAtualizacao(Instant.now());
 
             atendimentoService.alterarStatusAtendente(idFuncionario, status);
-
             situacaoAtual = nova;
 
-            FacesContext.getCurrentInstance().addMessage(null,
-                new FacesMessage(FacesMessage.SEVERITY_INFO, "Sucesso", "Situação atualizada para: " + nova));
+            if (nova != StatusAtendente.Situacao.PAUSA) motivoPausa = null;
 
-            if (nova != Situacao.PAUSA) motivoPausa = null;
+            FacesContext.getCurrentInstance().addMessage(null,
+                new FacesMessage("Situação atualizada para: " + nova));
 
         } catch (Exception e) {
             FacesContext.getCurrentInstance().addMessage(null,
                 new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                                 "Erro ao alterar status: " + e.getMessage(), null));
+                        "Erro ao alterar status: " + e.getMessage(), null));
+        }
+    }
+    
+    public String irParaHistorico() {
+        return "/app/atendente/historico_disponibilidade.xhtml?faces-redirect=true";
+    }
+
+    public void carregarHistorico() {
+        if (idFuncionario != null) {
+            historico = atendimentoService.buscarHistorico(idFuncionario);
         }
     }
 
-    // GETTERS e SETTERS
+    public List<StatusAtendente> getHistorico() {
+        if (historico == null) {
+            carregarHistorico();
+        }
+        return historico;
+    }
+    
+
+    /* logout */
+    public String logout() throws IOException {
+        ExternalContext ec = FacesContext.getCurrentInstance().getExternalContext();
+        ec.invalidateSession();
+        return "/login.xhtml?faces-redirect=true";
+    }
+    
+
+    
+    // getters e setters
     public Funcionario getAtendente() { return atendente; }
-    public Situacao getSituacaoAtual() { return situacaoAtual; }
+    public StatusAtendente.Situacao getSituacaoAtual() { return situacaoAtual; }
     public String getMotivoPausa() { return motivoPausa; }
     public void setMotivoPausa(String motivoPausa) { this.motivoPausa = motivoPausa; }
 }

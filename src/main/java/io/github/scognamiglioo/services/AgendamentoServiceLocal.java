@@ -154,5 +154,7 @@ public interface AgendamentoServiceLocal {
      * Finaliza o atendimento de um agendamento (muda status para CONCLUIDO)
      */
     void finalizarAtendimento(Long agendamentoId);
+    
+    public List<Agendamento> searchByCpfOrProtocoloOrName(String trim);
 }
 

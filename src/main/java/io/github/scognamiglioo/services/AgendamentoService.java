@@ -515,4 +515,23 @@ public class AgendamentoService implements AgendamentoServiceLocal {
         em.flush();
         LOGGER.log(Level.INFO, "Atendimento finalizado para o agendamento {0}", agendamentoId);
     }
+
+    
+    @Override
+    public List<Agendamento> searchByCpfOrProtocoloOrName(String termo) {
+        if (termo == null || termo.isBlank()) return new ArrayList<>();
+
+        List<Agendamento> resultados = em.createQuery(
+            "SELECT a FROM Agendamento a " +
+            "WHERE (a.user.cpf = :cpf OR LOWER(a.user.nome) LIKE :nome OR CAST(a.id AS string) = :id) " +
+            "AND a.data = :hoje", Agendamento.class)
+            .setParameter("cpf", termo)
+            .setParameter("nome", "%" + termo.toLowerCase() + "%")
+            .setParameter("id", termo)
+            .setParameter("hoje", LocalDate.now())
+            .getResultList();
+
+        return resultados;
+    }
+
 }

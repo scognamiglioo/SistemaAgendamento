@@ -1,0 +1,144 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Disponibilidade do Atendente</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <style>
+        /* layout/global baseado no seu estilo maior */
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+               background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+               min-height:100vh; padding:20px; }
+
+        .page-container { max-width: 1100px; margin: 0 auto; }
+
+        .page-header {
+            background: white;
+            padding: 22px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            margin: 0 auto 18px auto;
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            gap: 16px;
+        }
+        .page-header-left { display:flex; flex-direction:column; gap:6px; }
+        .page-header h1 { color:#2d3748; font-size:1.6em; font-weight:700; margin:0; }
+        .page-header p { color:#718096; margin:0; }
+
+        .header-buttons { display:flex; gap:10px; align-items:center; }
+
+        /* botão estilo */
+        .ui-button { border-radius:8px !important; padding:10px 14px !important; font-weight:600 !important; text-transform:none; font-size:0.85em; transition:all 0.18s ease !important; }
+        .btn-secondary { background: linear-gradient(135deg,#eef2ff 0%,#e6f0ff 100%) !important; border: none !important; color:#2d3748 !important; }
+        .btn-primary { background: linear-gradient(135deg,#667eea 0%,#764ba2 100%) !important; border:none !important; color:white !important; }
+
+        /* conteúdo central */
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            background:white;
+            padding:28px;
+            border-radius:12px;
+            box-shadow:0 10px 30px rgba(0,0,0,0.12);
+        }
+
+        .status-badge { padding:6px 14px; border-radius:20px; font-size:0.85em; font-weight:600; display:inline-flex; align-items:center; gap:6px; color:white; margin-left:5px; text-transform:uppercase; }
+        .status-DISPONIVEL { background:linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .status-PAUSA { background:linear-gradient(135deg, #ffd200 0%, #f7971e 100%); color:black; }
+        .status-INDISPONIVEL { background:linear-gradient(135deg, #f5576c 0%, #c6426e 100%); }
+        .status-OCUPADO { background:linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
+
+        .center-buttons { display:flex; flex-direction:column; gap:12px; margin-top:20px; }
+        .btn-green { background:linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important; border:none !important; color:white !important; padding:12px 18px !important; border-radius:10px !important; }
+        .btn-yellow { background:linear-gradient(135deg, #ffd200 0%, #f7971e 100%) !important; border:none !important; color:#000 !important; padding:12px 18px !important; border-radius:10px !important; }
+        .btn-red { background:linear-gradient(135deg, #f5576c 0%, #c6426e 100%) !important; border:none !important; color:white !important; padding:12px 18px !important; border-radius:10px !important; }
+        .btn-blue { background:linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; border:none !important; color:white !important; padding:12px 18px !important; border-radius:10px !important; }
+
+        @media (max-width:768px) {
+            .page-header { flex-direction:column; text-align:center; gap:12px; }
+            .header-buttons { justify-content:center; width:100%; }
+            .container { padding:18px; }
+        }
+    </style>
+</h:head>
+
+<h:body>
+    <div class="page-container">
+
+        <!-- HEADER com botões Histórico e Sair -->
+        <div class="page-header">
+            <div class="page-header-left">
+                <h1><i class="pi pi-user" style="color:#667eea; margin-right:8px;"></i>Disponibilidade do Atendente</h1>
+                <p>Gerencie seu status em tempo real</p>
+            </div>
+
+            <h:form id="headerForm">
+                <div class="header-buttons">
+                <p:commandButton value="Histórico"
+                                 action="#{atendenteController.irParaHistorico()}"
+                                 icon="pi pi-history"
+                                 styleClass="ui-button btn-secondary"
+                                 update="@none" />
+
+
+                    <p:commandButton value="Sair"
+                                     action="#{atendenteController.logout}"
+                                     icon="pi pi-sign-out"
+                                     styleClass="ui-button btn-secondary"
+                                     immediate="true" />
+                </div>
+            </h:form>
+        </div>
+
+        <!-- MENSAGENS -->
+        <h:form id="formAtendente">
+            <p:messages id="messages" closable="true" showDetail="true"/>
+
+            <div class="container">
+                <h:panelGrid columns="2" cellpadding="8" style="width:100%">
+                    <h:outputText value="Atendente:" style="font-weight:bold;"/>
+                    <h:outputText value="#{atendenteController.atendente.nome}" />
+
+                    <h:outputText value="Situação atual:" style="font-weight:bold;"/>
+                    <h:panelGroup>
+                        <span class="status-badge status-#{atendenteController.situacaoAtual}">
+                            #{atendenteController.situacaoAtual}
+                        </span>
+                    </h:panelGroup>
+                </h:panelGrid>
+
+                <div class="center-buttons">
+                    <p:commandButton value="Disponível"
+                                     action="#{atendenteController.disponibilizar}"
+                                     update=":formAtendente:messages :formAtendente"
+                                     styleClass="btn-green ui-button"/>
+
+                    <p:commandButton value="Em Pausa"
+                                     action="#{atendenteController.pausar}"
+                                     update=":formAtendente:messages :formAtendente"
+                                     styleClass="btn-yellow ui-button"/>
+
+                    <p:commandButton value="Indisponível"
+                                     action="#{atendenteController.indisponibilizar}"
+                                     update=":formAtendente:messages :formAtendente"
+                                     styleClass="btn-red ui-button"/>
+
+                    <p:commandButton value="Ocupado"
+                                     action="#{atendenteController.ficarOcupado}"
+                                     update=":formAtendente:messages :formAtendente"
+                                     styleClass="btn-blue ui-button"/>
+                </div>
+            </div>
+        </h:form>
+
+    </div>
+</h:body>
+</html>

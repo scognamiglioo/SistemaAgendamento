@@ -100,22 +100,32 @@ public class AgendamentoService implements AgendamentoServiceLocal {
         // Obtém data/hora atual
         java.time.LocalDateTime agora = java.time.LocalDateTime.now();
 
-        // Calcula diferença em horas
+        // Calcula diferença em horas (positivo = futuro, negativo = passado)
         long horasRestantes = java.time.Duration.between(agora, dataHoraAgendamento).toHours();
 
-        // Valida se há pelo menos 24 horas de antecedência
-        if (horasRestantes < 24) {
+        // Se o agendamento é FUTURO (horasRestantes >= 0) e falta menos de 24h, bloqueia
+        if (horasRestantes >= 0 && horasRestantes < 24) {
             throw new IllegalArgumentException(
                     "Não é possível cancelar o agendamento com menos de 24 horas de antecedência. " +
-                            "Agendamento marcado para " + agendamento.getDataFormatada() + " às " + agendamento.getHoraFormatada() + "."
+                            "Agendamento marcado para " + agendamento.getDataFormatada() + " às " + agendamento.getHoraFormatada() + ". " +
+                            "Faltam apenas " + horasRestantes + " horas."
             );
         }
+
+        // Se horasRestantes < 0, significa que o agendamento é passado - pode cancelar
+        // Se horasRestantes >= 24, também pode cancelar (futuro com mais de 24h)
 
         agendamento.setStatus(StatusAgendamento.CANCELADO);
         em.merge(agendamento);
         em.flush();
-        LOGGER.log(Level.INFO, "Agendamento {0} cancelado com {1} horas de antecedência",
-                new Object[]{agendamentoId, horasRestantes});
+
+        if (horasRestantes < 0) {
+            LOGGER.log(Level.INFO, "Agendamento passado {0} cancelado (estava agendado para {1} às {2})",
+                    new Object[]{agendamentoId, agendamento.getDataFormatada(), agendamento.getHoraFormatada()});
+        } else {
+            LOGGER.log(Level.INFO, "Agendamento {0} cancelado com {1} horas de antecedência",
+                    new Object[]{agendamentoId, horasRestantes});
+        }
     }
 
     @Override
@@ -372,8 +382,8 @@ public class AgendamentoService implements AgendamentoServiceLocal {
 
         try {
             List<Localizacao> resultados = em.createNamedQuery("Agendamento.findLocalizacaoServicoPrestado", Localizacao.class)
-                .setParameter("agendamentoId", agendamentoId)
-                .getResultList();
+                    .setParameter("agendamentoId", agendamentoId)
+                    .getResultList();
 
             if (resultados.isEmpty()) {
                 LOGGER.log(Level.WARNING, "Nenhuma localização encontrada para o agendamento: " + agendamentoId);
@@ -382,8 +392,8 @@ public class AgendamentoService implements AgendamentoServiceLocal {
 
             if (resultados.size() > 1) {
                 LOGGER.log(Level.WARNING,
-                    "Múltiplas localizações encontradas para o agendamento " + agendamentoId +
-                    ". Retornando a primeira.");
+                        "Múltiplas localizações encontradas para o agendamento " + agendamentoId +
+                                ". Retornando a primeira.");
             }
 
             return resultados.get(0);
@@ -408,13 +418,13 @@ public class AgendamentoService implements AgendamentoServiceLocal {
 
         try {
             String jpql = "SELECT fs.localizacao FROM Agendamento a " +
-                          "JOIN FuncionarioServico fs ON fs.funcionario.id = a.funcionario.id " +
-                          "AND fs.servico.id = a.servico.id " +
-                          "WHERE a.id = :agendamentoId";
+                    "JOIN FuncionarioServico fs ON fs.funcionario.id = a.funcionario.id " +
+                    "AND fs.servico.id = a.servico.id " +
+                    "WHERE a.id = :agendamentoId";
 
             List<Localizacao> resultados = em.createQuery(jpql, Localizacao.class)
-                .setParameter("agendamentoId", agendamentoId)
-                .getResultList();
+                    .setParameter("agendamentoId", agendamentoId)
+                    .getResultList();
 
             return resultados.isEmpty() ? null : resultados.get(0);
         } catch (Exception e) {
@@ -430,12 +440,12 @@ public class AgendamentoService implements AgendamentoServiceLocal {
 
             // Busca agendamentos CONFIRMADOS ou AGENDADOS para hoje, ordenados por hora
             String jpql = "SELECT a FROM Agendamento a " +
-                         "LEFT JOIN FETCH a.user " +
-                         "LEFT JOIN FETCH a.servico " +
-                         "LEFT JOIN FETCH a.funcionario " +
-                         "WHERE a.data = :data " +
-                         "AND (a.status = :statusConfirmado OR a.status = :statusAgendado) " +
-                         "ORDER BY a.hora ASC";
+                    "LEFT JOIN FETCH a.user " +
+                    "LEFT JOIN FETCH a.servico " +
+                    "LEFT JOIN FETCH a.funcionario " +
+                    "WHERE a.data = :data " +
+                    "AND (a.status = :statusConfirmado OR a.status = :statusAgendado) " +
+                    "ORDER BY a.hora ASC";
 
             return em.createQuery(jpql, Agendamento.class)
                     .setParameter("data", hoje)
@@ -455,12 +465,12 @@ public class AgendamentoService implements AgendamentoServiceLocal {
 
             // Busca agendamentos EM_ATENDIMENTO para hoje
             String jpql = "SELECT a FROM Agendamento a " +
-                         "LEFT JOIN FETCH a.user " +
-                         "LEFT JOIN FETCH a.servico " +
-                         "LEFT JOIN FETCH a.funcionario " +
-                         "WHERE a.data = :data " +
-                         "AND a.status = :status " +
-                         "ORDER BY a.hora ASC";
+                    "LEFT JOIN FETCH a.user " +
+                    "LEFT JOIN FETCH a.servico " +
+                    "LEFT JOIN FETCH a.funcionario " +
+                    "WHERE a.data = :data " +
+                    "AND a.status = :status " +
+                    "ORDER BY a.hora ASC";
 
             return em.createQuery(jpql, Agendamento.class)
                     .setParameter("data", hoje)

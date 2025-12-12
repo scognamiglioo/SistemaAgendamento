@@ -33,7 +33,6 @@ public class MailService
 
         String email = dotenv.get("EMAIL");
         try {
-            //        mail.setFrom("webappactivation@outlook.com");
             mail.setFrom(
                     new InternetAddress(email,
                             "Sistema de Agendamento")
@@ -48,21 +47,153 @@ public class MailService
 
         MimeMultipart content = new MimeMultipart();
 
-        mail.setRecipient(Message.RecipientType.TO, new InternetAddress(to));
-        mail.setSubject("Ativação de Conta");
-
         MimeBodyPart body = new MimeBodyPart();
         body.setContent(String.format("""
                 <html>
-                    <h2>Olá, %s!</h2>
-                    <p>
-                        Clique no link abaixo para ativar sua conta:
-                    </p>
-                    <p>
-                        <a href="%s">Ativar Conta</a>
-                    </p>
+                <head>
+                    <style>
+                        body {
+                            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+                            background-color: #f5f5f5;
+                            margin: 0;
+                            padding: 20px;
+                        }
+                        .container {
+                            max-width: 600px;
+                            margin: 0 auto;
+                            background: white;
+                            border-radius: 15px;
+                            overflow: hidden;
+                            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+                        }
+                        .header {
+                            background: linear-gradient(135deg, #495057 0%%, #343a40 100%%);
+                            color: white;
+                            padding: 30px;
+                            text-align: center;
+                        }
+                        .header h1 {
+                            margin: 0;
+                            font-size: 28px;
+                            font-weight: 700;
+                        }
+                        .header p {
+                            margin: 10px 0 0 0;
+                            opacity: 0.9;
+                        }
+                        .content {
+                            padding: 30px;
+                        }
+                        .greeting {
+                            color: #212529;
+                            font-size: 18px;
+                            margin-bottom: 20px;
+                        }
+                        .message {
+                            background: #f8f9fa;
+                            border-left: 4px solid #343a40;
+                            border-radius: 8px;
+                            padding: 20px;
+                            margin: 20px 0;
+                            color: #495057;
+                            line-height: 1.6;
+                        }
+                        .button-container {
+                            text-align: center;
+                            margin: 30px 0;
+                        }
+                        .btn-activate {
+                            display: inline-block;
+                            background: linear-gradient(135deg, #212529 0%%, #000000 100%%);
+                            color: white;
+                            padding: 15px 40px;
+                            border-radius: 8px;
+                            text-decoration: none;
+                            font-weight: 700;
+                            font-size: 16px;
+                            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+                            transition: all 0.3s ease;
+                        }
+                        .btn-activate:hover {
+                            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+                            transform: translateY(-2px);
+                        }
+                        .info-box {
+                            background: #e9ecef;
+                            border-radius: 8px;
+                            padding: 15px;
+                            margin: 20px 0;
+                            color: #495057;
+                            line-height: 1.6;
+                        }
+                        .footer {
+                            background: #f8f9fa;
+                            padding: 20px;
+                            text-align: center;
+                            border-top: 2px solid #e9ecef;
+                            color: #6c757d;
+                            font-size: 14px;
+                        }
+                        .security-note {
+                            background: #fff3cd;
+                            border-left: 4px solid #ffc107;
+                            border-radius: 8px;
+                            padding: 15px;
+                            margin: 20px 0;
+                            color: #856404;
+                            font-size: 14px;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <div class="header">
+                            <h1>Bem-vindo ao Sistema de Agendamento!</h1>
+                            <p>Estamos felizes em ter você conosco</p>
+                        </div>
+                        
+                        <div class="content">
+                            <p class="greeting">Olá, <strong>%s</strong>!</p>
+                            
+                            <div class="message">
+                                <p style="margin: 0;">
+                                    Obrigado por se cadastrar em nosso sistema! Para começar a usar todos os recursos, 
+                                    você precisa ativar sua conta.
+                                </p>
+                            </div>
+                            
+                            <div class="button-container">
+                                <a href="%s" class="btn-activate">Ativar Minha Conta</a>
+                            </div>
+                            
+                            <div class="info-box">
+                                <strong>O que você pode fazer após a ativação:</strong><br/>
+                                • Agendar consultas e serviços<br/>
+                                • Gerenciar seus agendamentos<br/>
+                                • Acompanhar histórico de atendimentos<br/>
+                                • Receber notificações sobre seus agendamentos
+                            </div>
+                            
+                            <div class="security-note">
+                                <strong>Importante:</strong><br/>
+                                Se você não solicitou este cadastro, por favor ignore este e-mail. 
+                                Este link de ativação expira em 24 horas.
+                            </div>
+                            
+                            <p style="color: #6c757d; font-size: 14px; margin-top: 20px;">
+                                Se o botão não funcionar, copie e cole o link abaixo no seu navegador:<br/>
+                                <a href="%s" style="color: #212529; word-break: break-all;">%s</a>
+                            </p>
+                        </div>
+                        
+                        <div class="footer">
+                            <p><strong>Sistema de Agendamento</strong></p>
+                            <p>Este é um e-mail automático, por favor não responda.</p>
+                        </div>
+                    </div>
+                </body>
                 </html>
-                """, name, link),
+                """, name, link, link, link),
                 "text/html; charset=utf-8");
 
         content.addBodyPart(body);

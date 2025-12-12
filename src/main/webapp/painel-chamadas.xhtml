@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Painel Público - Chamadas</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <h:outputStylesheet library="css" name="painel_chamadas.css" />
+</h:head>
+
+<h:body>
+    <div class="container">
+        <!-- Status de Conexão -->
+        <div class="status-conexao">
+            <div class="status-dot" id="statusDot"></div>
+            <span id="statusTexto">Conectando...</span>
+        </div>
+
+        <!-- Chamada Atual -->
+        <div class="chamada-atual-container" id="chamadaContainer">
+            <div class="chamada-atual-content">
+                <div class="label-chamada">Chamando:</div>
+                <div id="chamadaVazia" class="chamada-vazia">
+                    <h2>🔔</h2>
+                    <p>Aguardando chamadas...</p>
+                </div>
+                <div id="chamadaAtual" style="display: none;">
+                    <div class="nome-usuario" id="nomeUsuario">-</div>
+                    <div class="detalhes-chamada">
+                        <div class="detalhe-item">
+                            <div class="detalhe-label">📍 Local</div>
+                            <div class="detalhe-valor" id="guicheAtual">-</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        
+    </div>
+
+    <script type="text/javascript">
+        //<![CDATA[
+        
+        // Configurar WebSocket
+        const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+        const host = window.location.host;
+        const contextPath = '#{request.contextPath}' || '';
+        const wsUrl = protocol + '//' + host + contextPath + '/painel-chamadas';
+        
+        let socket = null;
+        let reconectarIntervalo = null;
+        const historico = [];
+
+        function conectarWebSocket() {
+            try {
+                socket = new WebSocket(wsUrl);
+
+                socket.onopen = function(event) {
+                    console.log('✅ Conectado ao servidor WebSocket');
+                    atualizarStatusConexao(true);
+                    limparReconexao();
+                };
+
+                socket.onmessage = function(event) {
+                    try {
+                        const chamada = JSON.parse(event.data);
+                        console.log('📨 Chamada recebida:', chamada);
+
+                        // Atualizar quantidade na fila
+                        if (typeof chamada.quantidadeFila === 'number') {
+                            atualizarQuantidadeFila(chamada.quantidadeFila);
+                        }
+
+                        const temNome = chamada.nomeUsuario && chamada.nomeUsuario.trim() !== '';
+
+                        if (chamada.ativo && temNome) {
+                            exibirChamadaAtual(chamada);
+                        } else if (temNome) {
+                            adicionarAoHistorico(chamada);
+                        }
+                    } catch (e) {
+                        console.error('❌ Erro ao processar mensagem:', e);
+                    }
+                };
+
+                socket.onerror = function(event) {
+                    console.error('❌ Erro WebSocket:', event);
+                    atualizarStatusConexao(false);
+                };
+
+                socket.onclose = function(event) {
+                    console.log('🔌 Desconectado do servidor');
+                    atualizarStatusConexao(false);
+                    reconectarAutomaticamente();
+                };
+            } catch (e) {
+                console.error('❌ Erro ao conectar WebSocket:', e);
+                reconectarAutomaticamente();
+            }
+        }
+
+        function exibirChamadaAtual(chamada) {
+            const chamadaVazia = document.getElementById('chamadaVazia');
+            const chamadaAtual = document.getElementById('chamadaAtual');
+            const nomeUsuario = document.getElementById('nomeUsuario');
+            const guiche = document.getElementById('guicheAtual');
+
+            // Abreviar nome se muito longo
+            let nomeAbreviado = chamada.nomeUsuario;
+            if (nomeAbreviado.length > 25) {
+                nomeAbreviado = nomeAbreviado.substring(0, 22) + '...';
+            }
+
+            nomeUsuario.textContent = nomeAbreviado.toUpperCase();
+            guiche.textContent = chamada.localizacao || '-';
+
+            chamadaVazia.style.display = 'none';
+            chamadaAtual.style.display = 'block';
+
+            // Efeito de animação
+            chamadaAtual.style.animation = 'none';
+            setTimeout(() => {
+                chamadaAtual.style.animation = '';
+            }, 10);
+        }
+
+        function adicionarAoHistorico(chamada) {
+            historico.unshift(chamada);
+            if (historico.length > 5) {
+                historico.pop();
+            }
+            renderizarHistorico();
+        }
+
+        function renderizarHistorico() {
+            const container = document.getElementById('historico');
+
+            if (historico.length === 0) {
+                container.innerHTML = '<div class="historico-vazio">Nenhuma chamada realizada ainda</div>';
+                return;
+            }
+
+            container.innerHTML = historico.map((chamada, index) => `
+                <div class="historico-item" style="animation-delay: ${index * 0.1}s;">
+                    <div class="historico-usuario">
+                        <div class="historico-nome">${chamada.nomeUsuario}</div>
+                        <div class="historico-info">${chamada.dataHora || ''}</div>
+                    </div>
+                    <div class="historico-guiche">Local ${chamada.localizacao || '-'}</div>
+                    <div class="historico-hora">${chamada.dataHora || ''}</div>
+                </div>
+            `).join('');
+        }
+
+        function atualizarQuantidadeFila(quantidade) {
+            const filaSpan = document.getElementById('filaQuantidade');
+            if (filaSpan) {
+                filaSpan.textContent = quantidade;
+            }
+        }
+
+        function atualizarStatusConexao(conectado) {
+            const statusDot = document.getElementById('statusDot');
+            const statusTexto = document.getElementById('statusTexto');
+
+            if (conectado) {
+                statusDot.classList.remove('desconectado');
+                statusTexto.textContent = 'Conectado';
+            } else {
+                statusDot.classList.add('desconectado');
+                statusTexto.textContent = 'Desconectado - Reconectando...';
+            }
+        }
+
+        function reconectarAutomaticamente() {
+            if (!reconectarIntervalo) {
+                console.log('🔄 Tentando reconectar em 5 segundos...');
+                reconectarIntervalo = setTimeout(() => {
+                    reconectarIntervalo = null;
+                    conectarWebSocket();
+                }, 5000);
+            }
+        }
+
+        function limparReconexao() {
+            if (reconectarIntervalo) {
+                clearTimeout(reconectarIntervalo);
+                reconectarIntervalo = null;
+            }
+        }
+
+        // Conectar ao iniciar
+        conectarWebSocket();
+
+        // Fechar WebSocket ao sair
+        window.addEventListener('beforeunload', () => {
+            if (socket) {
+                socket.close();
+            }
+        });
+
+        //]]>
+    </script>
+</h:body>
+
+</html>

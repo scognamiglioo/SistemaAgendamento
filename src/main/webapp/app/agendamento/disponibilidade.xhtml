@@ -1,0 +1,78 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+
+<h:head>
+    <title>Disponibilidade do Atendente</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height:100vh; padding:20px; }
+        .page-header { background:white; padding:25px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.1); margin:0 auto 25px auto; max-width:500px; text-align:center; animation: fadeIn 0.6s ease-out; }
+        .page-header h1 { color:#2d3748; font-size:1.8em; font-weight:700; }
+        .page-header p { color:#718096; }
+        .container { max-width:500px; margin:0 auto; background:white; padding:30px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.15); animation: fadeIn 0.8s ease-out; }
+        .status-badge { padding:6px 14px; border-radius:20px; font-size:0.85em; font-weight:600; display:inline-flex; align-items:center; gap:6px; color:white; margin-left:5px; }
+        .status-DISPONIVEL { background:linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .status-PAUSA { background:linear-gradient(135deg, #ffd200 0%, #f7971e 100%); color:black; }
+        .status-INDISPONIVEL { background:linear-gradient(135deg, #f5576c 0%, #c6426e 100%); }
+        .status-OCUPADO { background:linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); }
+        .ui-button { border-radius:10px !important; padding:12px 22px !important; font-weight:600 !important; font-size:0.95em !important; transition:all 0.3s ease !important; width:100%; }
+        .ui-button:hover { transform:translateY(-2px); box-shadow:0 5px 15px rgba(0,0,0,0.2) !important; }
+        .btn-green { background:linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important; border:none !important; }
+        .btn-yellow { background:linear-gradient(135deg, #ffd200 0%, #f7971e 100%) !important; border:none !important; color:#000 !important; }
+        .btn-red { background:linear-gradient(135deg, #f5576c 0%, #c6426e 100%) !important; border:none !important; }
+        .btn-blue { background:linear-gradient(135deg, #1e3c72 0%, #2a5298 100%) !important; border:none !important; }
+        .center-buttons { display:flex; flex-direction:column; gap:12px; margin-top:25px; }
+        @keyframes fadeIn { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+    </style>
+</h:head>
+
+<h:body>
+    <h:form id="formAtendente">
+        <div class="page-header">
+            <div>
+                <h1><i class="pi pi-user" style="color:#667eea; font-size:1.3em;"></i>Disponibilidade do Atendente</h1>
+                <p>Gerencie seu status em tempo real</p>
+            </div>
+            <h:panelGroup rendered="#{request.isUserInRole('admin')}">
+                <p:commandButton value="Voltar"
+                                 action="/app/admin.xhtml?faces-redirect=true"
+                                 styleClass="ui-button-secondary"
+                                 icon="pi pi-arrow-left"/>
+            </h:panelGroup>
+            
+            <h:panelGroup rendered="#{request.isUserInRole('atendente') or request.isUserInRole('recepcionista') or request.isUserInRole('funcionario')}">
+                <p:commandButton value="Voltar"
+                                 action="/app/agendamento/gerenciar_agendamentos.xhtml?faces-redirect=true"
+                                 styleClass="ui-button-secondary"
+                                 icon="pi pi-arrow-left"/>
+            </h:panelGroup>
+        </div>
+
+        <p:messages id="messages" closable="true" showDetail="true"/>
+
+        <div class="container">
+            <h:panelGrid columns="2" cellpadding="8" style="width:100%">
+                <h:outputText value="Atendente:" style="font-weight:bold;"/>
+                <h:outputText value="#{atendenteController.atendente.nome}" />
+
+                <h:outputText value="Situação atual:" style="font-weight:bold;"/>
+                <h:panelGroup>
+                    <span class="status-badge status-#{atendenteController.situacaoAtual}">
+                        #{atendenteController.situacaoAtual}
+                    </span>
+                </h:panelGroup>
+            </h:panelGrid>
+
+            <div class="center-buttons">
+                <p:commandButton value="Disponível" action="#{atendenteController.disponibilizar}" update="formAtendente" styleClass="btn-green"/>
+                <p:commandButton value="Em Pausa" action="#{atendenteController.pausar}" update="formAtendente" styleClass="btn-yellow"/>
+                <p:commandButton value="Indisponível" action="#{atendenteController.indisponibilizar}" update="formAtendente" styleClass="btn-red"/>
+                <p:commandButton value="Ocupado" action="#{atendenteController.ficarOcupado}" update="formAtendente" styleClass="btn-blue"/>
+            </div>
+        </div>
+    </h:form>
+</h:body>
+</html>

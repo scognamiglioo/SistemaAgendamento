@@ -4,20 +4,23 @@
 
 <h:head>
     <title>Erro na ativação</title>
-    <h:outputStylesheet name="css/login.css"/>
+     <h:outputStylesheet library="css" name="auth-pages.css"/>
 </h:head>
 
 <h:body>
-    <div style="max-width: 500px; margin: 4rem auto; padding: 2rem;
-                border: 1px solid #ccc; border-radius: 8px;">
+    <div class="error-container">
+        <div class="error-icon">❌</div>
+        
+        <h1>Link Inválido</h1>
 
-        <h1>Link inválido</h1>
-
-        <p style="color: red; font-size: 18px;">
-            O link de ativação não é válido ou a conta já foi ativada.
+        <p>
+            O link de ativação não é válido ou a conta já foi ativada anteriormente.
         </p>
 
-        <a href="login.xhtml">Voltar para login</a>
+        <h:form>
+            <h:commandButton value="Ir para Login →"
+                             action="/login?faces-redirect=true" />
+        </h:form>
     </div>
 </h:body>
 

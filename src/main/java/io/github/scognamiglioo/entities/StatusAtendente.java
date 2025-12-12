@@ -16,6 +16,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import java.io.Serializable;
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 
 /**
  *
@@ -42,6 +44,14 @@ public class StatusAtendente implements Serializable {
     @JoinColumn(name = "id_funcionario", nullable = false)
     private Funcionario funcionario;
 
+    
+    public String getAtualizacaoFormatada() {
+        if (atualizacao == null) return "";
+        return atualizacao
+                .atZone(ZoneId.systemDefault())
+                .toLocalDateTime()
+                .format(DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss"));
+    }
     public Long getId() { return id; }
     public Situacao getSituacao() { return situacao; }
     public void setSituacao(Situacao situacao) { this.situacao = situacao; }

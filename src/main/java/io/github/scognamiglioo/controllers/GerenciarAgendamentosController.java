@@ -237,6 +237,13 @@ public class GerenciarAgendamentosController implements Serializable {
                 return;
             }
 
+            // Verifica se o agendamento pode ser editado
+            if (!isPodeEditar()) {
+                addErrorMessage("Este agendamento não pode ser editado pois está " +
+                               agendamentoSelecionado.getStatus().getDescricao());
+                return;
+            }
+
             Long agendamentoId = agendamentoSelecionado.getId();
             LOGGER.log(Level.INFO, "Salvando alterações do agendamento #{0}", agendamentoId);
 
@@ -502,5 +509,29 @@ public class GerenciarAgendamentosController implements Serializable {
             LOGGER.log(Level.SEVERE, "Erro ao obter nome da localização para agendamento: " + agendamentoId, e);
             return "Erro ao carregar";
         }
+    }
+
+    /**
+     * Verifica se o agendamento pode ser editado.
+     * Agendamentos com status CONCLUIDO ou CANCELADO não podem ser editados.
+     *
+     * @return true se pode editar, false se é somente leitura
+     */
+    public boolean isPodeEditar() {
+        if (agendamentoSelecionado == null) {
+            return false;
+        }
+        StatusAgendamento status = agendamentoSelecionado.getStatus();
+        return status != StatusAgendamento.CONCLUIDO && status != StatusAgendamento.CANCELADO;
+    }
+
+    /**
+     * Getter alternativo para compatibilidade JSF.
+     * Alguns frameworks JSF preferem getPodeEditar() ao invés de isPodeEditar().
+     *
+     * @return true se pode editar, false se é somente leitura
+     */
+    public boolean getPodeEditar() {
+        return isPodeEditar();
     }
 }

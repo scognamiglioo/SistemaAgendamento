@@ -523,7 +523,9 @@
             </div>
 
             <!-- Dialog de Edição Moderno -->
-            <p:dialog id="dialogEditar" header="Editar Agendamento" widgetVar="dialogEditar" modal="true" width="650"
+            <p:dialog id="dialogEditar"
+                header="#{gerenciarAgendamentosController.podeEditar ? 'Editar Agendamento' : 'Visualizar Agendamento'}"
+                widgetVar="dialogEditar" modal="true" width="650"
                 height="600" fitViewport="true" maximizable="true" showEffect="fade" hideEffect="fade"
                 responsive="true">
 
@@ -535,6 +537,19 @@
                 </h:panelGroup>
 
                 <h:panelGroup rendered="#{gerenciarAgendamentosController.agendamentoSelecionado != null}">
+                    <!-- Alerta para visualização -->
+                    <h:panelGroup rendered="#{!gerenciarAgendamentosController.podeEditar}">
+                        <div style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+                                    color: white; padding: 15px; border-radius: 10px; margin-bottom: 20px;
+                                    display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(240, 147, 251, 0.3);">
+                            <i class="pi pi-info-circle" style="font-size: 1.5em;"></i>
+                            <div>
+                                <strong style="display: block; font-size: 1.1em; margin-bottom: 5px;">Modo Visualização</strong>
+                                <span style="font-size: 0.9em;">Este agendamento está #{gerenciarAgendamentosController.agendamentoSelecionado.status.descricao} e não pode mais ser editado.</span>
+                            </div>
+                        </div>
+                    </h:panelGroup>
+
                     <div class="dialog-grid">
                         <!-- Informações do Paciente -->
                         <div class="dialog-field">
@@ -575,33 +590,61 @@
                         <!-- Campos Editáveis -->
                         <div class="dialog-field">
                             <label><i class="pi pi-user-plus icon"></i> Profissional Responsável</label>
-                            <p:selectOneMenu value="#{gerenciarAgendamentosController.funcionarioSelecionadoId}"
-                                style="width: 100%;">
-                                <f:selectItem itemLabel="Selecione o profissional..." itemValue="#{null}" />
-                                <f:selectItems value="#{gerenciarAgendamentosController.funcionariosDisponiveis}"
-                                    var="func" itemLabel="#{func.nome}" itemValue="#{func.id}" />
-                            </p:selectOneMenu>
+                            <h:panelGroup rendered="#{gerenciarAgendamentosController.podeEditar}">
+                                <p:selectOneMenu value="#{gerenciarAgendamentosController.funcionarioSelecionadoId}"
+                                    style="width: 100%;">
+                                    <f:selectItem itemLabel="Selecione o profissional..." itemValue="#{null}" />
+                                    <f:selectItems value="#{gerenciarAgendamentosController.funcionariosDisponiveis}"
+                                        var="func" itemLabel="#{func.nome}" itemValue="#{func.id}" />
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{!gerenciarAgendamentosController.podeEditar}">
+                                <div class="value">
+                                    <h:outputText
+                                        value="#{gerenciarAgendamentosController.agendamentoSelecionado.nomeFuncionario}" />
+                                </div>
+                            </h:panelGroup>
                         </div>
 
 
                         <div class="dialog-field">
                             <label><i class="pi pi-info-circle icon"></i> Status do Atendimento</label>
-                            <p:selectOneMenu value="#{gerenciarAgendamentosController.statusSelecionado}"
-                                style="width: 100%;">
-                                <f:selectItem itemLabel="Agendado" itemValue="AGENDADO" />
-                                <f:selectItem itemLabel="Confirmado" itemValue="CONFIRMADO" />
-                                <f:selectItem itemLabel="Em Atendimento" itemValue="EM_ATENDIMENTO" />
-                                <f:selectItem itemLabel="Concluído" itemValue="CONCLUIDO" />
-                                <f:selectItem itemLabel="Cancelado" itemValue="CANCELADO" />
-                                <f:selectItem itemLabel="Não Compareceu" itemValue="NAO_COMPARECEU" />
-                            </p:selectOneMenu>
+                            <h:panelGroup rendered="#{gerenciarAgendamentosController.podeEditar}">
+                                <p:selectOneMenu value="#{gerenciarAgendamentosController.statusSelecionado}"
+                                    style="width: 100%;">
+                                    <f:selectItem itemLabel="Agendado" itemValue="AGENDADO" />
+                                    <f:selectItem itemLabel="Confirmado" itemValue="CONFIRMADO" />
+                                    <f:selectItem itemLabel="Em Atendimento" itemValue="EM_ATENDIMENTO" />
+                                    <f:selectItem itemLabel="Concluído" itemValue="CONCLUIDO" />
+                                    <f:selectItem itemLabel="Cancelado" itemValue="CANCELADO" />
+                                    <f:selectItem itemLabel="Não Compareceu" itemValue="NAO_COMPARECEU" />
+                                </p:selectOneMenu>
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{!gerenciarAgendamentosController.podeEditar}">
+                                <div class="value">
+                                    <h:outputText
+                                        value="#{gerenciarAgendamentosController.agendamentoSelecionado.status.descricao}" />
+                                </div>
+                            </h:panelGroup>
                         </div>
 
                         <div class="dialog-field">
                             <label><i class="pi pi-comment icon"></i> Observações</label>
-                            <p:inputTextarea
-                                value="#{gerenciarAgendamentosController.agendamentoSelecionado.observacoes}" rows="4"
-                                placeholder="Adicione observações sobre o atendimento..." style="width: 100%;" />
+                            <h:panelGroup rendered="#{gerenciarAgendamentosController.podeEditar}">
+                                <p:inputTextarea
+                                    value="#{gerenciarAgendamentosController.agendamentoSelecionado.observacoes}" rows="4"
+                                    placeholder="Adicione observações sobre o atendimento..." style="width: 100%;" />
+                            </h:panelGroup>
+                            <h:panelGroup rendered="#{!gerenciarAgendamentosController.podeEditar}">
+                                <div class="value" style="white-space: pre-wrap;">
+                                    <h:outputText
+                                        value="#{gerenciarAgendamentosController.agendamentoSelecionado.observacoes}"
+                                        rendered="#{gerenciarAgendamentosController.agendamentoSelecionado.observacoes != null and gerenciarAgendamentosController.agendamentoSelecionado.observacoes != ''}" />
+                                    <h:outputText value="Sem observações"
+                                        style="color: #a0aec0; font-style: italic;"
+                                        rendered="#{gerenciarAgendamentosController.agendamentoSelecionado.observacoes == null or gerenciarAgendamentosController.agendamentoSelecionado.observacoes == ''}" />
+                                </div>
+                            </h:panelGroup>
                         </div>
                     </div>
                 </h:panelGroup>
@@ -613,7 +656,7 @@
                             update=":formAgendamentos:tabelaAgendamentos :formAgendamentos:messages"
                             process="dialogEditar" oncomplete="PF('dialogEditar').hide();" icon="pi pi-check"
                             ajax="true" styleClass="ui-button-success"
-                            rendered="#{gerenciarAgendamentosController.agendamentoSelecionado != null}" />
+                            rendered="#{gerenciarAgendamentosController.agendamentoSelecionado != null and gerenciarAgendamentosController.podeEditar}" />
 
                         <p:commandButton value="Fechar" onclick="PF('dialogEditar').hide(); return false;" type="button"
                             icon="pi pi-times" styleClass="ui-button-secondary" />

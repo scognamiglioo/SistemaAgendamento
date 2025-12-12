@@ -42,32 +42,42 @@
 
 
                             
-                            <p:outputLabel for="nome" value="Nome Completo *"/>
+                            <p:outputLabel for="nome" value="Nome Completo"/>
                             <p:inputText id="nome"
                                          value="#{newUserController.user.nome}"
                                          required="true"
                                          requiredMessage="Nome é obrigatório"
                                          style="width: 100%"/>
 
+                            <h:outputLabel />
+                            <p:message for="nome" id="nomeMessage"/>
+
                             <!-- Username -->
-                            <p:outputLabel for="username" value="Username *"/>
+                            <p:outputLabel for="username" value="Username"/>
                             <p:inputText id="username"
                                          value="#{newUserController.user.username}"
                                          required="true"
                                          requiredMessage="Username é obrigatório"
                                          style="width: 100%"/>
 
+                            <h:outputLabel />
+                            <p:message for="username" id="usernameMessage"/>
+
                             <!-- Senha -->
-                            <p:outputLabel for="password" value="Senha *"/>
+                            <p:outputLabel for="password" value="Senha"/>
                             <p:password id="password"
                                         value="#{newUserController.user.userPassword}"
                                         required="true"
                                         requiredMessage="Senha é obrigatória"
                                         feedback="true"
+                                        
                                         style="width: 100%"/>
 
+                            <h:outputLabel />
+                            <p:message for="password" id="passwordMessage"/>
+
                             <!-- CPF -->
-                            <p:outputLabel for="cpf" value="CPF *"/>
+                            <p:outputLabel for="cpf" value="CPF"/>
                             
                             <p:inputText id="cpf"
                                          value="#{newUserController.user.cpf}"
@@ -83,21 +93,27 @@
                             <p:message for="cpf" id="cpfMessage"/>
 
                             <!-- Email -->
-                            <p:outputLabel for="email" value="E-mail *"/>
+                            <p:outputLabel for="email" value="E-mail"/>
                             <p:inputText id="email"
                                          value="#{newUserController.user.email}"
                                          required="true"
                                          requiredMessage="E-mail é obrigatório"
                                          style="width: 100%"/>
 
+                                                        <h:outputLabel />
+                                                        <p:message for="email" id="emailMessage"/>
+
                             <!-- Telefone -->
-                            <p:outputLabel for="telefone" value="Telefone *"/>
+                            <p:outputLabel for="telefone" value="Telefone"/>
                             <p:inputText id="telefone"
                                          value="#{newUserController.user.telefone}"
                                          required="true"
                                          requiredMessage="Telefone é obrigatório"
                                          maxlength="15"
                                          style="width: 100%"/>
+
+                                                        <h:outputLabel />
+                                                        <p:message for="telefone" id="telefoneMessage"/>
 
                             <!-- Botão Cancelar -->
                             
@@ -129,8 +145,12 @@
                     font-family: 'Poppins', sans-serif;
                     font-size: 1.1rem;
                     letter-spacing: 0.5px;">
-
-                <p style="margin: 0;">Web Dev / 2025</p>
+                <p style="margin: 0;">© 2025 Sistema de Agendamento - Todos os direitos reservados</p>
+                
+                <a href="./politica_privacidade.xhtml"
+                   style="color: white; text-decoration: underline; display: inline-block; margin-top: 8px;">
+                    Política de Privacidade
+                </a>
             </footer>
 
         </h:body>

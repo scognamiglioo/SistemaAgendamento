@@ -526,11 +526,24 @@
                                 <div class="queue-item-header">
                                     <div class="patient-info">
                                         <div class="patient-avatar">
-                                            #{agendamento.user.nome.substring(0, 1).toUpperCase()}
+                                            <h:outputText value="#{agendamento.walkinNome.substring(0, 1).toUpperCase()}" 
+                                                        rendered="#{agendamento.isWalkin}"/>
+                                            <h:outputText value="#{agendamento.user.nome.substring(0, 1).toUpperCase()}" 
+                                                        rendered="#{not agendamento.isWalkin}"/>
                                         </div>
                                         <div class="patient-details">
-                                            <h3>#{agendamento.user.nome}</h3>
-                                            <p>ID: #{agendamento.id}</p>
+                                            <h3>
+                                                <h:outputText value="#{agendamento.walkinNome}" 
+                                                            rendered="#{agendamento.isWalkin}"/>
+                                                <h:outputText value="#{agendamento.user.nome}" 
+                                                            rendered="#{not agendamento.isWalkin}"/>
+                                            </h3>
+                                            <p>
+                                                <h:outputText value="Walk-in | #{agendamento.walkinCpf}" 
+                                                            rendered="#{agendamento.isWalkin}"/>
+                                                <h:outputText value="ID: #{agendamento.id}" 
+                                                            rendered="#{not agendamento.isWalkin}"/>
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="time-badge">
@@ -562,6 +575,10 @@
                                         <span class="info-value"
                                               style="color: #f59e0b;">#{agendamento.status.descricao}</span>
                                     </div>
+                                    <div class="info-field" rendered="#{agendamento.isWalkin}">
+                                        <span class="info-label">Telefone</span>
+                                        <span class="info-value">#{agendamento.walkinTelefone}</span>
+                                    </div>
                                 </div>
 
                                 <div class="queue-item-actions">
@@ -571,7 +588,7 @@
                                                      styleClass="btn btn-success"
                                                      rendered="#{agendamento.funcionario != null}">
                                         <p:confirm header="Confirmação"
-                                                   message="Deseja iniciar o atendimento de #{agendamento.user.nome}?"
+                                                   message="Deseja iniciar o atendimento de #{agendamento.nomeUsuario}?"
                                                    icon="pi pi-exclamation-triangle"/>
                                     </p:commandButton>
                                 </div>
@@ -606,11 +623,24 @@
                                     <div class="patient-info">
                                         <div class="patient-avatar"
                                              style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">
-                                            #{agendamento.user.nome.substring(0, 1).toUpperCase()}
+                                            <h:outputText value="#{agendamento.walkinNome.substring(0, 1).toUpperCase()}" 
+                                                        rendered="#{agendamento.isWalkin}"/>
+                                            <h:outputText value="#{agendamento.user.nome.substring(0, 1).toUpperCase()}" 
+                                                        rendered="#{not agendamento.isWalkin}"/>
                                         </div>
                                         <div class="patient-details">
-                                            <h3>#{agendamento.user.nome}</h3>
-                                            <p>ID: #{agendamento.id}</p>
+                                            <h3>
+                                                <h:outputText value="#{agendamento.walkinNome}" 
+                                                            rendered="#{agendamento.isWalkin}"/>
+                                                <h:outputText value="#{agendamento.user.nome}" 
+                                                            rendered="#{not agendamento.isWalkin}"/>
+                                            </h3>
+                                            <p>
+                                                <h:outputText value="Walk-in | #{agendamento.walkinCpf}" 
+                                                            rendered="#{agendamento.isWalkin}"/>
+                                                <h:outputText value="ID: #{agendamento.id}" 
+                                                            rendered="#{not agendamento.isWalkin}"/>
+                                            </p>
                                         </div>
                                     </div>
                                     <div class="time-badge" style="background: #10b981;">
@@ -636,6 +666,10 @@
                                         <span class="info-value"
                                               style="color: #10b981;">#{agendamento.status.descricao}</span>
                                     </div>
+                                    <div class="info-field" rendered="#{agendamento.isWalkin}">
+                                        <span class="info-label">Telefone</span>
+                                        <span class="info-value">#{agendamento.walkinTelefone}</span>
+                                    </div>
                                 </div>
 
                                 <div class="queue-item-actions">
@@ -644,7 +678,7 @@
                                                      update=":mainContent"
                                                      styleClass="btn btn-success">
                                         <p:confirm header="Confirmação"
-                                                   message="Deseja finalizar o atendimento de #{agendamento.user.nome}?"
+                                                   message="Deseja finalizar o atendimento de #{agendamento.nomeUsuario}?"
                                                    icon="pi pi-check-circle"/>
                                     </p:commandButton>
                                 </div>

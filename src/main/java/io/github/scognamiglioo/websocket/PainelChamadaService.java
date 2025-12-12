@@ -59,6 +59,31 @@ public class PainelChamadaService {
         }
     }
 
+    /**
+     * Envia chamada para walk-in mascarando o horário exibido no painel.
+     */
+    public void enviarChamadaWalkin(String nomeUsuario, String localizacao, int quantidadeFila) {
+        try {
+            if (quantidadeFila >= 0) {
+                this.quantidadeFilaEspera = quantidadeFila;
+            }
+
+            Chamada chamada = new Chamada(nomeUsuario, localizacao, true);
+            chamada.setQuantidadeFila(this.quantidadeFilaEspera);
+            
+
+            if (chamadaAtual != null) {
+                chamadaAtual.setAtivo(false);
+                adicionarAoHistorico(chamadaAtual);
+            }
+
+            chamadaAtual = chamada;
+            broadcast(chamada);
+        } catch (Exception e) {
+            System.err.println("[PAINEL-SERVICE] Erro ao enviar chamada walk-in: " + e.getMessage());
+        }
+    }
+
     public void atualizarQuantidadeNaFila(int quantidade) {
         this.quantidadeFilaEspera = quantidade;
         broadcastQuantidadeFila();

@@ -6,7 +6,9 @@ package io.github.scognamiglioo.controllers;
 
 import io.github.scognamiglioo.entities.Agendamento;
 import io.github.scognamiglioo.entities.StatusAgendamento;
+import io.github.scognamiglioo.entities.StatusAtendenteAtual;
 import io.github.scognamiglioo.services.AgendamentoServiceLocal;
+import io.github.scognamiglioo.services.AtendenteServiceLocal;
 import jakarta.annotation.PostConstruct;
 import jakarta.ejb.EJB;
 import jakarta.faces.application.FacesMessage;
@@ -27,6 +29,10 @@ public class RecepcaoController implements Serializable {
 
     @EJB
     private AgendamentoServiceLocal agendamentoService;
+    
+    @EJB
+    private AtendenteServiceLocal atendenteService;
+
 
     // === Check-in ===
     private String termoBusca; // CPF, nome ou protocolo
@@ -35,12 +41,24 @@ public class RecepcaoController implements Serializable {
 
     // === Walk-in (apenas confirma presença) ===
     private String walkCpf;
+    
+    //=== Lista de Status dos atendentes===
+    private List<StatusAtendenteAtual> statusAtendentes;
 
     @PostConstruct
     public void init() {
         resultadosBusca = new ArrayList<>();
+        carregarStatusAtendentes();
     }
 
+    // -----------------------------
+    // LISTA DE STATUS DE ATENDENTES
+    // -----------------------------    
+    // === Método para atualizar lista no clique do botão ===
+    public void carregarStatusAtendentes() {
+        statusAtendentes = atendenteService.buscarTodosStatusAtendentes();
+    }
+    
     // -----------------------------
     // CHECK-IN: busca agendamento existente de hoje
     // -----------------------------
@@ -132,7 +150,9 @@ public class RecepcaoController implements Serializable {
     public List<Agendamento> getResultadosBusca() { return resultadosBusca; }
     public Agendamento getAgendamentoSelecionado() { return agendamentoSelecionado; }
     public void setAgendamentoSelecionado(Agendamento agendamentoSelecionado) { this.agendamentoSelecionado = agendamentoSelecionado; }
-
+    public List<StatusAtendenteAtual> getStatusAtendentes() {
+        return statusAtendentes;
+    }
     public String getWalkCpf() { return walkCpf; }
     public void setWalkCpf(String walkCpf) { this.walkCpf = walkCpf; }
 }

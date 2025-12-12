@@ -87,5 +87,19 @@ public class AtendenteService implements AtendenteServiceLocal {
                 .setParameter("id", idFuncionario)
                 .getResultList();
     }
+    
+    @Override
+    public List<StatusAtendenteAtual> buscarTodosStatusAtendentes() {
+        return em.createQuery(
+            "SELECT s FROM StatusAtendenteAtual s " +
+            "JOIN FETCH s.funcionario " +
+            "JOIN FETCH s.funcionario.user " +
+            "LEFT JOIN FETCH s.funcionario.cargo " +
+            "ORDER BY s.funcionario.user.nome",
+            StatusAtendenteAtual.class
+        ).getResultList();
+    }
+
+
 
 }

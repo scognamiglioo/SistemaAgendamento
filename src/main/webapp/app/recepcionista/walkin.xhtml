@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="jakarta.faces.html"
+      xmlns:f="jakarta.faces.core"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Walk-In - Atendimento Presencial</title>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <h:outputStylesheet library="css" name="walkin.css"/>
+    
+</h:head>
+
+<h:body>
+    <div class="container">
+        <!-- Header -->
+        <div class="page-header">
+            <div>
+                <h1><i class="pi pi-user-plus" style="color:#667eea; font-size:1.2em;"></i> Walk-In: Atendimento Presencial</h1>
+                <p>Registre um novo atendimento presencial sem agendamento prévio</p>
+            </div>
+        </div>
+
+        <!-- Form Card -->
+        <div class="form-card">
+            <div class="form-header">
+                <h2>Dados do Cliente</h2>
+            </div>
+
+            <div class="form-content">
+
+                <!-- Registration Form -->
+                <h:form id="walkinForm" onsubmit="if (!confirm('Confirmar registro do atendimento walk-in?')) return false;">
+                    <p:messages id="msgs" autoUpdate="true" closable="true"/>
+
+                    <div class="form-grid">
+                        <!-- Nome do Cliente -->
+                        <div class="form-group">
+                            <label for="nomeCliente">
+                                Nome do Cliente
+                                <span class="required-mark">*</span>
+                            </label>
+                            <p:inputText id="nomeCliente" 
+                                        value="#{walkinController.nomeCliente}"
+                                        placeholder="Nome completo do cliente"
+                                        required="true"
+                                        requiredMessage="Nome é obrigatório"
+                                        styleClass="ui-inputtext"/>
+                        </div>
+
+                        <!-- CPF -->
+                        <div class="form-group">
+                            <label for="cpfCliente">
+                                CPF
+                                <span class="required-mark">*</span>
+                            </label>
+                            <p:inputMask id="cpfCliente"
+                                        value="#{walkinController.cpfCliente}"
+                                        mask="999.999.999-99"
+                                        placeholder="000.000.000-00"
+                                        required="true"
+                                        requiredMessage="CPF é obrigatório"
+                                        styleClass="ui-inputtext"/>
+                            <div class="helper-text">Insira apenas números ou use a máscara</div>
+                        </div>
+                    </div>
+
+                    <div class="form-grid">
+                        <!-- Telefone -->
+                        <div class="form-group">
+                            <label for="telefoneCliente">
+                                Telefone
+                                <span class="required-mark">*</span>
+                            </label>
+                            <p:inputMask id="telefoneCliente"
+                                        value="#{walkinController.telefoneCliente}"
+                                        mask="(99) 99999-9999"
+                                        placeholder="(00) 00000-0000"
+                                        required="true"
+                                        requiredMessage="Telefone é obrigatório"
+                                        styleClass="ui-inputtext"/>
+                        </div>
+
+                        <!-- Serviço -->
+                        <div class="form-group">
+                            <label for="servicoSelecionado">
+                                Serviço Desejado
+                                <span class="required-mark">*</span>
+                            </label>
+                            <p:selectOneMenu id="servicoSelecionado"
+                                            value="#{walkinController.servicoSelecionadoId}"
+                                            required="true"
+                                            requiredMessage="Selecione um serviço"
+                                            style="width: 100%;">
+                                <f:converter converterId="jakarta.faces.Long" />
+                                <f:selectItem itemLabel="Escolha o serviço desejado..."
+                                              itemValue="#{null}"/>
+                                <f:selectItems value="#{walkinController.servicosList}"
+                                              var="servico"
+                                              itemLabel="#{servico.nome}"
+                                              itemValue="#{servico.id}"/>
+                                <p:ajax event="change"
+                                        listener="#{walkinController.onServicoChange}"
+                                        process="@this"
+                                        update="walkinForm:panelCascata walkinForm:msgs"/>
+                            </p:selectOneMenu>
+                        </div>
+                    </div>
+
+                        <p:outputPanel id="panelCascata" layout="block">
+                            <!-- Localização -->
+                            <p:outputPanel id="panelLocalizacao" styleClass="form-group" layout="block">
+                                <label for="localizacaoSelecionada">
+                                    Localização do Atendimento
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <p:selectOneMenu id="localizacaoSelecionada"
+                                                value="#{walkinController.localizacaoSelecionadaId}"
+                                                required="true"
+                                                requiredMessage="Selecione uma localização"
+                                                style="width: 100%;"
+                                                disabled="#{walkinController.servicoSelecionadoId == null}">
+                                    <f:converter converterId="jakarta.faces.Long" />
+                                    <f:selectItem itemLabel="#{walkinController.servicoSelecionadoId == null ? 'Primeiro selecione um serviço...' : 'Escolha a localização...'}"
+                                                  itemValue="#{null}"/>
+                                    <f:selectItems value="#{walkinController.localizacoesList}"
+                                                  var="loc"
+                                                  itemLabel="#{loc.nome}"
+                                                  itemValue="#{loc.id}"/>
+                                        <p:ajax event="change"
+                                            listener="#{walkinController.onLocalizacaoChange}"
+                                            process="@this"
+                                                update="walkinForm:panelCascata walkinForm:msgs"/>
+                                </p:selectOneMenu>
+                            </p:outputPanel>
+
+                            <!-- Funcionário -->
+                            <p:outputPanel id="panelFuncionario" styleClass="form-group" layout="block">
+                                <label for="funcionarioSelecionado">
+                                    Profissional
+                                    <span class="required-mark">*</span>
+                                </label>
+                                <p:selectOneMenu id="funcionarioSelecionado"
+                                                value="#{walkinController.funcionarioSelecionadoId}"
+                                                required="true"
+                                                requiredMessage="Selecione um profissional"
+                                                style="width: 100%;"
+                                                disabled="#{walkinController.localizacaoSelecionadaId == null or empty walkinController.funcionariosList}">
+                                    <f:converter converterId="jakarta.faces.Long" />
+                                    <f:selectItem itemLabel="#{walkinController.localizacaoSelecionadaId == null ? 'Primeiro selecione uma localização...' : 'Escolha o profissional...'}"
+                                                  itemValue="#{null}"/>
+                                    <f:selectItems value="#{walkinController.funcionariosList}"
+                                                  var="func"
+                                                  itemLabel="#{func.nome} - #{func.cargo != null ? func.cargo.nome : 'Profissional'}"
+                                                  itemValue="#{func.id}"/>
+                                </p:selectOneMenu>
+
+                                <h:panelGroup rendered="#{walkinController.localizacaoSelecionadaId != null and empty walkinController.funcionariosList}">
+                                    <span class="helper-text">Nenhum profissional disponível para esta localização.</span>
+                                </h:panelGroup>
+                            </p:outputPanel>
+                        </p:outputPanel>
+
+                    <!-- Buttons -->
+                    <div class="buttons-group">
+                        <p:commandButton value="Cancelar"
+                                        action="/app/recepcionista/index.xhtml?faces-redirect=true"
+                                        immediate="true"
+                                        styleClass="btn-cancel"
+                                        icon="pi pi-times"/>
+
+                        <p:commandButton id="btnRegistrar"
+                                        value="Registrar Walk-In"
+                                        action="#{walkinController.registrarWalkin}"
+                                        update="walkinForm,messagesForm"
+                                        styleClass="btn-submit"
+                                        icon="pi pi-check"
+                                        process="walkinForm"/>
+                    </div>
+
+                </h:form>
+            </div>
+        </div>
+    </div>
+</h:body>
+
+</html>

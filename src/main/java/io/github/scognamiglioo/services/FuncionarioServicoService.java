@@ -158,7 +158,14 @@ public class FuncionarioServicoService implements FuncionarioServicoServiceLocal
     public List<Funcionario> findFuncionariosByServicoAndLocalizacao(Long servicoId, Long localizacaoId) {
         try {
             TypedQuery<Funcionario> query = em.createQuery(
-                "SELECT fs.funcionario FROM FuncionarioServico fs WHERE fs.servico.id = :servicoId AND fs.localizacao.id = :localizacaoId", 
+                "SELECT DISTINCT f FROM FuncionarioServico fs " +
+                "JOIN fs.funcionario f " +
+                "LEFT JOIN FETCH f.user " +
+                "LEFT JOIN FETCH f.cargo " +
+                "WHERE fs.servico.id = :servicoId " +
+                "AND fs.localizacao.id = :localizacaoId " +
+                "AND f.ativo = true " +
+                "ORDER BY f.user.nome",
                 Funcionario.class);
             query.setParameter("servicoId", servicoId);
             query.setParameter("localizacaoId", localizacaoId);
@@ -218,7 +225,9 @@ public class FuncionarioServicoService implements FuncionarioServicoServiceLocal
     public List<Localizacao> findLocalizacoesByServico(Long servicoId) {
         try {
             TypedQuery<Localizacao> query = em.createQuery(
-                "SELECT fs.localizacao FROM FuncionarioServico fs WHERE fs.servico.id = :servicoId", 
+                "SELECT DISTINCT fs.localizacao FROM FuncionarioServico fs " +
+                "WHERE fs.servico.id = :servicoId " +
+                "ORDER BY fs.localizacao.nome",
                 Localizacao.class);
             query.setParameter("servicoId", servicoId);
             return query.getResultList();

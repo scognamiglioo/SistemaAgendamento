@@ -45,8 +45,8 @@
         <div style="display:flex; gap:10px; align-items:center;">
             <!-- Ver Disponibilidade -->
             <h:form>
-                <p:commandButton value="Ver Disponibilidade"
-                                 action="/app/recepcionista/disponibilidade_funcionario.xhtml?faces-redirect=true"
+                <p:commandButton value="Alterar Disponibilidade"
+                                 action="/app/atendente/disponibilidade.xhtml?faces-redirect=true"
                                  styleClass="btn-filtrar"
                                  icon="pi pi-users"/>
             </h:form>
@@ -109,17 +109,16 @@
         </h:form>
     </div>
 
-    <!-- ================= Walk-in ================= -->
+    
     <div class="main-card">
         <h:form id="formWalkin" style="text-align:center;">
             <div class="filters-section">
-                <label>Walk-in (Atendimento Sem Agendamento)</label>
-                <p:inputText value="#{recepcaoController.walkCpf}" placeholder="CPF do cliente"/>
-                <p:commandButton value="Registrar Walk-in"
-                                 action="#{recepcaoController.registrarWalkin}"
-                                 update="@form messagesForm"
+                <label style="display:block; margin-bottom:15px; font-size:1.1em; font-weight:600;">Walk-in (Atendimento Sem Agendamento)</label>
+                <p:commandButton value="Registrar Novo Walk-In"
+                                 action="/app/recepcionista/walkin.xhtml?faces-redirect=true"
                                  styleClass="btn-filtrar"
-                                 icon="pi pi-user-plus"/>
+                                 icon="pi pi-user-plus"
+                                 immediate="true"/>
             </div>
         </h:form>
     </div>

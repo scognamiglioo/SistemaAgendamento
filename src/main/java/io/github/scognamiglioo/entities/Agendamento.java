@@ -43,9 +43,8 @@ public class Agendamento implements Serializable {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotNull(message = "Usuário é obrigatório")
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id")
     private User user;
 
     @NotNull(message = "Serviço é obrigatório")
@@ -56,6 +55,19 @@ public class Agendamento implements Serializable {
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "funcionario_id")
     private Funcionario funcionario;
+
+    // Campos para walk-in (atendimento sem agendamento prévio)
+    @Column(name = "is_walkin", nullable = false)
+    private Boolean isWalkin = false;
+
+    @Column(name = "walkin_nome", length = 255)
+    private String walkinNome;
+
+    @Column(name = "walkin_cpf", length = 14)
+    private String walkinCpf;
+
+    @Column(name = "walkin_telefone", length = 20)
+    private String walkinTelefone;
 
 
     @NotNull(message = "Data é obrigatória")
@@ -187,6 +199,9 @@ public class Agendamento implements Serializable {
 
     // Métodos auxiliares
     public String getNomeUsuario() {
+        if (isWalkin && walkinNome != null) {
+            return walkinNome;
+        }
         return user != null ? user.getNome() : "";
     }
 
@@ -196,6 +211,38 @@ public class Agendamento implements Serializable {
 
     public String getNomeFuncionario() {
         return funcionario != null ? funcionario.getNome() : "Não atribuído";
+    }
+
+    public Boolean getIsWalkin() {
+        return isWalkin;
+    }
+
+    public void setIsWalkin(Boolean isWalkin) {
+        this.isWalkin = isWalkin;
+    }
+
+    public String getWalkinNome() {
+        return walkinNome;
+    }
+
+    public void setWalkinNome(String walkinNome) {
+        this.walkinNome = walkinNome;
+    }
+
+    public String getWalkinCpf() {
+        return walkinCpf;
+    }
+
+    public void setWalkinCpf(String walkinCpf) {
+        this.walkinCpf = walkinCpf;
+    }
+
+    public String getWalkinTelefone() {
+        return walkinTelefone;
+    }
+
+    public void setWalkinTelefone(String walkinTelefone) {
+        this.walkinTelefone = walkinTelefone;
     }
 
 

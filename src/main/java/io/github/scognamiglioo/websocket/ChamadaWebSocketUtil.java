@@ -19,6 +19,13 @@ public class ChamadaWebSocketUtil {
     }
 
     /**
+     * Envia chamada de walk-in mascarando horário exibido.
+     */
+    public static void enviarChamadaWalkin(String nomeUsuario, String localizacao, int quantidadeFila) {
+        PainelChamadaService.getInstance().enviarChamadaWalkin(nomeUsuario, localizacao, quantidadeFila);
+    }
+
+    /**
      * Atualiza apenas a quantidade de pessoas na fila.
      */
     public static void atualizarQuantidadeFila(int quantidadeFila) {

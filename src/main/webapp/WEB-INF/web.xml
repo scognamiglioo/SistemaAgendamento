@@ -103,6 +103,8 @@
             <url-pattern>/app/agendamento/disponibilidade.xhtml</url-pattern>
             <url-pattern>/app/agendamento/fila_atendimentos.xhtml</url-pattern>
             <url-pattern>/app/agendamento/gerenciar_agendamentos.xhtml</url-pattern>
+            <url-pattern>/app/atendente/disponibilidade.xhtml</url-pattern>
+            <url-pattern>/app/atendente/historico_disponibilidade.xhtml</url-pattern>
             <url-pattern>/atendente/*</url-pattern>
             <!-- any other atendente-only endpoints go here -->
         </web-resource-collection>

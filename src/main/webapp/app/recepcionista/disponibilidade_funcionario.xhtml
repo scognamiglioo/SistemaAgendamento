@@ -9,88 +9,211 @@
     <meta charset="UTF-8"/>
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <style>
-        * {margin:0; padding:0; box-sizing:border-box;}
-        body {font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height:100vh; padding:20px;}
-        .page-container {max-width:1400px; margin:0 auto;}
-        .page-header {background:white; padding:30px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.1); margin-bottom:25px; display:flex; justify-content:space-between; align-items:center;}
-        .page-header h1 {color:#2d3748; font-size:2em; font-weight:700;}
-        .page-header p {color:#718096; font-size:1em;}
-        .main-card {background:white; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.1); overflow:hidden; margin-bottom:25px; padding:25px;}
-        .ui-datatable thead th {background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; color:white !important; padding:15px !important; font-weight:600 !important; text-transform:uppercase; font-size:0.85em; letter-spacing:0.5px; border:none !important;}
-        .ui-datatable tbody td {padding:15px !important; border-bottom:1px solid #e2e8f0 !important; vertical-align:middle !important;}
-        .ui-datatable tbody tr:hover {background:#f7fafc !important;}
-        .status-badge {display:inline-flex; align-items:center; gap:6px; padding:6px 14px; border-radius:20px; font-size:0.85em; font-weight:600; text-transform:uppercase;}
-        .status-disponivel {background: #48bb78; color:white;}
-        .status-ocupado {background: #f6ad55; color:white;}
-        .status-pausa {background: #4299e1; color:white;}
-        .status-indisponivel {background: #e53e3e; color:white;}
-        .btn-filtrar {border-radius:8px !important; padding:10px 20px !important; font-weight:600 !important; text-transform:uppercase; font-size:0.85em; letter-spacing:0.5px; transition:all 0.3s ease !important; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important; border:none !important; color:white !important;}
-        @media (max-width:768px){.page-header{flex-direction:column;gap:20px;text-align:center;}}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .page-container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .page-header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .page-header h1 {
+            color: #2d3748;
+            font-size: 2em;
+            font-weight: 700;
+        }
+
+        .page-header p {
+            color: #718096;
+            font-size: 1em;
+        }
+
+        .main-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            margin-bottom: 25px;
+            padding: 25px;
+        }
+
+        .ui-datatable thead th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            color: white !important;
+            padding: 15px !important;
+            font-weight: 600 !important;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            border: none !important;
+        }
+
+        .ui-datatable tbody td {
+            padding: 15px !important;
+            border-bottom: 1px solid #e2e8f0 !important;
+            vertical-align: middle !important;
+        }
+
+        .ui-datatable tbody tr:hover {
+            background: #f7fafc !important;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .status-disponivel {
+            background: #48bb78;
+            color: white;
+        }
+
+        .status-ocupado {
+            background: #f6ad55;
+            color: white;
+        }
+
+        .status-pausa {
+            background: #4299e1;
+            color: white;
+        }
+
+        .status-indisponivel {
+            background: #e53e3e;
+            color: white;
+        }
+
+        .btn-filtrar {
+            border-radius: 8px !important;
+            padding: 10px 20px !important;
+            font-weight: 600 !important;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease !important;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border: none !important;
+            color: white !important;
+        }
+
+        @media (max-width: 768px) {
+            .page-header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+        }
     </style>
 </h:head>
 
 <h:body>
-<div class="page-container">
+    <div class="page-container">
 
-    <!-- Header -->
-    <div class="page-header">
-        <div>
-            <h1><i class="pi pi-users" style="color:#667eea;"></i> Disponibilidade de Atendentes</h1>
-            <p>Visualize o status atual de todos os atendentes</p>
+        <!-- Header -->
+        <div class="page-header">
+            <div>
+                <h1><i class="pi pi-users" style="color:#667eea;"></i> Disponibilidade de Atendentes</h1>
+                <p>Visualize o status atual de todos os atendentes</p>
+            </div>
+
+            <div style="display:flex; gap:10px; align-items:center;">
+                <h:form>
+                    <p:commandButton value="Atualizar Status"
+                                     action="#{recepcaoController.carregarStatusAtendentes}"
+                                     update="@form"
+                                     styleClass="btn-filtrar"
+                                     icon="pi pi-refresh"/>
+                </h:form>
+
+                <h:form>
+                    <h:panelGroup rendered="#{request.isUserInRole('recepcionista')}">
+                        <div style="display: flex; gap: 10px;">
+                            <p:commandButton value="Voltar"
+                                             action="/app/recepcionista/index.xhtml?faces-redirect=true"
+                                             styleClass="ui-button-secondary" icon="pi pi-list"/>
+                        </div>
+                    </h:panelGroup>
+                    <h:panelGroup rendered="#{request.isUserInRole('admin')}">
+                        <div style="display: flex; gap: 10px;">
+                            <p:commandButton value="Voltar"
+                                             action="/app/index.xhtml?faces-redirect=true"
+                                             styleClass="ui-button-secondary" icon="pi pi-list"/>
+                        </div>
+                    </h:panelGroup>
+
+                    <h:panelGroup rendered="#{request.isUserInRole('atendente')}">
+                        <div style="display: flex; gap: 10px;">
+                            <p:commandButton value="Voltar"
+                                             action="/app/agendamento/gerenciar_agendamentos.xhtml?faces-redirect=true"
+                                             styleClass="ui-button-secondary" icon="pi pi-list"/>
+                        </div>
+                    </h:panelGroup>
+
+                </h:form>
+            </div>
         </div>
 
-        <div style="display:flex; gap:10px; align-items:center;">
-            <h:form>
-                <p:commandButton value="Atualizar Status"
-                                 action="#{recepcaoController.carregarStatusAtendentes}"
-                                 update="@form"
-                                 styleClass="btn-filtrar"
-                                 icon="pi pi-refresh"/>
-            </h:form>
+        <!-- Tabela de Status -->
+        <div class="main-card">
+            <h:form id="formStatus">
 
-            <h:form>
-                <p:commandButton value="Voltar"
-                                 action="/app/recepcionista/index.xhtml?faces-redirect=true"
-                                 styleClass="btn-filtrar"
-                                 icon="pi pi-arrow-left"/>
-            </h:form>
-        </div>
-    </div>
+                <p:dataTable value="#{recepcaoController.statusAtendentes}"
+                             var="s"
+                             rowKey="#{s.funcionario.id}"
+                             emptyMessage="Nenhum atendente cadastrado">
 
-    <!-- Tabela de Status -->
-    <div class="main-card">
-        <h:form id="formStatus">
+                    <p:column headerText="Atendente">
+                        #{s.funcionario.user.nome}
+                        (#{s.funcionario.cargo.nome})
+                    </p:column>
 
-            <p:dataTable value="#{recepcaoController.statusAtendentes}" 
-                         var="s"
-                         rowKey="#{s.funcionario.id}" 
-                         emptyMessage="Nenhum atendente cadastrado">
-
-               <p:column headerText="Atendente">
-                   #{s.funcionario.user.nome} 
-                   (#{s.funcionario.cargo.nome})
-               </p:column>
-
-               <p:column headerText="Status Atual">
-                    <h:panelGroup 
-                        layout="block"
-                        styleClass="status-badge #{s.situacao eq 'DISPONIVEL' ? 'status-disponivel' 
+                    <p:column headerText="Status Atual">
+                        <h:panelGroup
+                                layout="block"
+                                styleClass="status-badge #{s.situacao eq 'DISPONIVEL' ? 'status-disponivel'
                                                     : s.situacao eq 'OCUPADO' ? 'status-ocupado' 
                                                     : s.situacao eq 'PAUSA' ? 'status-pausa'
                                                     : 'status-indisponivel'}">
-                        #{s.situacao}
-                    </h:panelGroup>
-                </p:column>
+                            #{s.situacao}
+                        </h:panelGroup>
+                    </p:column>
 
-               <p:column headerText="Última Atualização">
-                   #{s.atualizacao}
-               </p:column>
+                    <p:column headerText="Última Atualização">
+                        #{s.atualizacao}
+                    </p:column>
 
-           </p:dataTable>
+                </p:dataTable>
 
-        </h:form>
+            </h:form>
+        </div>
+
     </div>
-
-</div>
 </h:body>
 </html>

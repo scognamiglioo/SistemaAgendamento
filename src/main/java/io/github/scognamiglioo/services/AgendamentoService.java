@@ -411,8 +411,8 @@ public class AgendamentoService implements AgendamentoServiceLocal {
 
         try {
             List<Localizacao> resultados = em.createNamedQuery("Agendamento.findLocalizacaoServicoPrestado", Localizacao.class)
-                .setParameter("agendamentoId", agendamentoId)
-                .getResultList();
+                    .setParameter("agendamentoId", agendamentoId)
+                    .getResultList();
 
             if (resultados.isEmpty()) {
                 LOGGER.log(Level.WARNING, "Nenhuma localização encontrada para o agendamento: " + agendamentoId);
@@ -421,8 +421,8 @@ public class AgendamentoService implements AgendamentoServiceLocal {
 
             if (resultados.size() > 1) {
                 LOGGER.log(Level.WARNING,
-                    "Múltiplas localizações encontradas para o agendamento " + agendamentoId +
-                    ". Retornando a primeira.");
+                        "Múltiplas localizações encontradas para o agendamento " + agendamentoId +
+                                ". Retornando a primeira.");
             }
 
             return resultados.get(0);
@@ -447,13 +447,13 @@ public class AgendamentoService implements AgendamentoServiceLocal {
 
         try {
             String jpql = "SELECT fs.localizacao FROM Agendamento a " +
-                          "JOIN FuncionarioServico fs ON fs.funcionario.id = a.funcionario.id " +
-                          "AND fs.servico.id = a.servico.id " +
-                          "WHERE a.id = :agendamentoId";
+                    "JOIN FuncionarioServico fs ON fs.funcionario.id = a.funcionario.id " +
+                    "AND fs.servico.id = a.servico.id " +
+                    "WHERE a.id = :agendamentoId";
 
             List<Localizacao> resultados = em.createQuery(jpql, Localizacao.class)
-                .setParameter("agendamentoId", agendamentoId)
-                .getResultList();
+                    .setParameter("agendamentoId", agendamentoId)
+                    .getResultList();
 
             return resultados.isEmpty() ? null : resultados.get(0);
         } catch (Exception e) {
@@ -469,17 +469,16 @@ public class AgendamentoService implements AgendamentoServiceLocal {
 
             // Busca agendamentos CONFIRMADOS ou AGENDADOS para hoje, ordenados por hora
             String jpql = "SELECT a FROM Agendamento a " +
-                         "LEFT JOIN FETCH a.user " +
-                         "LEFT JOIN FETCH a.servico " +
-                         "LEFT JOIN FETCH a.funcionario " +
-                         "WHERE a.data = :data " +
-                         "AND (a.status = :statusConfirmado OR a.status = :statusAgendado) " +
-                         "ORDER BY a.hora ASC";
+                    "LEFT JOIN FETCH a.user " +
+                    "LEFT JOIN FETCH a.servico " +
+                    "LEFT JOIN FETCH a.funcionario " +
+                    "WHERE a.data = :data " +
+                    "AND (a.status = :statusConfirmado) " +
+                    "ORDER BY a.hora ASC";
 
             return em.createQuery(jpql, Agendamento.class)
                     .setParameter("data", hoje)
                     .setParameter("statusConfirmado", StatusAgendamento.CONFIRMADO)
-                    .setParameter("statusAgendado", StatusAgendamento.AGENDADO)
                     .getResultList();
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Erro ao buscar fila de espera", e);
@@ -494,12 +493,12 @@ public class AgendamentoService implements AgendamentoServiceLocal {
 
             // Busca agendamentos EM_ATENDIMENTO para hoje
             String jpql = "SELECT a FROM Agendamento a " +
-                         "LEFT JOIN FETCH a.user " +
-                         "LEFT JOIN FETCH a.servico " +
-                         "LEFT JOIN FETCH a.funcionario " +
-                         "WHERE a.data = :data " +
-                         "AND a.status = :status " +
-                         "ORDER BY a.hora ASC";
+                    "LEFT JOIN FETCH a.user " +
+                    "LEFT JOIN FETCH a.servico " +
+                    "LEFT JOIN FETCH a.funcionario " +
+                    "WHERE a.data = :data " +
+                    "AND a.status = :status " +
+                    "ORDER BY a.hora ASC";
 
             return em.createQuery(jpql, Agendamento.class)
                     .setParameter("data", hoje)
@@ -555,21 +554,20 @@ public class AgendamentoService implements AgendamentoServiceLocal {
         LOGGER.log(Level.INFO, "Atendimento finalizado para o agendamento {0}", agendamentoId);
     }
 
-    
-    
+
     @Override
     public List<Agendamento> searchByCpfOrProtocoloOrName(String termo) {
         if (termo == null || termo.isBlank()) return new ArrayList<>();
 
         List<Agendamento> resultados = em.createQuery(
-            "SELECT a FROM Agendamento a " +
-            "WHERE (a.user.cpf = :cpf OR LOWER(a.user.nome) LIKE :nome OR CAST(a.id AS string) = :id) " +
-            "AND a.data = :hoje", Agendamento.class)
-            .setParameter("cpf", termo)
-            .setParameter("nome", "%" + termo.toLowerCase() + "%")
-            .setParameter("id", termo)
-            .setParameter("hoje", LocalDate.now())
-            .getResultList();
+                        "SELECT a FROM Agendamento a " +
+                                "WHERE (a.user.cpf = :cpf OR LOWER(a.user.nome) LIKE :nome OR CAST(a.id AS string) = :id) " +
+                                "AND a.data = :hoje", Agendamento.class)
+                .setParameter("cpf", termo)
+                .setParameter("nome", "%" + termo.toLowerCase() + "%")
+                .setParameter("id", termo)
+                .setParameter("hoje", LocalDate.now())
+                .getResultList();
 
         return resultados;
     }

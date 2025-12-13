@@ -156,6 +156,25 @@
                                          styleClass="ui-button-secondary" icon="pi pi-arrow-left"/>
                     </div>
                 </h:panelGroup>
+
+                <h:panelGroup rendered="#{request.isUserInRole('admin')}">
+                    <div style="display: flex; gap: 10px;">
+
+                        <p:commandButton value="Voltar"
+                                         action="/app/atendente/disponibilidade.xhtml?faces-redirect=true"
+                                         styleClass="ui-button-secondary" icon="pi pi-arrow-left"/>
+                    </div>
+                </h:panelGroup>
+
+                <h:panelGroup rendered="#{request.isUserInRole('recepcionista')}">
+                    <div style="display: flex; gap: 10px;">
+
+                        <p:commandButton value="Voltar"
+                                         action="/app/atendente/disponibilidade.xhtml?faces-redirect=true"
+                                         styleClass="ui-button-secondary" icon="pi pi-arrow-left"/>
+                    </div>
+                </h:panelGroup>
+
             </h:form>
         </div>
 
